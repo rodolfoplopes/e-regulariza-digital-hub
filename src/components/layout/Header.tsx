@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { Menu, X, User, Bell } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
@@ -15,6 +15,7 @@ import {
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const location = useLocation();
   
   // Simulating logged-in state, will be replaced with actual auth
   const isLoggedIn = false;
@@ -36,16 +37,28 @@ export default function Header() {
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center space-x-4">
-          <Link to="/" className="text-gray-700 hover:text-eregulariza-primary px-3 py-2 text-sm font-medium">
+          <Link 
+            to="/" 
+            className={`px-3 py-2 text-sm font-medium ${location.pathname === "/" ? "text-eregulariza-primary" : "text-gray-700 hover:text-eregulariza-primary"}`}
+          >
             Home
           </Link>
-          <Link to="/sobre" className="text-gray-700 hover:text-eregulariza-primary px-3 py-2 text-sm font-medium">
+          <Link 
+            to="/sobre" 
+            className={`px-3 py-2 text-sm font-medium ${location.pathname === "/sobre" ? "text-eregulariza-primary" : "text-gray-700 hover:text-eregulariza-primary"}`}
+          >
             Sobre
           </Link>
-          <Link to="/servicos" className="text-gray-700 hover:text-eregulariza-primary px-3 py-2 text-sm font-medium">
+          <Link 
+            to="/servicos" 
+            className={`px-3 py-2 text-sm font-medium ${location.pathname === "/servicos" ? "text-eregulariza-primary" : "text-gray-700 hover:text-eregulariza-primary"}`}
+          >
             Serviços
           </Link>
-          <Link to="/contato" className="text-gray-700 hover:text-eregulariza-primary px-3 py-2 text-sm font-medium">
+          <Link 
+            to="/contato" 
+            className={`px-3 py-2 text-sm font-medium ${location.pathname === "/contato" ? "text-eregulariza-primary" : "text-gray-700 hover:text-eregulariza-primary"}`}
+          >
             Contato
           </Link>
         </nav>
@@ -119,28 +132,36 @@ export default function Header() {
           <div className="container px-4 pt-2 pb-3 space-y-1 sm:px-3">
             <Link
               to="/"
-              className="block px-3 py-2 text-base font-medium text-gray-700 hover:bg-gray-50 rounded-md"
+              className={`block px-3 py-2 text-base font-medium rounded-md ${
+                location.pathname === "/" ? "bg-gray-50 text-eregulariza-primary" : "text-gray-700 hover:bg-gray-50"
+              }`}
               onClick={() => setIsMenuOpen(false)}
             >
               Home
             </Link>
             <Link
               to="/sobre"
-              className="block px-3 py-2 text-base font-medium text-gray-700 hover:bg-gray-50 rounded-md"
+              className={`block px-3 py-2 text-base font-medium rounded-md ${
+                location.pathname === "/sobre" ? "bg-gray-50 text-eregulariza-primary" : "text-gray-700 hover:bg-gray-50"
+              }`}
               onClick={() => setIsMenuOpen(false)}
             >
               Sobre
             </Link>
             <Link
               to="/servicos"
-              className="block px-3 py-2 text-base font-medium text-gray-700 hover:bg-gray-50 rounded-md"
+              className={`block px-3 py-2 text-base font-medium rounded-md ${
+                location.pathname === "/servicos" ? "bg-gray-50 text-eregulariza-primary" : "text-gray-700 hover:bg-gray-50"
+              }`}
               onClick={() => setIsMenuOpen(false)}
             >
               Serviços
             </Link>
             <Link
               to="/contato"
-              className="block px-3 py-2 text-base font-medium text-gray-700 hover:bg-gray-50 rounded-md"
+              className={`block px-3 py-2 text-base font-medium rounded-md ${
+                location.pathname === "/contato" ? "bg-gray-50 text-eregulariza-primary" : "text-gray-700 hover:bg-gray-50"
+              }`}
               onClick={() => setIsMenuOpen(false)}
             >
               Contato
