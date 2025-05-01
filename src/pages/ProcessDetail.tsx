@@ -1,19 +1,21 @@
-
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { ChevronDown, FileText, MessageSquare, Bell } from "lucide-react";
+import { ChevronDown, FileText, MessageSquare } from "lucide-react";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
 import MobileNav from "@/components/dashboard/MobileNav";
 import ProcessTimeline, { ProcessStage } from "@/components/process/ProcessTimeline";
 import DocumentUploader, { DocumentType } from "@/components/process/DocumentUploader";
 import ProcessMessages, { Message } from "@/components/process/ProcessMessages";
+import ProcessNotifications, { Notification } from "@/components/process/ProcessNotifications";
+import { useToast } from "@/hooks/use-toast";
 
 export default function ProcessDetail() {
   const { processId } = useParams();
+  const { toast } = useToast();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("timeline");
   const [stageDetailsOpen, setStageDetailsOpen] = useState<Record<string, boolean>>({});
@@ -184,6 +186,42 @@ export default function ProcessDetail() {
     }
   ];
 
+  // Mock notifications data
+  const [notifications, setNotifications] = useState<Notification[]>([
+    {
+      id: "notif-1",
+      title: "Documento aprovado",
+      message: "Seu documento 'RG e CPF' foi aprovado pela nossa equipe.",
+      timestamp: "Hoje, 10:15",
+      isRead: false,
+      type: "document"
+    },
+    {
+      id: "notif-2",
+      title: "Nova mensagem",
+      message: "Maria Assessora respondeu à sua dúvida sobre documentos.",
+      timestamp: "Hoje, 09:30",
+      isRead: false,
+      type: "message"
+    },
+    {
+      id: "notif-3",
+      title: "Atualização de status",
+      message: "Seu processo avançou para a etapa 'Coleta de Documentos'.",
+      timestamp: "Ontem, 14:20",
+      isRead: true,
+      type: "status"
+    },
+    {
+      id: "notif-4",
+      title: "Prazo atualizado",
+      message: "O prazo estimado para conclusão da etapa atual foi ajustado.",
+      timestamp: "15/04/2023",
+      isRead: true,
+      type: "system"
+    },
+  ]);
+
   // Handlers for interactions
   const toggleStageDetails = (stageId: string) => {
     setStageDetailsOpen(prev => ({
@@ -195,7 +233,19 @@ export default function ProcessDetail() {
   const handleDocumentUpload = async (documentId: string, file: File) => {
     console.log(`Uploading document ${documentId}:`, file);
     // This would call your API to upload the file
-    // For now we'll just log it
+    
+    // Add notification for document upload
+    const newNotification: Notification = {
+      id: `notif-${Date.now()}`,
+      title: "Documento enviado",
+      message: `Seu documento '${file.name}' foi enviado e está aguardando aprovação.`,
+      timestamp: "Agora",
+      isRead: false,
+      type: "document"
+    };
+    
+    setNotifications(prev => [newNotification, ...prev]);
+    
     return Promise.resolve();
   };
 
@@ -210,8 +260,42 @@ export default function ProcessDetail() {
     if (attachments) {
       console.log("With attachments:", attachments);
     }
+    
+    // Add notification for new message
+    const newNotification: Notification = {
+      id: `notif-${Date.now()}`,
+      title: "Mensagem enviada",
+      message: "Sua mensagem foi enviada à equipe de suporte.",
+      timestamp: "Agora",
+      isRead: false,
+      type: "message"
+    };
+    
+    setNotifications(prev => [newNotification, ...prev]);
+    
     // This would call your API to send the message
     return Promise.resolve();
+  };
+  
+  const handleMarkAsRead = (notificationId: string) => {
+    setNotifications(prev => 
+      prev.map(notif => 
+        notif.id === notificationId 
+          ? { ...notif, isRead: true } 
+          : notif
+      )
+    );
+  };
+  
+  const handleMarkAllAsRead = () => {
+    setNotifications(prev => 
+      prev.map(notif => ({ ...notif, isRead: true }))
+    );
+    
+    toast({
+      title: "Notificações lidas",
+      description: "Todas as notificações foram marcadas como lidas",
+    });
   };
 
   return (
@@ -229,11 +313,13 @@ export default function ProcessDetail() {
                 <h1 className="text-2xl font-bold">{process.title}</h1>
                 <p className="text-gray-500">{process.type}</p>
               </div>
-              <div className="hidden md:block">
-                <Button variant="outline" className="mr-2">
-                  <Bell className="h-4 w-4 mr-2" />
-                  Notificações
-                </Button>
+              <div className="hidden md:flex items-center space-x-2">
+                <ProcessNotifications 
+                  processId={process.id}
+                  notifications={notifications}
+                  onMarkAsRead={handleMarkAsRead}
+                  onMarkAllAsRead={handleMarkAllAsRead}
+                />
                 <Button>Contatar Equipe</Button>
               </div>
             </div>

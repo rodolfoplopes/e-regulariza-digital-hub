@@ -1,12 +1,10 @@
 
-import { useState } from "react";
-import { z } from "zod";
-import { useForm } from "react-hook-form";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Form,
   FormControl,
@@ -16,6 +14,8 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -23,533 +23,604 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Calendar } from "@/components/ui/calendar";
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
+import { CalendarIcon, Plus, Trash2, ChevronRight, ChevronLeft } from "lucide-react";
+import { cn } from "@/lib/utils";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { useToast } from "@/hooks/use-toast";
-import { X } from "lucide-react";
-import DashboardHeader from "@/components/dashboard/DashboardHeader";
-import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
-import MobileNav from "@/components/dashboard/MobileNav";
-import { useNavigate } from "react-router-dom";
 
-// Define the form schema
+// Form schemas
+const clientFormSchema = z.object({
+  clientName: z.string().min(3, "Nome do cliente é obrigatório"),
+  email: z.string().email("Email inválido"),
+  phone: z.string().min(10, "Telefone inválido"),
+});
+
 const processFormSchema = z.object({
-  title: z.string().min(3, { message: "Título deve ter pelo menos 3 caracteres" }),
-  client: z.string().min(1, { message: "Selecione um cliente" }),
-  type: z.string().min(1, { message: "Selecione um tipo de processo" }),
+  processName: z.string().min(3, "Nome do processo é obrigatório"),
+  processType: z.string().min(1, "Tipo de processo é obrigatório"),
+  startDate: z.date({
+    required_error: "Data de início é obrigatória",
+  }),
   description: z.string().optional(),
 });
 
-type ProcessFormValues = z.infer<typeof processFormSchema>;
+const stageSchema = z.object({
+  id: z.string(),
+  name: z.string().min(3, "Nome da etapa é obrigatório"),
+  description: z.string().optional(),
+  estimatedDays: z.string().transform(val => Number(val) || 0),
+});
 
-// Define process stage type
-interface ProcessStage {
-  id: string;
-  title: string;
-  description: string;
-  estimatedDays: number;
-  isRequired: boolean;
-}
+const stagesFormSchema = z.object({
+  stages: z.array(stageSchema),
+});
 
-// Predefined stages for different process types
-const processTypeStages: Record<string, ProcessStage[]> = {
-  usucapiao: [
-    { 
-      id: "stage-1", 
-      title: "Análise Preliminar", 
-      description: "Verificação inicial da documentação e viabilidade do processo.", 
-      estimatedDays: 7,
-      isRequired: true
-    },
-    {
-      id: "stage-2",
-      title: "Coleta de Documentos",
-      description: "Recebimento e validação de toda documentação necessária.",
-      estimatedDays: 30,
-      isRequired: true
-    },
-    {
-      id: "stage-3",
-      title: "Elaboração da Petição",
-      description: "Preparação dos documentos legais para o processo de usucapião.",
-      estimatedDays: 15,
-      isRequired: true
-    },
-    {
-      id: "stage-4",
-      title: "Protocolo no Cartório",
-      description: "Entrada do processo no cartório de registro de imóveis.",
-      estimatedDays: 5,
-      isRequired: true
-    },
-    {
-      id: "stage-5",
-      title: "Acompanhamento e Prenotação",
-      description: "Acompanhamento do andamento do processo no cartório.",
-      estimatedDays: 60,
-      isRequired: true
-    },
-    {
-      id: "stage-6",
-      title: "Registro da Matrícula",
-      description: "Finalização do processo com o registro da nova matrícula.",
-      estimatedDays: 15,
-      isRequired: true
-    }
-  ],
-  retificacao: [
-    { 
-      id: "stage-1", 
-      title: "Análise Documental", 
-      description: "Verificação dos documentos do imóvel e planejamento do processo.", 
-      estimatedDays: 7,
-      isRequired: true
-    },
-    {
-      id: "stage-2",
-      title: "Levantamento Topográfico",
-      description: "Realização de medição e elaboração de planta e memorial.",
-      estimatedDays: 15,
-      isRequired: true
-    },
-    {
-      id: "stage-3",
-      title: "Protocolo da Retificação",
-      description: "Entrada com o pedido de retificação no cartório competente.",
-      estimatedDays: 5,
-      isRequired: true
-    },
-    {
-      id: "stage-4",
-      title: "Notificação de Confrontantes",
-      description: "Notificação dos proprietários vizinhos para anuência.",
-      estimatedDays: 30,
-      isRequired: true
-    },
-    {
-      id: "stage-5",
-      title: "Averbação na Matrícula",
-      description: "Averbação da nova descrição na matrícula do imóvel.",
-      estimatedDays: 20,
-      isRequired: true
-    }
-  ],
-  inventario: [
-    { 
-      id: "stage-1", 
-      title: "Análise do Caso", 
-      description: "Verificação da viabilidade do inventário extrajudicial.", 
-      estimatedDays: 5,
-      isRequired: true
-    },
-    {
-      id: "stage-2",
-      title: "Coleta de Documentos",
-      description: "Obtenção de certidões de óbito, casamento, nascimento, etc.",
-      estimatedDays: 20,
-      isRequired: true
-    },
-    {
-      id: "stage-3",
-      title: "Declaração de Bens",
-      description: "Levantamento do patrimônio e elaboração da declaração.",
-      estimatedDays: 15,
-      isRequired: true
-    },
-    {
-      id: "stage-4",
-      title: "Cálculo do ITCMD",
-      description: "Apuração e pagamento do imposto de transmissão causa mortis.",
-      estimatedDays: 10,
-      isRequired: true
-    },
-    {
-      id: "stage-5",
-      title: "Escritura de Inventário",
-      description: "Lavratura da escritura pública em tabelionato de notas.",
-      estimatedDays: 7,
-      isRequired: true
-    },
-    {
-      id: "stage-6",
-      title: "Registro nos Órgãos Competentes",
-      description: "Registro da escritura nos cartórios de imóveis ou outros órgãos.",
-      estimatedDays: 15,
-      isRequired: true
-    }
-  ],
-  adjudicacao: [
-    { 
-      id: "stage-1", 
-      title: "Análise Inicial", 
-      description: "Verificação do contrato e possibilidade de adjudicação.", 
-      estimatedDays: 7,
-      isRequired: true
-    },
-    {
-      id: "stage-2",
-      title: "Notificação Extrajudicial",
-      description: "Notificação da parte vendedora para outorga da escritura.",
-      estimatedDays: 15,
-      isRequired: true
-    },
-    {
-      id: "stage-3",
-      title: "Elaboração de Petição Inicial",
-      description: "Preparação da documentação para o processo judicial.",
-      estimatedDays: 10,
-      isRequired: true
-    },
-    {
-      id: "stage-4",
-      title: "Acompanhamento Processual",
-      description: "Acompanhamento do trâmite judicial até sentença.",
-      estimatedDays: 180,
-      isRequired: true
-    },
-    {
-      id: "stage-5",
-      title: "Registro da Carta de Adjudicação",
-      description: "Registro do título no cartório de registro de imóveis.",
-      estimatedDays: 15,
-      isRequired: true
-    }
-  ]
-};
+// Process types with their default stages
+const processTypes = [
+  {
+    id: "usucapiao",
+    name: "Usucapião",
+    stages: [
+      {
+        id: "stage-1",
+        name: "Análise Preliminar",
+        description: "Verificação inicial da documentação e viabilidade do processo",
+        estimatedDays: 7,
+      },
+      {
+        id: "stage-2",
+        name: "Coleta de Documentos",
+        description: "Recebimento e validação de toda documentação necessária",
+        estimatedDays: 30,
+      },
+      {
+        id: "stage-3",
+        name: "Elaboração da Petição",
+        description: "Preparação dos documentos legais para o processo de usucapião",
+        estimatedDays: 15,
+      },
+      {
+        id: "stage-4",
+        name: "Protocolo no Cartório",
+        description: "Entrada do processo no cartório de registro de imóveis",
+        estimatedDays: 5,
+      },
+      {
+        id: "stage-5",
+        name: "Acompanhamento e Prenotação",
+        description: "Acompanhamento do andamento do processo no cartório",
+        estimatedDays: 60,
+      },
+      {
+        id: "stage-6",
+        name: "Registro da Matrícula",
+        description: "Finalização do processo com o registro da nova matrícula",
+        estimatedDays: 10,
+      },
+    ],
+  },
+  {
+    id: "retificacao",
+    name: "Retificação de Área",
+    stages: [
+      {
+        id: "stage-1",
+        name: "Análise Documental",
+        description: "Análise dos documentos existentes e identificação de discrepâncias",
+        estimatedDays: 7,
+      },
+      {
+        id: "stage-2",
+        name: "Levantamento Topográfico",
+        description: "Realização de medições técnicas para determinar a área correta",
+        estimatedDays: 15,
+      },
+      {
+        id: "stage-3",
+        name: "Notificação de Confrontantes",
+        description: "Comunicação aos proprietários de imóveis vizinhos",
+        estimatedDays: 30,
+      },
+      {
+        id: "stage-4",
+        name: "Elaboração de Memorial",
+        description: "Preparação do memorial descritivo com as novas medidas",
+        estimatedDays: 10,
+      },
+      {
+        id: "stage-5",
+        name: "Protocolo de Retificação",
+        description: "Entrada do pedido de retificação no registro de imóveis",
+        estimatedDays: 5,
+      },
+      {
+        id: "stage-6",
+        name: "Averbação na Matrícula",
+        description: "Finalização com a averbação das novas medidas na matrícula",
+        estimatedDays: 20,
+      },
+    ],
+  },
+  {
+    id: "regularizacao",
+    name: "Regularização de Construção",
+    stages: [
+      {
+        id: "stage-1",
+        name: "Vistoria Técnica",
+        description: "Inspeção da construção para verificar conformidade",
+        estimatedDays: 5,
+      },
+      {
+        id: "stage-2",
+        name: "Elaboração de Projeto",
+        description: "Desenvolvimento de projeto arquitetônico da edificação existente",
+        estimatedDays: 15,
+      },
+      {
+        id: "stage-3",
+        name: "Aprovação na Prefeitura",
+        description: "Obtenção de alvará de regularização junto à prefeitura",
+        estimatedDays: 45,
+      },
+      {
+        id: "stage-4",
+        name: "Emissão de Habite-se",
+        description: "Obtenção do habite-se ou documento equivalente",
+        estimatedDays: 30,
+      },
+      {
+        id: "stage-5",
+        name: "Averbação da Construção",
+        description: "Registro da construção regularizada na matrícula do imóvel",
+        estimatedDays: 15,
+      },
+    ],
+  },
+];
 
 export default function ProcessCreate() {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState("info");
-  const [processType, setProcessType] = useState("");
-  const [stages, setStages] = useState<ProcessStage[]>([]);
-  const [customStages, setCustomStages] = useState<ProcessStage[]>([]);
   const { toast } = useToast();
   const navigate = useNavigate();
+  const [currentStep, setCurrentStep] = useState(1);
+  const [formData, setFormData] = useState({
+    client: {},
+    process: {},
+    stages: [],
+  });
+  const [selectedProcessType, setSelectedProcessType] = useState("");
 
-  // Mock data for clients
-  const clients = [
-    { id: "client-001", name: "João Silva" },
-    { id: "client-002", name: "Maria Souza" },
-    { id: "client-003", name: "Pedro Santos" },
-    { id: "client-004", name: "Ana Oliveira" },
-  ];
+  // Client form
+  const clientForm = useForm({
+    resolver: zodResolver(clientFormSchema),
+    defaultValues: {
+      clientName: "",
+      email: "",
+      phone: "",
+    },
+  });
 
-  // Form definition
-  const form = useForm<ProcessFormValues>({
+  // Process form
+  const processForm = useForm({
     resolver: zodResolver(processFormSchema),
     defaultValues: {
-      title: "",
-      client: "",
-      type: "",
+      processName: "",
+      processType: "",
+      startDate: new Date(),
       description: "",
     },
   });
 
-  // Watch for changes to the type field
-  const currentType = form.watch("type");
-  
-  // Update stages when process type changes
-  React.useEffect(() => {
-    if (currentType) {
-      setProcessType(currentType);
-      setStages(processTypeStages[currentType] || []);
-      setCustomStages([]);
+  // Stages form
+  const stagesForm = useForm({
+    resolver: zodResolver(stagesFormSchema),
+    defaultValues: {
+      stages: [],
+    },
+  });
+
+  // Handle process type selection and load default stages
+  const handleProcessTypeChange = (value: string) => {
+    processForm.setValue("processType", value);
+    setSelectedProcessType(value);
+    
+    const selectedType = processTypes.find((type) => type.id === value);
+    if (selectedType) {
+      stagesForm.setValue("stages", selectedType.stages);
     }
-  }, [currentType]);
+  };
 
-  // Add custom stage
+  // Add a new custom stage
   const addCustomStage = () => {
-    const newStage: ProcessStage = {
-      id: `custom-${Date.now()}`,
-      title: "Nova Etapa",
-      description: "Descrição da etapa personalizada",
+    const currentStages = stagesForm.getValues("stages") || [];
+    const newStage = {
+      id: `custom-stage-${currentStages.length + 1}`,
+      name: "",
+      description: "",
       estimatedDays: 7,
-      isRequired: false,
     };
+    stagesForm.setValue("stages", [...currentStages, newStage]);
+  };
+
+  // Remove a stage
+  const removeStage = (index: number) => {
+    const currentStages = stagesForm.getValues("stages");
+    currentStages.splice(index, 1);
+    stagesForm.setValue("stages", currentStages);
+  };
+
+  // Submit handlers for each step
+  const handleClientSubmit = (data: z.infer<typeof clientFormSchema>) => {
+    setFormData((prev) => ({ ...prev, client: data }));
+    setCurrentStep(2);
+  };
+
+  const handleProcessSubmit = (data: z.infer<typeof processFormSchema>) => {
+    setFormData((prev) => ({ ...prev, process: data }));
+    setCurrentStep(3);
+  };
+
+  const handleStagesSubmit = (data: z.infer<typeof stagesFormSchema>) => {
+    setFormData((prev) => ({ ...prev, stages: data.stages }));
     
-    setCustomStages([...customStages, newStage]);
-  };
-
-  // Remove custom stage
-  const removeCustomStage = (id: string) => {
-    setCustomStages(customStages.filter(stage => stage.id !== id));
-  };
-
-  // Update custom stage
-  const updateCustomStage = (id: string, field: keyof ProcessStage, value: string | number | boolean) => {
-    setCustomStages(
-      customStages.map(stage => 
-        stage.id === id ? { ...stage, [field]: value } : stage
-      )
-    );
-  };
-
-  // Handle form submission
-  const onSubmit = (data: ProcessFormValues) => {
-    // Combine default and custom stages
-    const allStages = [...stages, ...customStages];
-    
-    console.log("Form data:", data);
-    console.log("Process stages:", allStages);
+    // Here we would normally submit the complete form data to an API
+    console.log("Complete form data:", {
+      ...formData,
+      process: formData.process,
+      stages: data.stages,
+    });
     
     toast({
-      title: "Processo criado com sucesso",
-      description: `O processo "${data.title}" foi criado e está pronto para ser iniciado.`,
+      title: "Processo criado com sucesso!",
+      description: "O novo processo foi criado e está pronto para acompanhamento.",
     });
     
     // Navigate to admin dashboard after successful creation
-    setTimeout(() => {
-      navigate("/admin");
-    }, 1500);
+    navigate("/admin");
+  };
+
+  const goToPreviousStep = () => {
+    if (currentStep > 1) {
+      setCurrentStep(currentStep - 1);
+    }
   };
 
   return (
-    <div className="flex h-screen bg-gray-50">
-      <DashboardSidebar />
-      <MobileNav isOpen={isMobileMenuOpen} />
-      
-      <div className="flex-1 flex flex-col overflow-hidden">
-        <DashboardHeader />
-        
-        <main className="flex-1 overflow-y-auto p-4 md:p-6">
-          <div className="mb-6">
-            <h1 className="text-2xl font-bold">Criar Novo Processo</h1>
-            <p className="text-gray-500">Cadastre um novo processo de regularização</p>
+    <div className="container mx-auto py-8 max-w-4xl">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold">Criar Novo Processo</h1>
+        <p className="text-gray-500">Preencha os dados para iniciar um novo processo de regularização</p>
+      </div>
+
+      <div className="mb-6">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center space-x-2">
+            <div className={`h-8 w-8 rounded-full flex items-center justify-center ${currentStep >= 1 ? 'bg-primary text-white' : 'bg-gray-200'}`}>1</div>
+            <div className={`h-1 w-16 ${currentStep >= 2 ? 'bg-primary' : 'bg-gray-200'}`}></div>
+            <div className={`h-8 w-8 rounded-full flex items-center justify-center ${currentStep >= 2 ? 'bg-primary text-white' : 'bg-gray-200'}`}>2</div>
+            <div className={`h-1 w-16 ${currentStep >= 3 ? 'bg-primary' : 'bg-gray-200'}`}></div>
+            <div className={`h-8 w-8 rounded-full flex items-center justify-center ${currentStep >= 3 ? 'bg-primary text-white' : 'bg-gray-200'}`}>3</div>
           </div>
-          
-          <div className="bg-white rounded-lg shadow p-6">
-            <Tabs value={activeTab} onValueChange={setActiveTab}>
-              <TabsList className="mb-6">
-                <TabsTrigger value="info">Informações Básicas</TabsTrigger>
-                <TabsTrigger value="stages">Etapas do Processo</TabsTrigger>
-              </TabsList>
-              
-              <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                  <TabsContent value="info" className="space-y-6">
-                    <FormField
-                      control={form.control}
-                      name="title"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Título do Processo</FormLabel>
+          <div className="text-sm font-medium">
+            Passo {currentStep} de 3
+          </div>
+        </div>
+      </div>
+
+      {currentStep === 1 && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Dados do Cliente</CardTitle>
+            <CardDescription>Informe os dados do cliente para este processo</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Form {...clientForm}>
+              <form onSubmit={clientForm.handleSubmit(handleClientSubmit)} className="space-y-6">
+                <FormField
+                  control={clientForm.control}
+                  name="clientName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Nome do Cliente</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Digite o nome completo" {...field} />
+                      </FormControl>
+                      <FormDescription>
+                        Nome completo do cliente responsável pelo processo
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={clientForm.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email</FormLabel>
+                      <FormControl>
+                        <Input placeholder="email@exemplo.com" {...field} />
+                      </FormControl>
+                      <FormDescription>
+                        Email para comunicação e acesso à plataforma
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={clientForm.control}
+                  name="phone"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Telefone</FormLabel>
+                      <FormControl>
+                        <Input placeholder="(11) 98765-4321" {...field} />
+                      </FormControl>
+                      <FormDescription>
+                        Telefone de contato com DDD
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <CardFooter className="px-0">
+                  <Button type="submit">Próximo Passo</Button>
+                </CardFooter>
+              </form>
+            </Form>
+          </CardContent>
+        </Card>
+      )}
+
+      {currentStep === 2 && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Dados do Processo</CardTitle>
+            <CardDescription>Configure as informações básicas do processo</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Form {...processForm}>
+              <form onSubmit={processForm.handleSubmit(handleProcessSubmit)} className="space-y-6">
+                <FormField
+                  control={processForm.control}
+                  name="processName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Nome do Processo</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Ex: Regularização Imóvel Rua das Flores" {...field} />
+                      </FormControl>
+                      <FormDescription>
+                        Um nome único para identificação do processo
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={processForm.control}
+                  name="processType"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Tipo de Processo</FormLabel>
+                      <Select 
+                        onValueChange={handleProcessTypeChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Selecione o tipo de processo" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {processTypes.map((type) => (
+                            <SelectItem key={type.id} value={type.id}>
+                              {type.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormDescription>
+                        O tipo de processo determina as etapas padrão
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={processForm.control}
+                  name="startDate"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-col">
+                      <FormLabel>Data de Início</FormLabel>
+                      <Popover>
+                        <PopoverTrigger asChild>
                           <FormControl>
-                            <Input placeholder="Ex: Usucapião Extraordinária - Rua das Flores, 123" {...field} />
+                            <Button
+                              variant={"outline"}
+                              className={cn(
+                                "w-full pl-3 text-left font-normal",
+                                !field.value && "text-muted-foreground"
+                              )}
+                            >
+                              {field.value ? (
+                                format(field.value, "dd/MM/yyyy", { locale: ptBR })
+                              ) : (
+                                <span>Selecione uma data</span>
+                              )}
+                              <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                            </Button>
                           </FormControl>
-                          <FormDescription>
-                            Nome descritivo que identifique o processo.
-                          </FormDescription>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    
-                    <FormField
-                      control={form.control}
-                      name="client"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Cliente</FormLabel>
-                          <Select 
-                            onValueChange={field.onChange} 
-                            defaultValue={field.value}
-                          >
-                            <FormControl>
-                              <SelectTrigger>
-                                <SelectValue placeholder="Selecione o cliente" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              {clients.map((client) => (
-                                <SelectItem key={client.id} value={client.id}>
-                                  {client.name}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                          <FormDescription>
-                            Cliente responsável pelo processo.
-                          </FormDescription>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    
-                    <FormField
-                      control={form.control}
-                      name="type"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Tipo de Processo</FormLabel>
-                          <Select 
-                            onValueChange={field.onChange} 
-                            defaultValue={field.value}
-                          >
-                            <FormControl>
-                              <SelectTrigger>
-                                <SelectValue placeholder="Selecione o tipo" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              <SelectItem value="usucapiao">Usucapião</SelectItem>
-                              <SelectItem value="retificacao">Retificação de Área</SelectItem>
-                              <SelectItem value="inventario">Inventário Extrajudicial</SelectItem>
-                              <SelectItem value="adjudicacao">Adjudicação Compulsória</SelectItem>
-                            </SelectContent>
-                          </Select>
-                          <FormDescription>
-                            O tipo define as etapas padrão do processo.
-                          </FormDescription>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    
-                    <FormField
-                      control={form.control}
-                      name="description"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Descrição (Opcional)</FormLabel>
-                          <FormControl>
-                            <Textarea 
-                              placeholder="Informações adicionais sobre o processo..."
-                              className="min-h-[100px]"
-                              {...field} 
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    
-                    <div className="flex justify-end">
-                      <Button type="button" onClick={() => setActiveTab("stages")}>
-                        Próximo: Configurar Etapas
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={field.value}
+                            onSelect={field.onChange}
+                            initialFocus
+                            locale={ptBR}
+                            className={cn("p-3 pointer-events-auto")}
+                          />
+                        </PopoverContent>
+                      </Popover>
+                      <FormDescription>
+                        Data oficial de início do processo
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={processForm.control}
+                  name="description"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Descrição do Processo</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder="Descreva detalhes importantes sobre este processo"
+                          className="resize-none"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        Informações adicionais sobre o processo (opcional)
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <CardFooter className="px-0 flex justify-between">
+                  <Button type="button" variant="outline" onClick={goToPreviousStep}>
+                    <ChevronLeft className="mr-2 h-4 w-4" />
+                    Voltar
+                  </Button>
+                  <Button type="submit">
+                    Próximo Passo
+                    <ChevronRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </CardFooter>
+              </form>
+            </Form>
+          </CardContent>
+        </Card>
+      )}
+
+      {currentStep === 3 && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Etapas do Processo</CardTitle>
+            <CardDescription>Configure as etapas e prazos do processo</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Form {...stagesForm}>
+              <form onSubmit={stagesForm.handleSubmit(handleStagesSubmit)} className="space-y-6">
+                {stagesForm.getValues("stages")?.map((stage, index) => (
+                  <div key={stage.id} className="p-4 border rounded-md">
+                    <div className="flex justify-between items-center mb-2">
+                      <h4 className="font-medium">Etapa {index + 1}</h4>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => removeStage(index)}
+                      >
+                        <Trash2 className="h-4 w-4" />
                       </Button>
                     </div>
-                  </TabsContent>
-                  
-                  <TabsContent value="stages">
-                    {processType ? (
-                      <div className="space-y-6">
-                        <div>
-                          <h3 className="text-lg font-medium mb-2">Etapas Padrão</h3>
-                          <p className="text-sm text-gray-500 mb-4">
-                            Estas são as etapas pré-definidas para o tipo de processo selecionado.
-                          </p>
-                          
-                          <div className="space-y-4">
-                            {stages.map((stage, index) => (
-                              <div key={stage.id} className="border rounded-lg p-4">
-                                <div className="flex justify-between items-center mb-2">
-                                  <h4 className="font-medium">
-                                    Etapa {index + 1}: {stage.title}
-                                  </h4>
-                                  <span className="text-sm text-gray-500">
-                                    {stage.estimatedDays} dias
-                                  </span>
-                                </div>
-                                <p className="text-sm text-gray-600 mb-2">
-                                  {stage.description}
-                                </p>
-                                <div className="flex items-center">
-                                  <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded">
-                                    Etapa obrigatória
-                                  </span>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                        
-                        <div>
-                          <div className="flex justify-between items-center mb-4">
-                            <h3 className="text-lg font-medium">Etapas Personalizadas</h3>
-                            <Button type="button" variant="outline" onClick={addCustomStage}>
-                              Adicionar Etapa
-                            </Button>
-                          </div>
-                          
-                          {customStages.length > 0 ? (
-                            <div className="space-y-4">
-                              {customStages.map((stage, index) => (
-                                <div key={stage.id} className="border rounded-lg p-4">
-                                  <div className="flex justify-between items-center mb-4">
-                                    <Input
-                                      value={stage.title}
-                                      onChange={(e) => updateCustomStage(stage.id, 'title', e.target.value)}
-                                      className="font-medium"
-                                      placeholder={`Etapa ${stages.length + index + 1}`}
-                                    />
-                                    <Button
-                                      type="button"
-                                      variant="ghost"
-                                      size="sm"
-                                      onClick={() => removeCustomStage(stage.id)}
-                                    >
-                                      <X className="h-4 w-4" />
-                                    </Button>
-                                  </div>
-                                  
-                                  <Textarea
-                                    value={stage.description}
-                                    onChange={(e) => updateCustomStage(stage.id, 'description', e.target.value)}
-                                    className="mb-4 text-sm"
-                                    placeholder="Descrição da etapa"
-                                  />
-                                  
-                                  <div className="flex items-center gap-4">
-                                    <div className="flex items-center gap-2">
-                                      <label className="text-sm">Dias estimados:</label>
-                                      <Input
-                                        type="number"
-                                        value={stage.estimatedDays}
-                                        onChange={(e) => updateCustomStage(stage.id, 'estimatedDays', parseInt(e.target.value) || 0)}
-                                        className="w-20"
-                                        min="1"
-                                      />
-                                    </div>
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                          ) : (
-                            <div className="text-center py-8 border border-dashed rounded-lg">
-                              <p className="text-gray-500">
-                                Nenhuma etapa personalizada adicionada.
-                              </p>
-                              <Button type="button" variant="link" onClick={addCustomStage}>
-                                Adicionar uma etapa
-                              </Button>
-                            </div>
-                          )}
-                        </div>
-                        
-                        <div className="flex justify-between pt-4">
-                          <Button type="button" variant="outline" onClick={() => setActiveTab("info")}>
-                            Voltar
-                          </Button>
-                          <Button type="submit">
-                            Criar Processo
-                          </Button>
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="text-center py-12">
-                        <p className="text-lg text-gray-500">
-                          Selecione um tipo de processo na aba de Informações Básicas primeiro.
-                        </p>
-                        <Button type="button" onClick={() => setActiveTab("info")} className="mt-4">
-                          Voltar para Informações Básicas
-                        </Button>
-                      </div>
-                    )}
-                  </TabsContent>
-                </form>
-              </Form>
-            </Tabs>
-          </div>
-        </main>
-      </div>
+
+                    <div className="grid gap-4">
+                      <FormField
+                        control={stagesForm.control}
+                        name={`stages.${index}.name`}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Nome da Etapa</FormLabel>
+                            <FormControl>
+                              <Input {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={stagesForm.control}
+                        name={`stages.${index}.description`}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Descrição</FormLabel>
+                            <FormControl>
+                              <Textarea className="resize-none" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={stagesForm.control}
+                        name={`stages.${index}.estimatedDays`}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Prazo Estimado (dias)</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="number"
+                                min="1"
+                                {...field}
+                                onChange={(e) => field.onChange(e.target.value)}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  </div>
+                ))}
+
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full"
+                  onClick={addCustomStage}
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Adicionar Nova Etapa
+                </Button>
+
+                <CardFooter className="px-0 flex justify-between">
+                  <Button type="button" variant="outline" onClick={goToPreviousStep}>
+                    <ChevronLeft className="mr-2 h-4 w-4" />
+                    Voltar
+                  </Button>
+                  <Button type="submit">
+                    Criar Processo
+                  </Button>
+                </CardFooter>
+              </form>
+            </Form>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }
