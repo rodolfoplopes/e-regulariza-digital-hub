@@ -11,6 +11,8 @@ import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import ContactPage from "./pages/ContactPage";
 import ProcessDetail from "./pages/ProcessDetail";
+import AdminDashboard from "./pages/AdminDashboard";
+import ProcessCreate from "./pages/ProcessCreate";
 
 const queryClient = new QueryClient();
 
@@ -27,6 +29,9 @@ const App = () => (
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/contato" element={<ContactPage />} />
           <Route path="/processo/:processId" element={<ProcessDetail />} />
+          {/* Admin routes */}
+          <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/admin/novo-processo" element={<ProcessCreate />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

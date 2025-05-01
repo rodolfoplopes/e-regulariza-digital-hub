@@ -1,11 +1,9 @@
 
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { Send, Paperclip } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { useToast } from "@/hooks/use-toast";
-import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Paperclip, Send, X as CloseIcon } from "lucide-react";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 export interface Message {
   id: string;
@@ -14,15 +12,14 @@ export interface Message {
     id: string;
     name: string;
     initials: string;
-    type: "client" | "admin";
+    type: "admin" | "client";
   };
   timestamp: string;
-  attachments?: Array<{
-    id: string;
+  attachments?: {
     name: string;
     url: string;
     type: string;
-  }>;
+  }[];
 }
 
 interface ProcessMessagesProps {
@@ -31,187 +28,221 @@ interface ProcessMessagesProps {
   processId: string;
 }
 
-export default function ProcessMessages({ 
-  messages, 
+export default function ProcessMessages({
+  messages,
   onSendMessage,
-  processId 
+  processId
 }: ProcessMessagesProps) {
-  const [message, setMessage] = useState("");
+  const [newMessage, setNewMessage] = useState("");
   const [attachments, setAttachments] = useState<File[]>([]);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const { toast } = useToast();
+  const [isSending, setIsSending] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
   
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (!files || files.length === 0) return;
-    
-    // Convert FileList to Array
-    const fileArray = Array.from(files);
-    
-    // Check file size (5MB limit per file)
-    const oversizedFiles = fileArray.filter(file => file.size > 5 * 1024 * 1024);
-    if (oversizedFiles.length > 0) {
-      toast({
-        title: "Arquivo(s) muito grande(s)",
-        description: "Cada arquivo deve ter no máximo 5MB",
-        variant: "destructive",
-      });
-      return;
-    }
-    
-    // Add to existing attachments
-    setAttachments(prev => [...prev, ...fileArray]);
-    
-    // Reset the input
-    e.target.value = "";
+  // Scroll to bottom when messages change
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+  
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
   
-  const removeAttachment = (index: number) => {
-    setAttachments(prev => prev.filter((_, i) => i !== index));
-  };
-  
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!message.trim() && attachments.length === 0) return;
+    if (!newMessage.trim() && !attachments.length) return;
     
-    setIsSubmitting(true);
+    setIsSending(true);
     
     try {
-      await onSendMessage(message.trim(), attachments.length > 0 ? attachments : undefined);
-      setMessage("");
+      await onSendMessage(newMessage, attachments.length > 0 ? attachments : undefined);
+      setNewMessage("");
       setAttachments([]);
     } catch (error) {
       console.error("Error sending message:", error);
-      toast({
-        title: "Erro ao enviar mensagem",
-        description: "Não foi possível enviar a mensagem. Tente novamente.",
-        variant: "destructive",
-      });
     } finally {
-      setIsSubmitting(false);
+      setIsSending(false);
     }
   };
   
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      // Convert FileList to Array and add to attachments
+      const newFiles = Array.from(e.target.files);
+      setAttachments(prev => [...prev, ...newFiles]);
+      
+      // Reset file input
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+    }
+  };
+  
+  const removeAttachment = (index: number) => {
+    setAttachments(attachments.filter((_, i) => i !== index));
+  };
+  
+  // Group messages by date
+  const groupedMessages: { [date: string]: Message[] } = {};
+  messages.forEach(message => {
+    const date = message.timestamp.split(' ')[0]; // Extract date part
+    if (!groupedMessages[date]) {
+      groupedMessages[date] = [];
+    }
+    groupedMessages[date].push(message);
+  });
+  
   return (
     <div className="flex flex-col h-full">
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
-        {messages.length === 0 ? (
-          <div className="text-center py-8">
-            <p className="text-gray-500">
-              Nenhuma mensagem enviada ainda. Inicie uma conversa com a equipe.
-            </p>
-          </div>
-        ) : (
-          messages.map(msg => (
-            <div 
-              key={msg.id} 
-              className={cn(
-                "flex items-start gap-3",
-                msg.sender.type === "client" ? "flex-row-reverse" : ""
-              )}
-            >
-              <Avatar className={msg.sender.type === "client" ? "border-eregulariza-primary" : "border-gray-300"}>
-                <AvatarFallback className={
-                  msg.sender.type === "client" 
-                    ? "bg-eregulariza-primary text-white" 
-                    : "bg-gray-100 text-gray-700"
-                }>
-                  {msg.sender.initials}
-                </AvatarFallback>
-              </Avatar>
-              <div className="max-w-[75%]">
-                <div className={cn(
-                  "rounded-lg py-2 px-3",
-                  msg.sender.type === "client" 
-                    ? "bg-eregulariza-primary/10 text-eregulariza-primary/90"
-                    : "bg-gray-100 text-gray-800"
-                )}>
-                  <p className="text-sm font-medium">
-                    {msg.sender.name}
-                  </p>
-                  <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
-                  {msg.attachments && msg.attachments.length > 0 && (
-                    <div className="mt-2 space-y-1">
-                      {msg.attachments.map(attachment => (
-                        <a 
-                          key={attachment.id}
-                          href={attachment.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center p-2 bg-white/50 rounded text-xs hover:bg-white/80 transition"
-                        >
-                          <Paperclip className="h-3 w-3 mr-1" />
-                          <span className="truncate">{attachment.name}</span>
-                        </a>
-                      ))}
-                    </div>
-                  )}
-                </div>
-                <p className="text-xs text-gray-500 mt-1">
-                  {msg.timestamp}
-                </p>
-              </div>
-            </div>
-          ))
-        )}
+      <div className="p-4 border-b">
+        <h3 className="text-lg font-semibold">Mensagens do Processo</h3>
+        <p className="text-sm text-gray-500">
+          Entre em contato com a equipe de suporte
+        </p>
       </div>
       
-      <form onSubmit={handleSubmit} className="border-t p-4">
-        {attachments.length > 0 && (
-          <div className="mb-2 space-y-1">
-            {attachments.map((file, index) => (
-              <div key={index} className="flex items-center justify-between p-2 bg-gray-50 rounded text-sm">
-                <div className="flex items-center overflow-hidden">
-                  <Paperclip className="h-3 w-3 mr-2 shrink-0" />
-                  <span className="truncate">{file.name}</span>
+      <ScrollArea className="flex-grow p-4">
+        <div className="space-y-6">
+          {Object.entries(groupedMessages).map(([date, dateMessages]) => (
+            <div key={date}>
+              <div className="relative mb-4">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-gray-200"></div>
                 </div>
-                <Button 
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  className="h-6 w-6 p-0"
-                  onClick={() => removeAttachment(index)}
-                >
-                  <span className="sr-only">Remover</span>
-                  <X className="h-3 w-3" />
-                </Button>
+                <div className="relative flex justify-center">
+                  <span className="bg-white px-2 text-xs text-gray-500">
+                    {date}
+                  </span>
+                </div>
               </div>
-            ))}
-          </div>
-        )}
-        
-        <div className="flex items-end gap-2">
-          <div className="flex-1">
-            <Textarea 
-              value={message} 
-              onChange={(e) => setMessage(e.target.value)} 
-              placeholder="Escreva sua mensagem aqui..."
-              className="resize-none min-h-[80px]"
-            />
-          </div>
-          <div className="flex flex-col space-y-2">
-            <label htmlFor="file-upload" className="cursor-pointer">
-              <div className="rounded-md border border-input hover:bg-gray-50 h-9 w-9 flex items-center justify-center">
-                <Paperclip className="h-4 w-4" />
+              
+              <div className="space-y-4">
+                {dateMessages.map(message => (
+                  <div 
+                    key={message.id}
+                    className={`flex ${
+                      message.sender.type === "admin" ? "justify-start" : "justify-end"
+                    }`}
+                  >
+                    <div className="flex max-w-[70%]">
+                      {message.sender.type === "admin" && (
+                        <Avatar className="h-8 w-8 mr-2">
+                          <AvatarFallback className="bg-primary text-primary-foreground">
+                            {message.sender.initials}
+                          </AvatarFallback>
+                        </Avatar>
+                      )}
+                      
+                      <div>
+                        <div 
+                          className={`rounded-lg p-3 ${
+                            message.sender.type === "admin" 
+                              ? "bg-gray-100" 
+                              : "bg-primary text-primary-foreground"
+                          }`}
+                        >
+                          <p>{message.content}</p>
+                          
+                          {message.attachments && message.attachments.length > 0 && (
+                            <div className="mt-2 space-y-1">
+                              {message.attachments.map(attachment => (
+                                <a 
+                                  key={attachment.name}
+                                  href={attachment.url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="flex items-center text-xs p-2 bg-white/20 rounded hover:bg-white/30"
+                                >
+                                  <Paperclip className="h-3 w-3 mr-1" />
+                                  {attachment.name}
+                                </a>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                        
+                        <div 
+                          className={`text-xs mt-1 text-gray-500 ${
+                            message.sender.type === "admin" ? "text-left" : "text-right"
+                          }`}
+                        >
+                          {message.timestamp.split(' ')[1]} • {message.sender.name}
+                        </div>
+                      </div>
+                      
+                      {message.sender.type === "client" && (
+                        <Avatar className="h-8 w-8 ml-2">
+                          <AvatarFallback className="bg-primary text-primary-foreground">
+                            {message.sender.initials}
+                          </AvatarFallback>
+                        </Avatar>
+                      )}
+                    </div>
+                  </div>
+                ))}
               </div>
-              <input 
-                id="file-upload" 
-                type="file" 
-                className="hidden"
-                multiple
-                onChange={handleFileChange}
-              />
-            </label>
-            <Button 
-              type="submit"
-              size="icon"
-              disabled={isSubmitting || (!message.trim() && attachments.length === 0)}
-            >
-              <Send className="h-4 w-4" />
-            </Button>
-          </div>
+            </div>
+          ))}
+          <div ref={messagesEndRef} />
         </div>
+      </ScrollArea>
+      
+      {attachments.length > 0 && (
+        <div className="px-4 py-2 border-t flex flex-wrap gap-2">
+          {attachments.map((file, index) => (
+            <div 
+              key={index}
+              className="bg-gray-100 rounded-full px-3 py-1 text-sm flex items-center"
+            >
+              <Paperclip className="h-3 w-3 mr-1" />
+              <span className="truncate max-w-[100px]">{file.name}</span>
+              <button 
+                type="button"
+                onClick={() => removeAttachment(index)}
+                className="ml-1 text-gray-500 hover:text-gray-700"
+              >
+                <CloseIcon className="h-3 w-3" />
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+      
+      <form onSubmit={handleSendMessage} className="p-4 border-t flex items-center">
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          className="px-2"
+          onClick={() => fileInputRef.current?.click()}
+        >
+          <Paperclip className="h-5 w-5" />
+        </Button>
+        <input
+          ref={fileInputRef}
+          type="file"
+          multiple
+          className="hidden"
+          onChange={handleFileChange}
+        />
+        
+        <input
+          type="text"
+          value={newMessage}
+          onChange={(e) => setNewMessage(e.target.value)}
+          placeholder="Digite sua mensagem..."
+          className="flex-1 border-0 focus:ring-0 focus:outline-none bg-transparent"
+        />
+        
+        <Button
+          type="submit"
+          size="sm"
+          disabled={isSending || (!newMessage.trim() && !attachments.length)}
+        >
+          {isSending ? "Enviando..." : "Enviar"}
+          <Send className="h-4 w-4 ml-2" />
+        </Button>
       </form>
     </div>
   );
