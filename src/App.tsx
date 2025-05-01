@@ -10,6 +10,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import ContactPage from "./pages/ContactPage";
+import ProcessDetail from "./pages/ProcessDetail";
 
 const queryClient = new QueryClient();
 
@@ -25,6 +26,7 @@ const App = () => (
           <Route path="/register" element={<Register />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/contato" element={<ContactPage />} />
+          <Route path="/processo/:processId" element={<ProcessDetail />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
