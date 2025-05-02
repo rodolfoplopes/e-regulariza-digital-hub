@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -35,7 +35,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { CalendarIcon, Plus, Trash2, ChevronRight, ChevronLeft } from "lucide-react";
+import { CalendarIcon, Plus, Trash2, ChevronRight, ChevronLeft, Edit } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
   Popover,
@@ -43,15 +43,18 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { useToast } from "@/hooks/use-toast";
+import { generateProcessNumber } from "@/utils/processUtils";
 
 // Form schemas
 const clientFormSchema = z.object({
   clientName: z.string().min(3, "Nome do cliente é obrigatório"),
   email: z.string().email("Email inválido"),
   phone: z.string().min(10, "Telefone inválido"),
+  cpf: z.string().min(11, "CPF inválido").max(14, "CPF inválido"),
 });
 
 const processFormSchema = z.object({
+  processNumber: z.string().min(3, "Número do processo é obrigatório"),
   processName: z.string().min(3, "Nome do processo é obrigatório"),
   processType: z.string().min(1, "Tipo de processo é obrigatório"),
   startDate: z.date({
@@ -205,6 +208,8 @@ export default function ProcessCreate() {
     stages: [],
   });
   const [selectedProcessType, setSelectedProcessType] = useState("");
+  const [processNumber, setProcessNumber] = useState(() => generateProcessNumber());
+  const [isEditingNumber, setIsEditingNumber] = useState(false);
 
   // Client form
   const clientForm = useForm({
@@ -213,6 +218,7 @@ export default function ProcessCreate() {
       clientName: "",
       email: "",
       phone: "",
+      cpf: "",
     },
   });
 
@@ -220,12 +226,18 @@ export default function ProcessCreate() {
   const processForm = useForm({
     resolver: zodResolver(processFormSchema),
     defaultValues: {
+      processNumber: processNumber,
       processName: "",
       processType: "",
       startDate: new Date(),
       description: "",
     },
   });
+
+  // Update the form when processNumber changes
+  useEffect(() => {
+    processForm.setValue("processNumber", processNumber);
+  }, [processNumber, processForm]);
 
   // Stages form
   const stagesForm = useForm({
@@ -234,6 +246,16 @@ export default function ProcessCreate() {
       stages: [],
     },
   });
+
+  // Handle manual edit of process number
+  const handleProcessNumberEdit = () => {
+    setIsEditingNumber(!isEditingNumber);
+  };
+
+  // Handle process number change
+  const handleProcessNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setProcessNumber(e.target.value);
+  };
 
   // Handle process type selection and load default stages
   const handleProcessTypeChange = (value: string) => {
@@ -282,7 +304,10 @@ export default function ProcessCreate() {
     // Here we would normally submit the complete form data to an API
     console.log("Complete form data:", {
       ...formData,
-      process: formData.process,
+      process: {
+        ...formData.process,
+        processNumber: processNumber
+      },
       stages: data.stages,
     });
     
@@ -380,6 +405,22 @@ export default function ProcessCreate() {
                     </FormItem>
                   )}
                 />
+                <FormField
+                  control={clientForm.control}
+                  name="cpf"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>CPF</FormLabel>
+                      <FormControl>
+                        <Input placeholder="123.456.789-00" {...field} />
+                      </FormControl>
+                      <FormDescription>
+                        CPF do cliente (obrigatório e único no sistema)
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
                 <CardFooter className="px-0">
                   <Button type="submit">Próximo Passo</Button>
                 </CardFooter>
@@ -398,6 +439,31 @@ export default function ProcessCreate() {
           <CardContent>
             <Form {...processForm}>
               <form onSubmit={processForm.handleSubmit(handleProcessSubmit)} className="space-y-6">
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center">
+                    <FormLabel>Número do Processo</FormLabel>
+                    <Button type="button" variant="ghost" size="sm" onClick={handleProcessNumberEdit}>
+                      <Edit className="h-4 w-4 mr-1" />
+                      {isEditingNumber ? "Concluir" : "Editar"}
+                    </Button>
+                  </div>
+                  {isEditingNumber ? (
+                    <Input 
+                      value={processNumber} 
+                      onChange={handleProcessNumberChange}
+                      className="font-mono"
+                      placeholder="ER-YYMM-XXXX"
+                    />
+                  ) : (
+                    <div className="p-2 bg-muted rounded-md font-mono">
+                      {processNumber}
+                    </div>
+                  )}
+                  <FormDescription>
+                    Número único gerado automaticamente para este processo
+                  </FormDescription>
+                </div>
+                
                 <FormField
                   control={processForm.control}
                   name="processName"
@@ -589,10 +655,25 @@ export default function ProcessCreate() {
                                 onChange={(e) => field.onChange(e.target.value)}
                               />
                             </FormControl>
+                            <FormDescription>
+                              O sistema calculará a data final com base no prazo em dias
+                            </FormDescription>
                             <FormMessage />
                           </FormItem>
                         )}
                       />
+
+                      <div className="text-sm mt-2 text-muted-foreground">
+                        Data estimada de conclusão: {
+                          (() => {
+                            const startDate = processForm.getValues("startDate") || new Date();
+                            const days = parseInt(String(stage.estimatedDays)) || 0;
+                            const endDate = new Date(startDate);
+                            endDate.setDate(endDate.getDate() + days);
+                            return format(endDate, "dd/MM/yyyy", { locale: ptBR });
+                          })()
+                        }
+                      </div>
                     </div>
                   </div>
                 ))}

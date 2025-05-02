@@ -62,3 +62,31 @@ export function getRemainingDays(deadlineDate: Date): number {
   const timeDiff = deadlineDate.getTime() - today.getTime();
   return Math.ceil(timeDiff / (1000 * 3600 * 24));
 }
+
+/**
+ * Formats the deadline information for display
+ * 
+ * @param daysEstimated Number of days estimated for completion
+ * @param startDate Starting date of the process or stage
+ * @returns An object with formatted deadline information
+ */
+export function getDeadlineInfo(daysEstimated: number, startDate: Date = new Date()) {
+  const deadlineDate = daysToDeadlineDate(daysEstimated, startDate);
+  const remainingDays = getRemainingDays(deadlineDate);
+  const formattedDeadline = formatDate(deadlineDate);
+  
+  let status: 'on-time' | 'approaching' | 'late' = 'on-time';
+  
+  if (remainingDays < 0) {
+    status = 'late';
+  } else if (remainingDays <= Math.ceil(daysEstimated * 0.2)) {
+    status = 'approaching';
+  }
+  
+  return {
+    deadlineDate,
+    formattedDeadline,
+    remainingDays,
+    status
+  };
+}
