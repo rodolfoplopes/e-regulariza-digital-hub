@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Table,
   TableBody,
@@ -18,17 +18,29 @@ import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
 import MobileNav from "@/components/dashboard/MobileNav";
 import UserManagement from "@/components/admin/UserManagement";
 import { Link } from "react-router-dom";
-import { Calendar, FileText, FilePlus, Mail, Users } from "lucide-react";
+import { Calendar, FileText, FilePlus, Mail, Users, Filter } from "lucide-react";
 import EmailSender from "@/components/admin/EmailSender";
 import ReportExport from "@/components/admin/ReportExport";
+import ProcessFilters from "@/components/admin/ProcessFilters";
 
 export default function AdminDashboard() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [activeTab, setActiveTab] = useState("todos");
   const [activeSection, setActiveSection] = useState("processos");
+  const [showFilters, setShowFilters] = useState(false);
   const { toast } = useToast();
   
+  // Filter states
+  const [filters, setFilters] = useState({
+    clientName: "",
+    serviceType: "",
+    status: "",
+    startDate: "",
+    endDate: "",
+    processNumber: ""
+  });
+
   // Mock data for processes
   const processes = [
     {
@@ -38,7 +50,8 @@ export default function AdminDashboard() {
       type: "Usucapião",
       status: "em_andamento",
       progress: 45,
-      lastUpdate: "10/04/2023"
+      lastUpdate: "10/04/2023",
+      creationDate: "01/03/2023"
     },
     {
       id: "proc-002",
@@ -47,7 +60,8 @@ export default function AdminDashboard() {
       type: "Retificação de Área",
       status: "pendente",
       progress: 15,
-      lastUpdate: "02/05/2023"
+      lastUpdate: "02/05/2023",
+      creationDate: "15/04/2023"
     },
     {
       id: "proc-003",
@@ -56,7 +70,8 @@ export default function AdminDashboard() {
       type: "Inventário",
       status: "concluido",
       progress: 100,
-      lastUpdate: "20/02/2023"
+      lastUpdate: "20/02/2023",
+      creationDate: "05/01/2023"
     },
     {
       id: "proc-004",
@@ -65,7 +80,8 @@ export default function AdminDashboard() {
       type: "Adjudicação",
       status: "rejeitado",
       progress: 60,
-      lastUpdate: "15/03/2023"
+      lastUpdate: "15/03/2023",
+      creationDate: "10/02/2023"
     }
   ];
 
@@ -77,24 +93,83 @@ export default function AdminDashboard() {
     { id: "client-004", name: "Ana Oliveira", email: "ana@example.com", processes: 1 },
   ];
 
-  // Filter processes based on the active tab and search term
+  // Get unique service types for filter dropdown
+  const serviceTypes = [...new Set(processes.map(process => process.type))];
+  
+  // Filter processes based on the active tab, search term, and advanced filters
   const filteredProcesses = processes.filter(process => {
+    // First check the tab filter
+    if (activeTab !== "todos" && process.status !== activeTab) {
+      return false;
+    }
+    
+    // Then check search term
     const matchesSearch = 
       process.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       process.client.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      process.type.toLowerCase().includes(searchTerm.toLowerCase());
-      
-    if (activeTab === "todos") {
-      return matchesSearch;
+      process.type.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      process.id.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    if (!matchesSearch) {
+      return false;
     }
     
-    return process.status === activeTab && matchesSearch;
+    // Then check advanced filters
+    if (filters.clientName && !process.client.toLowerCase().includes(filters.clientName.toLowerCase())) {
+      return false;
+    }
+    
+    if (filters.serviceType && process.type !== filters.serviceType) {
+      return false;
+    }
+    
+    if (filters.status && process.status !== filters.status) {
+      return false;
+    }
+    
+    if (filters.processNumber && !process.id.toLowerCase().includes(filters.processNumber.toLowerCase())) {
+      return false;
+    }
+    
+    // Date filtering
+    if (filters.startDate) {
+      const startDate = new Date(filters.startDate);
+      const processDate = new Date(process.creationDate.split('/').reverse().join('-'));
+      if (processDate < startDate) {
+        return false;
+      }
+    }
+    
+    if (filters.endDate) {
+      const endDate = new Date(filters.endDate);
+      const processDate = new Date(process.creationDate.split('/').reverse().join('-'));
+      if (processDate > endDate) {
+        return false;
+      }
+    }
+    
+    return true;
   });
   
   const handleExportData = () => {
     toast({
       title: "Exportação iniciada",
       description: "Os dados serão enviados para seu e-mail em breve.",
+    });
+  };
+
+  const handleFilterChange = (newFilters) => {
+    setFilters({ ...filters, ...newFilters });
+  };
+  
+  const clearFilters = () => {
+    setFilters({
+      clientName: "",
+      serviceType: "",
+      status: "",
+      startDate: "",
+      endDate: "",
+      processNumber: ""
     });
   };
   
@@ -128,7 +203,10 @@ export default function AdminDashboard() {
                 </Link>
               </Button>
               
-              <ReportExport />
+              <ReportExport 
+                clients={clients}
+                serviceTypes={serviceTypes.map(type => ({ id: type, name: type }))}
+              />
               
               <EmailSender />
             </div>
@@ -162,22 +240,46 @@ export default function AdminDashboard() {
             
             <TabsContent value="processos" className="mt-4">
               <Tabs value={activeTab} onValueChange={setActiveTab}>
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
-                  <TabsList>
-                    <TabsTrigger value="todos">Todos</TabsTrigger>
-                    <TabsTrigger value="pendente">Pendentes</TabsTrigger>
-                    <TabsTrigger value="em_andamento">Em Andamento</TabsTrigger>
-                    <TabsTrigger value="concluido">Concluídos</TabsTrigger>
-                  </TabsList>
-                  
-                  <div className="relative">
-                    <Input
-                      placeholder="Buscar processos..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="w-full sm:w-[300px]"
-                    />
+                <div className="flex flex-col space-y-4 mb-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <TabsList>
+                      <TabsTrigger value="todos">Todos</TabsTrigger>
+                      <TabsTrigger value="pendente">Pendentes</TabsTrigger>
+                      <TabsTrigger value="em_andamento">Em Andamento</TabsTrigger>
+                      <TabsTrigger value="concluido">Concluídos</TabsTrigger>
+                    </TabsList>
+                    
+                    <div className="flex items-center gap-2">
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => setShowFilters(!showFilters)}
+                        className="flex items-center gap-1"
+                      >
+                        <Filter className="h-4 w-4" />
+                        {showFilters ? 'Ocultar Filtros' : 'Filtros Avançados'}
+                      </Button>
+                      
+                      <div className="relative">
+                        <Input
+                          placeholder="Buscar processos..."
+                          value={searchTerm}
+                          onChange={(e) => setSearchTerm(e.target.value)}
+                          className="w-full sm:w-[300px]"
+                        />
+                      </div>
+                    </div>
                   </div>
+                  
+                  {showFilters && (
+                    <ProcessFilters 
+                      filters={filters}
+                      onFilterChange={handleFilterChange}
+                      onClearFilters={clearFilters}
+                      clients={clients}
+                      serviceTypes={serviceTypes}
+                    />
+                  )}
                 </div>
                 
                 <TabsContent value={activeTab} className="mt-0">
@@ -190,6 +292,7 @@ export default function AdminDashboard() {
                           <TableHead>Tipo</TableHead>
                           <TableHead>Status</TableHead>
                           <TableHead>Progresso</TableHead>
+                          <TableHead>Criação</TableHead>
                           <TableHead>Última Atualização</TableHead>
                           <TableHead className="text-right">Ações</TableHead>
                         </TableRow>
@@ -211,6 +314,7 @@ export default function AdminDashboard() {
                                 <span className="text-xs text-gray-500">{process.progress}%</span>
                               </div>
                             </TableCell>
+                            <TableCell>{process.creationDate}</TableCell>
                             <TableCell>{process.lastUpdate}</TableCell>
                             <TableCell className="text-right">
                               <Button variant="ghost" size="sm" asChild>
@@ -224,7 +328,7 @@ export default function AdminDashboard() {
                         
                         {filteredProcesses.length === 0 && (
                           <TableRow>
-                            <TableCell colSpan={7} className="text-center py-8 text-gray-500">
+                            <TableCell colSpan={8} className="text-center py-8 text-gray-500">
                               Nenhum processo encontrado com os filtros selecionados.
                             </TableCell>
                           </TableRow>
