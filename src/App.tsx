@@ -13,6 +13,8 @@ import ContactPage from "./pages/ContactPage";
 import ProcessDetail from "./pages/ProcessDetail";
 import AdminDashboard from "./pages/AdminDashboard";
 import ProcessCreate from "./pages/ProcessCreate";
+import UserSettings from "./pages/UserSettings";
+import PolicyPage from "./pages/PolicyPage";
 
 const queryClient = new QueryClient();
 
@@ -27,8 +29,11 @@ const App = () => (
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/configuracoes" element={<UserSettings />} />
           <Route path="/contato" element={<ContactPage />} />
           <Route path="/processo/:processId" element={<ProcessDetail />} />
+          <Route path="/:policyType" element={<PolicyPage />} />
+          
           {/* Admin routes */}
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/admin/novo-processo" element={<ProcessCreate />} />

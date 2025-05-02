@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X, User, Bell } from "lucide-react";
+import { Menu, X, User, Bell, Settings } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -87,10 +87,10 @@ export default function Header() {
                     <Link to="/dashboard" className="w-full">Dashboard</Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem>
-                    <Link to="/profile" className="w-full">Perfil</Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <Link to="/settings" className="w-full">Configurações</Link>
+                    <Link to="/configuracoes" className="w-full flex items-center">
+                      <Settings className="h-4 w-4 mr-2" />
+                      Configurações
+                    </Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem>Sair</DropdownMenuItem>

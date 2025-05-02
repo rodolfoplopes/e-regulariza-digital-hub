@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import {
   Table,
@@ -16,6 +15,7 @@ import { useToast } from "@/hooks/use-toast";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
 import MobileNav from "@/components/dashboard/MobileNav";
+import UserManagement from "@/components/admin/UserManagement";
 import { Link } from "react-router-dom";
 import { Calendar, FilePlus, FileText, Users } from "lucide-react";
 
@@ -23,6 +23,7 @@ export default function AdminDashboard() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [activeTab, setActiveTab] = useState("todos");
+  const [activeSection, setActiveSection] = useState("processos");
   const { toast } = useToast();
   
   // Mock data for processes
@@ -113,7 +114,7 @@ export default function AdminDashboard() {
           <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
               <h1 className="text-2xl font-bold">Painel Administrativo</h1>
-              <p className="text-gray-500">Gerencie todos os processos e clientes</p>
+              <p className="text-gray-500">Gerencie processos, clientes e configurações</p>
             </div>
             
             <div className="flex flex-col sm:flex-row gap-3">
@@ -149,76 +150,146 @@ export default function AdminDashboard() {
             </div>
           </div>
           
-          <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
-              <TabsList>
-                <TabsTrigger value="todos">Todos</TabsTrigger>
-                <TabsTrigger value="pendente">Pendentes</TabsTrigger>
-                <TabsTrigger value="em_andamento">Em Andamento</TabsTrigger>
-                <TabsTrigger value="concluido">Concluídos</TabsTrigger>
-              </TabsList>
-              
-              <div className="relative">
-                <Input
-                  placeholder="Buscar processos..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full sm:w-[300px]"
-                />
-              </div>
-            </div>
+          <Tabs value={activeSection} onValueChange={setActiveSection} className="mb-6">
+            <TabsList>
+              <TabsTrigger value="processos">Processos</TabsTrigger>
+              <TabsTrigger value="usuarios">Usuários</TabsTrigger>
+              <TabsTrigger value="configuracoes">Configurações</TabsTrigger>
+            </TabsList>
             
-            <TabsContent value={activeTab} className="mt-0">
-              <div className="bg-white rounded-lg shadow overflow-hidden">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Processo</TableHead>
-                      <TableHead>Cliente</TableHead>
-                      <TableHead>Tipo</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Progresso</TableHead>
-                      <TableHead>Última Atualização</TableHead>
-                      <TableHead className="text-right">Ações</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {filteredProcesses.map((process) => (
-                      <TableRow key={process.id}>
-                        <TableCell className="font-medium">{process.title}</TableCell>
-                        <TableCell>{process.client}</TableCell>
-                        <TableCell>{process.type}</TableCell>
-                        <TableCell>
-                          <span className={`status-badge status-badge-${process.status}`}>
-                            {statusLabels[process.status]}
-                          </span>
-                        </TableCell>
-                        <TableCell className="w-[180px]">
-                          <div className="flex items-center space-x-2">
-                            <Progress value={process.progress} className="h-2" />
-                            <span className="text-xs text-gray-500">{process.progress}%</span>
-                          </div>
-                        </TableCell>
-                        <TableCell>{process.lastUpdate}</TableCell>
-                        <TableCell className="text-right">
-                          <Button variant="ghost" size="sm" asChild>
-                            <Link to={`/processo/${process.id}`}>
-                              Gerenciar
-                            </Link>
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    ))}
+            <TabsContent value="processos" className="mt-4">
+              <Tabs value={activeTab} onValueChange={setActiveTab}>
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+                  <TabsList>
+                    <TabsTrigger value="todos">Todos</TabsTrigger>
+                    <TabsTrigger value="pendente">Pendentes</TabsTrigger>
+                    <TabsTrigger value="em_andamento">Em Andamento</TabsTrigger>
+                    <TabsTrigger value="concluido">Concluídos</TabsTrigger>
+                  </TabsList>
+                  
+                  <div className="relative">
+                    <Input
+                      placeholder="Buscar processos..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="w-full sm:w-[300px]"
+                    />
+                  </div>
+                </div>
+                
+                <TabsContent value={activeTab} className="mt-0">
+                  <div className="bg-white rounded-lg shadow overflow-hidden">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Processo</TableHead>
+                          <TableHead>Cliente</TableHead>
+                          <TableHead>Tipo</TableHead>
+                          <TableHead>Status</TableHead>
+                          <TableHead>Progresso</TableHead>
+                          <TableHead>Última Atualização</TableHead>
+                          <TableHead className="text-right">Ações</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {filteredProcesses.map((process) => (
+                          <TableRow key={process.id}>
+                            <TableCell className="font-medium">{process.title}</TableCell>
+                            <TableCell>{process.client}</TableCell>
+                            <TableCell>{process.type}</TableCell>
+                            <TableCell>
+                              <span className={`status-badge status-badge-${process.status}`}>
+                                {statusLabels[process.status]}
+                              </span>
+                            </TableCell>
+                            <TableCell className="w-[180px]">
+                              <div className="flex items-center space-x-2">
+                                <Progress value={process.progress} className="h-2" />
+                                <span className="text-xs text-gray-500">{process.progress}%</span>
+                              </div>
+                            </TableCell>
+                            <TableCell>{process.lastUpdate}</TableCell>
+                            <TableCell className="text-right">
+                              <Button variant="ghost" size="sm" asChild>
+                                <Link to={`/processo/${process.id}`}>
+                                  Gerenciar
+                                </Link>
+                              </Button>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                        
+                        {filteredProcesses.length === 0 && (
+                          <TableRow>
+                            <TableCell colSpan={7} className="text-center py-8 text-gray-500">
+                              Nenhum processo encontrado com os filtros selecionados.
+                            </TableCell>
+                          </TableRow>
+                        )}
+                      </TableBody>
+                    </Table>
+                  </div>
+                </TabsContent>
+              </Tabs>
+            </TabsContent>
+            
+            <TabsContent value="usuarios" className="mt-4">
+              <UserManagement />
+            </TabsContent>
+            
+            <TabsContent value="configuracoes" className="mt-4">
+              <div className="bg-white rounded-lg shadow p-6">
+                <h2 className="text-xl font-semibold mb-4">Configurações do Sistema</h2>
+                
+                <div className="space-y-6">
+                  <div>
+                    <h3 className="text-lg font-medium mb-3">Páginas de Políticas</h3>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      Edite o conteúdo das páginas de políticas e termos do sistema.
+                    </p>
                     
-                    {filteredProcesses.length === 0 && (
-                      <TableRow>
-                        <TableCell colSpan={7} className="text-center py-8 text-gray-500">
-                          Nenhum processo encontrado com os filtros selecionados.
-                        </TableCell>
-                      </TableRow>
-                    )}
-                  </TableBody>
-                </Table>
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between p-3 border rounded-md">
+                        <div>
+                          <h4 className="font-medium">Política de Privacidade</h4>
+                          <p className="text-sm text-muted-foreground">
+                            Última atualização: 01/05/2025
+                          </p>
+                        </div>
+                        <Button variant="outline">Editar Conteúdo</Button>
+                      </div>
+                      
+                      <div className="flex items-center justify-between p-3 border rounded-md">
+                        <div>
+                          <h4 className="font-medium">Política de Cookies</h4>
+                          <p className="text-sm text-muted-foreground">
+                            Última atualização: 01/05/2025
+                          </p>
+                        </div>
+                        <Button variant="outline">Editar Conteúdo</Button>
+                      </div>
+                      
+                      <div className="flex items-center justify-between p-3 border rounded-md">
+                        <div>
+                          <h4 className="font-medium">Termos de Uso</h4>
+                          <p className="text-sm text-muted-foreground">
+                            Última atualização: 01/05/2025
+                          </p>
+                        </div>
+                        <Button variant="outline">Editar Conteúdo</Button>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <h3 className="text-lg font-medium mb-3">Configurações de E-mail</h3>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      Configure os templates e remetentes de e-mails automatizados.
+                    </p>
+                    
+                    <Button variant="outline">Gerenciar E-mails</Button>
+                  </div>
+                </div>
               </div>
             </TabsContent>
           </Tabs>
