@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
-import { FileText, FilePdf } from "lucide-react";
+import { FileText, File } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -341,7 +341,7 @@ export default function ReportExport({ clients = [], serviceTypes = [] }: Report
                   className="flex items-center"
                   onClick={() => setExportFormat("pdf")}
                 >
-                  <FilePdf className="h-4 w-4 mr-2" />
+                  <File className="h-4 w-4 mr-2" />
                   PDF (Relatório)
                 </Button>
               </div>
