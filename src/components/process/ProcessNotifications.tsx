@@ -21,22 +21,44 @@ export interface Notification {
   type: "document" | "message" | "status" | "system";
 }
 
-interface ProcessNotificationsProps {
+export interface ProcessNotificationsProps {
   processId: string;
-  notifications: Notification[];
-  onMarkAsRead: (notificationId: string) => void;
-  onMarkAllAsRead: () => void;
+  notifications?: Notification[];
+  onMarkAsRead?: (notificationId: string) => void;
+  onMarkAllAsRead?: () => void;
+  isAdmin?: boolean;
 }
 
 export default function ProcessNotifications({
   processId,
-  notifications,
-  onMarkAsRead,
-  onMarkAllAsRead,
+  notifications = [],
+  onMarkAsRead = () => {},
+  onMarkAllAsRead = () => {},
+  isAdmin = false
 }: ProcessNotificationsProps) {
   const [isOpen, setIsOpen] = useState(false);
   
-  const unreadCount = notifications.filter(n => !n.isRead).length;
+  // Dados de exemplo caso nenhum seja fornecido
+  const mockNotifications: Notification[] = notifications.length > 0 ? notifications : [
+    {
+      id: "1",
+      title: "Documento enviado",
+      message: "O documento 'Escritura.pdf' foi enviado com sucesso.",
+      timestamp: "02/05/2023 14:30",
+      isRead: false,
+      type: "document"
+    },
+    {
+      id: "2",
+      title: "Nova mensagem",
+      message: "Você recebeu uma nova mensagem do advogado.",
+      timestamp: "01/05/2023 10:15",
+      isRead: true,
+      type: "message"
+    }
+  ];
+  
+  const unreadCount = mockNotifications.filter(n => !n.isRead).length;
   
   const getNotificationIcon = (type: Notification["type"]) => {
     switch (type) {

@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
 import { getFormattedDeadline, getDeadlineInfo } from "@/utils/dateUtils";
-import ProcessTimeline from "@/components/process/ProcessTimeline";
+import ProcessTimeline, { ProcessStage } from "@/components/process/ProcessTimeline";
 import ProcessMessages from "@/components/process/ProcessMessages";
 import ProcessNotifications from "@/components/process/ProcessNotifications";
 import DocumentManager from "@/components/process/DocumentManager";
@@ -27,7 +27,7 @@ const process = {
 };
 
 // Mock stages data
-const stages = [
+const stages: ProcessStage[] = [
   {
     id: "stage-1",
     title: "Análise Preliminar",
@@ -128,8 +128,8 @@ export default function ProcessDetail() {
             </div>
             
             <div className="flex items-center space-x-2 md:space-x-4">
-              <div className="px-3 py-1 rounded-full text-sm font-medium whitespace-nowrap md:text-base md:px-4 md:py-1.5 inline-flex items-center gap-1.5 
-                              ${getStatusClass(process.status)}">
+              <div className={`px-3 py-1 rounded-full text-sm font-medium whitespace-nowrap md:text-base md:px-4 md:py-1.5 inline-flex items-center gap-1.5 
+                              ${getStatusClass(process.status)}`}>
                 {formatStatus(process.status)}
               </div>
               

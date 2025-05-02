@@ -22,16 +22,18 @@ export interface Message {
   }[];
 }
 
-interface ProcessMessagesProps {
-  messages: Message[];
-  onSendMessage: (content: string, attachments?: File[]) => Promise<void>;
+export interface ProcessMessagesProps {
+  messages?: Message[];
+  onSendMessage?: (content: string, attachments?: File[]) => Promise<void>;
   processId: string;
+  isAdmin?: boolean;
 }
 
 export default function ProcessMessages({
-  messages,
-  onSendMessage,
-  processId
+  messages = [],
+  onSendMessage = async () => {},
+  processId,
+  isAdmin = false
 }: ProcessMessagesProps) {
   const [newMessage, setNewMessage] = useState("");
   const [attachments, setAttachments] = useState<File[]>([]);
@@ -39,10 +41,36 @@ export default function ProcessMessages({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   
+  // Simulando mensagens caso não sejam passadas
+  const mockMessages: Message[] = messages.length > 0 ? messages : [
+    {
+      id: '1',
+      content: 'Bom dia! Precisamos dos documentos do terreno para dar continuidade ao processo.',
+      sender: {
+        id: 'admin1',
+        name: 'Advogado E-regulariza',
+        initials: 'ER',
+        type: 'admin'
+      },
+      timestamp: '01/05/2023 10:30'
+    },
+    {
+      id: '2',
+      content: 'Olá, acabei de enviar os documentos solicitados. Por favor, confirme o recebimento.',
+      sender: {
+        id: 'client1',
+        name: 'João da Silva',
+        initials: 'JS',
+        type: 'client'
+      },
+      timestamp: '01/05/2023 14:22'
+    }
+  ];
+  
   // Scroll to bottom when messages change
   useEffect(() => {
     scrollToBottom();
-  }, [messages]);
+  }, [mockMessages]);
   
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -85,7 +113,7 @@ export default function ProcessMessages({
   
   // Group messages by date
   const groupedMessages: { [date: string]: Message[] } = {};
-  messages.forEach(message => {
+  mockMessages.forEach(message => {
     const date = message.timestamp.split(' ')[0]; // Extract date part
     if (!groupedMessages[date]) {
       groupedMessages[date] = [];

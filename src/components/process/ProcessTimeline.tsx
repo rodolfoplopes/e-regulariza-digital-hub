@@ -6,27 +6,43 @@ export interface ProcessStage {
   id: string;
   title: string;
   description: string;
-  status: "pending" | "in_progress" | "completed";
+  status: "pendente" | "em_andamento" | "concluido" | "pending" | "in_progress" | "completed";
   date?: string;
+  startDate?: Date;
+  endDate?: Date;
+  estimatedDays?: number;
 }
 
 interface ProcessTimelineProps {
   stages: ProcessStage[];
-  currentStageId: string;
+  currentStageId?: string;
+  activeStage?: string;
+  onStageClick?: (stageId: string) => void;
+  isAdmin?: boolean;
 }
 
-export default function ProcessTimeline({ stages, currentStageId }: ProcessTimelineProps) {
+export default function ProcessTimeline({ 
+  stages, 
+  currentStageId, 
+  activeStage, 
+  onStageClick,
+  isAdmin 
+}: ProcessTimelineProps) {
   return (
     <div className="space-y-8 relative before:absolute before:inset-0 before:left-4 before:h-full before:w-0.5 before:bg-gray-200">
       {stages.map((stage, index) => {
-        const isActive = stage.id === currentStageId;
-        const isCompleted = stage.status === "completed";
+        const isActive = activeStage ? stage.id === activeStage : stage.id === currentStageId;
+        const isCompleted = stage.status === "completed" || stage.status === "concluido";
 
         return (
-          <div key={stage.id} className="relative pl-10">
+          <div 
+            key={stage.id} 
+            className="relative pl-10"
+            onClick={() => onStageClick && onStageClick(stage.id)}
+          >
             <div 
               className={cn(
-                "absolute left-0 flex h-8 w-8 items-center justify-center rounded-full border text-white",
+                "absolute left-0 flex h-8 w-8 items-center justify-center rounded-full border text-white cursor-pointer",
                 isCompleted ? "bg-green-500 border-green-600" : 
                 isActive ? "bg-eregulariza-primary border-eregulariza-primary/70" : 
                 "bg-gray-300 border-gray-400"
