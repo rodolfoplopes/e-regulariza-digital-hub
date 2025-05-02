@@ -16,6 +16,7 @@ import AdminDashboard from "./pages/AdminDashboard";
 import ProcessCreate from "./pages/ProcessCreate";
 import UserSettings from "./pages/UserSettings";
 import PolicyPage from "./pages/PolicyPage";
+import Notifications from "./pages/Notifications";
 
 const queryClient = new QueryClient();
 
@@ -136,6 +137,7 @@ const App = () => {
             <Route path="/configuracoes" element={<ProtectedRoute><UserSettings /></ProtectedRoute>} />
             <Route path="/contato" element={<ProtectedRoute><ContactPage /></ProtectedRoute>} />
             <Route path="/processo/:processId" element={<ProtectedRoute><ProcessDetail /></ProtectedRoute>} />
+            <Route path="/notificacoes" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />
             
             {/* Admin routes */}
             <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />

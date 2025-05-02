@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
-import { Bell, Check, Settings, X } from "lucide-react";
+import { Bell, Check, FileCheck, FileText, Mail, MessageSquare, Settings, X } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,11 +18,14 @@ export interface Notification {
   message: string;
   timestamp: string;
   isRead: boolean;
-  type: "document" | "message" | "status" | "system";
+  type: "document" | "message" | "status" | "system" | "approval";
+  processId?: string;
+  userId?: string;
+  priority?: "low" | "medium" | "high";
 }
 
 export interface ProcessNotificationsProps {
-  processId: string;
+  processId?: string;
   notifications?: Notification[];
   onMarkAsRead?: (notificationId: string) => void;
   onMarkAllAsRead?: () => void;
@@ -46,7 +49,8 @@ export default function ProcessNotifications({
       message: "O documento 'Escritura.pdf' foi enviado com sucesso.",
       timestamp: "02/05/2023 14:30",
       isRead: false,
-      type: "document"
+      type: "document",
+      priority: "medium"
     },
     {
       id: "2",
@@ -54,23 +58,81 @@ export default function ProcessNotifications({
       message: "Você recebeu uma nova mensagem do advogado.",
       timestamp: "01/05/2023 10:15",
       isRead: true,
-      type: "message"
+      type: "message",
+      priority: "high"
+    },
+    {
+      id: "3",
+      title: "Documento aprovado",
+      message: "O documento 'Procuração.pdf' foi aprovado pelo administrador.",
+      timestamp: "01/05/2023 09:20",
+      isRead: false,
+      type: "approval",
+      priority: "high"
+    },
+    {
+      id: "4",
+      title: "Etapa concluída",
+      message: "A etapa 'Análise Preliminar' foi concluída com sucesso.",
+      timestamp: "30/04/2023 16:45",
+      isRead: false,
+      type: "status",
+      priority: "medium"
+    },
+    {
+      id: "5",
+      title: "Novo processo iniciado",
+      message: "Um novo processo de usucapião foi iniciado para você.",
+      timestamp: "28/04/2023 11:30",
+      isRead: true,
+      type: "system",
+      priority: "low"
     }
   ];
   
   const unreadCount = mockNotifications.filter(n => !n.isRead).length;
   
-  const getNotificationIcon = (type: Notification["type"]) => {
+  const getNotificationIcon = (type: Notification["type"], priority: Notification["priority"] = "medium") => {
+    const priorityColors = {
+      low: "bg-gray-500",
+      medium: "bg-blue-500",
+      high: "bg-red-500",
+    };
+    
+    const color = priorityColors[priority || "medium"];
+    
     switch (type) {
       case "document":
-        return <div className="w-2 h-2 rounded-full bg-green-500"></div>;
+        return (
+          <div className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-100">
+            <FileText className="h-4 w-4 text-blue-600" />
+          </div>
+        );
       case "message":
-        return <div className="w-2 h-2 rounded-full bg-blue-500"></div>;
+        return (
+          <div className="flex items-center justify-center w-8 h-8 rounded-full bg-green-100">
+            <MessageSquare className="h-4 w-4 text-green-600" />
+          </div>
+        );
       case "status":
-        return <div className="w-2 h-2 rounded-full bg-yellow-500"></div>;
+        return (
+          <div className="flex items-center justify-center w-8 h-8 rounded-full bg-yellow-100">
+            <FileCheck className="h-4 w-4 text-yellow-600" />
+          </div>
+        );
+      case "approval":
+        return (
+          <div className="flex items-center justify-center w-8 h-8 rounded-full bg-green-100">
+            <Check className="h-4 w-4 text-green-600" />
+          </div>
+        );
       case "system":
       default:
-        return <div className="w-2 h-2 rounded-full bg-gray-500"></div>;
+        return (
+          <div className="flex items-center justify-center w-8 h-8 rounded-full bg-gray-100">
+            <Bell className="h-4 w-4 text-gray-600" />
+          </div>
+        );
     }
   };
 
@@ -107,19 +169,17 @@ export default function ProcessNotifications({
         <DropdownMenuSeparator />
         
         <ScrollArea className="h-[300px]">
-          {notifications.length > 0 ? (
+          {mockNotifications.length > 0 ? (
             <div className="py-2">
-              {notifications.map((notification) => (
+              {mockNotifications.map((notification) => (
                 <DropdownMenuItem
                   key={notification.id}
                   className={cn(
-                    "flex items-start p-3 cursor-default",
+                    "flex items-start gap-3 p-3 cursor-default",
                     !notification.isRead && "bg-muted/50"
                   )}
                 >
-                  <div className="flex items-center h-5 mr-3 mt-0.5">
-                    {getNotificationIcon(notification.type)}
-                  </div>
+                  {getNotificationIcon(notification.type, notification.priority)}
                   <div className="flex-1 space-y-1">
                     <div className="flex justify-between">
                       <p className="text-sm font-medium leading-none">

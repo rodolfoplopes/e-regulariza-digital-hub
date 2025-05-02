@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import {
   Table,
@@ -17,7 +18,9 @@ import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
 import MobileNav from "@/components/dashboard/MobileNav";
 import UserManagement from "@/components/admin/UserManagement";
 import { Link } from "react-router-dom";
-import { Calendar, FilePlus, FileText, Users } from "lucide-react";
+import { Calendar, FileText, FilePlus, Mail, Users } from "lucide-react";
+import EmailSender from "@/components/admin/EmailSender";
+import ReportExport from "@/components/admin/ReportExport";
 
 export default function AdminDashboard() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -124,10 +127,10 @@ export default function AdminDashboard() {
                   Novo Processo
                 </Link>
               </Button>
-              <Button onClick={handleExportData}>
-                <FileText className="h-4 w-4 mr-2" />
-                Exportar Relatório
-              </Button>
+              
+              <ReportExport />
+              
+              <EmailSender />
             </div>
           </div>
           
