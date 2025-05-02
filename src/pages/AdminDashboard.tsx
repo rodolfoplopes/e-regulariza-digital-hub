@@ -1,46 +1,20 @@
 
-import { useState, useEffect } from "react";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Progress } from "@/components/ui/progress";
+import { useState } from "react";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
 import MobileNav from "@/components/dashboard/MobileNav";
-import UserManagement from "@/components/admin/UserManagement";
-import { Link } from "react-router-dom";
-import { Calendar, FileText, FilePlus, Mail, Users, Filter } from "lucide-react";
-import EmailSender from "@/components/admin/EmailSender";
-import ReportExport from "@/components/admin/ReportExport";
-import ProcessFilters from "@/components/admin/ProcessFilters";
+import AdminStats from "@/components/admin/AdminStats";
+import AdminHeader from "@/components/admin/AdminHeader";
+import AdminTabContent from "@/components/admin/AdminTabContent";
+import ClientsTable from "@/components/admin/ClientsTable";
 
 export default function AdminDashboard() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [activeTab, setActiveTab] = useState("todos");
   const [activeSection, setActiveSection] = useState("processos");
-  const [showFilters, setShowFilters] = useState(false);
   const { toast } = useToast();
   
-  // Filter states
-  const [filters, setFilters] = useState({
-    clientName: "",
-    serviceType: "",
-    status: "",
-    startDate: "",
-    endDate: "",
-    processNumber: ""
-  });
-
   // Mock data for processes
   const processes = [
     {
@@ -95,90 +69,6 @@ export default function AdminDashboard() {
 
   // Get unique service types for filter dropdown
   const serviceTypes = [...new Set(processes.map(process => process.type))];
-  
-  // Filter processes based on the active tab, search term, and advanced filters
-  const filteredProcesses = processes.filter(process => {
-    // First check the tab filter
-    if (activeTab !== "todos" && process.status !== activeTab) {
-      return false;
-    }
-    
-    // Then check search term
-    const matchesSearch = 
-      process.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      process.client.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      process.type.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      process.id.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    if (!matchesSearch) {
-      return false;
-    }
-    
-    // Then check advanced filters
-    if (filters.clientName && !process.client.toLowerCase().includes(filters.clientName.toLowerCase())) {
-      return false;
-    }
-    
-    if (filters.serviceType && process.type !== filters.serviceType) {
-      return false;
-    }
-    
-    if (filters.status && process.status !== filters.status) {
-      return false;
-    }
-    
-    if (filters.processNumber && !process.id.toLowerCase().includes(filters.processNumber.toLowerCase())) {
-      return false;
-    }
-    
-    // Date filtering
-    if (filters.startDate) {
-      const startDate = new Date(filters.startDate);
-      const processDate = new Date(process.creationDate.split('/').reverse().join('-'));
-      if (processDate < startDate) {
-        return false;
-      }
-    }
-    
-    if (filters.endDate) {
-      const endDate = new Date(filters.endDate);
-      const processDate = new Date(process.creationDate.split('/').reverse().join('-'));
-      if (processDate > endDate) {
-        return false;
-      }
-    }
-    
-    return true;
-  });
-  
-  const handleExportData = () => {
-    toast({
-      title: "Exportação iniciada",
-      description: "Os dados serão enviados para seu e-mail em breve.",
-    });
-  };
-
-  const handleFilterChange = (newFilters) => {
-    setFilters({ ...filters, ...newFilters });
-  };
-  
-  const clearFilters = () => {
-    setFilters({
-      clientName: "",
-      serviceType: "",
-      status: "",
-      startDate: "",
-      endDate: "",
-      processNumber: ""
-    });
-  };
-  
-  const statusLabels: Record<string, string> = {
-    pendente: "Pendente",
-    em_andamento: "Em Andamento",
-    concluido: "Concluído",
-    rejeitado: "Rejeitado"
-  };
 
   return (
     <div className="flex h-screen bg-gray-50">
@@ -189,47 +79,15 @@ export default function AdminDashboard() {
         <DashboardHeader />
         
         <main className="flex-1 overflow-y-auto p-4 md:p-6">
-          <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div>
-              <h1 className="text-2xl font-bold">Painel Administrativo</h1>
-              <p className="text-gray-500">Gerencie processos, clientes e configurações</p>
-            </div>
-            
-            <div className="flex flex-col sm:flex-row gap-3">
-              <Button asChild variant="outline">
-                <Link to="/admin/novo-processo">
-                  <FilePlus className="h-4 w-4 mr-2" />
-                  Novo Processo
-                </Link>
-              </Button>
-              
-              <ReportExport 
-                clients={clients}
-                serviceTypes={serviceTypes.map(type => ({ id: type, name: type }))}
-              />
-              
-              <EmailSender />
-            </div>
-          </div>
+          <AdminHeader 
+            clients={clients}
+            serviceTypes={serviceTypes}
+          />
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-            <div className="bg-white p-4 rounded-lg shadow">
-              <h3 className="text-sm font-medium text-gray-500">Total de Processos</h3>
-              <p className="text-2xl font-bold">{processes.length}</p>
-            </div>
-            <div className="bg-white p-4 rounded-lg shadow">
-              <h3 className="text-sm font-medium text-gray-500">Em Andamento</h3>
-              <p className="text-2xl font-bold">{processes.filter(p => p.status === 'em_andamento').length}</p>
-            </div>
-            <div className="bg-white p-4 rounded-lg shadow">
-              <h3 className="text-sm font-medium text-gray-500">Concluídos</h3>
-              <p className="text-2xl font-bold">{processes.filter(p => p.status === 'concluido').length}</p>
-            </div>
-            <div className="bg-white p-4 rounded-lg shadow">
-              <h3 className="text-sm font-medium text-gray-500">Total de Clientes</h3>
-              <p className="text-2xl font-bold">{clients.length}</p>
-            </div>
-          </div>
+          <AdminStats 
+            processes={processes}
+            clientsCount={clients.length}
+          />
           
           <Tabs value={activeSection} onValueChange={setActiveSection} className="mb-6">
             <TabsList>
@@ -238,198 +96,15 @@ export default function AdminDashboard() {
               <TabsTrigger value="configuracoes">Configurações</TabsTrigger>
             </TabsList>
             
-            <TabsContent value="processos" className="mt-4">
-              <Tabs value={activeTab} onValueChange={setActiveTab}>
-                <div className="flex flex-col space-y-4 mb-4">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                    <TabsList>
-                      <TabsTrigger value="todos">Todos</TabsTrigger>
-                      <TabsTrigger value="pendente">Pendentes</TabsTrigger>
-                      <TabsTrigger value="em_andamento">Em Andamento</TabsTrigger>
-                      <TabsTrigger value="concluido">Concluídos</TabsTrigger>
-                    </TabsList>
-                    
-                    <div className="flex items-center gap-2">
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        onClick={() => setShowFilters(!showFilters)}
-                        className="flex items-center gap-1"
-                      >
-                        <Filter className="h-4 w-4" />
-                        {showFilters ? 'Ocultar Filtros' : 'Filtros Avançados'}
-                      </Button>
-                      
-                      <div className="relative">
-                        <Input
-                          placeholder="Buscar processos..."
-                          value={searchTerm}
-                          onChange={(e) => setSearchTerm(e.target.value)}
-                          className="w-full sm:w-[300px]"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                  
-                  {showFilters && (
-                    <ProcessFilters 
-                      filters={filters}
-                      onFilterChange={handleFilterChange}
-                      onClearFilters={clearFilters}
-                      clients={clients}
-                      serviceTypes={serviceTypes}
-                    />
-                  )}
-                </div>
-                
-                <TabsContent value={activeTab} className="mt-0">
-                  <div className="bg-white rounded-lg shadow overflow-hidden">
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>Processo</TableHead>
-                          <TableHead>Cliente</TableHead>
-                          <TableHead>Tipo</TableHead>
-                          <TableHead>Status</TableHead>
-                          <TableHead>Progresso</TableHead>
-                          <TableHead>Criação</TableHead>
-                          <TableHead>Última Atualização</TableHead>
-                          <TableHead className="text-right">Ações</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {filteredProcesses.map((process) => (
-                          <TableRow key={process.id}>
-                            <TableCell className="font-medium">{process.title}</TableCell>
-                            <TableCell>{process.client}</TableCell>
-                            <TableCell>{process.type}</TableCell>
-                            <TableCell>
-                              <span className={`status-badge status-badge-${process.status}`}>
-                                {statusLabels[process.status]}
-                              </span>
-                            </TableCell>
-                            <TableCell className="w-[180px]">
-                              <div className="flex items-center space-x-2">
-                                <Progress value={process.progress} className="h-2" />
-                                <span className="text-xs text-gray-500">{process.progress}%</span>
-                              </div>
-                            </TableCell>
-                            <TableCell>{process.creationDate}</TableCell>
-                            <TableCell>{process.lastUpdate}</TableCell>
-                            <TableCell className="text-right">
-                              <Button variant="ghost" size="sm" asChild>
-                                <Link to={`/processo/${process.id}`}>
-                                  Gerenciar
-                                </Link>
-                              </Button>
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                        
-                        {filteredProcesses.length === 0 && (
-                          <TableRow>
-                            <TableCell colSpan={8} className="text-center py-8 text-gray-500">
-                              Nenhum processo encontrado com os filtros selecionados.
-                            </TableCell>
-                          </TableRow>
-                        )}
-                      </TableBody>
-                    </Table>
-                  </div>
-                </TabsContent>
-              </Tabs>
-            </TabsContent>
-            
-            <TabsContent value="usuarios" className="mt-4">
-              <UserManagement />
-            </TabsContent>
-            
-            <TabsContent value="configuracoes" className="mt-4">
-              <div className="bg-white rounded-lg shadow p-6">
-                <h2 className="text-xl font-semibold mb-4">Configurações do Sistema</h2>
-                
-                <div className="space-y-6">
-                  <div>
-                    <h3 className="text-lg font-medium mb-3">Páginas de Políticas</h3>
-                    <p className="text-sm text-muted-foreground mb-4">
-                      Edite o conteúdo das páginas de políticas e termos do sistema.
-                    </p>
-                    
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between p-3 border rounded-md">
-                        <div>
-                          <h4 className="font-medium">Política de Privacidade</h4>
-                          <p className="text-sm text-muted-foreground">
-                            Última atualização: 01/05/2025
-                          </p>
-                        </div>
-                        <Button variant="outline">Editar Conteúdo</Button>
-                      </div>
-                      
-                      <div className="flex items-center justify-between p-3 border rounded-md">
-                        <div>
-                          <h4 className="font-medium">Política de Cookies</h4>
-                          <p className="text-sm text-muted-foreground">
-                            Última atualização: 01/05/2025
-                          </p>
-                        </div>
-                        <Button variant="outline">Editar Conteúdo</Button>
-                      </div>
-                      
-                      <div className="flex items-center justify-between p-3 border rounded-md">
-                        <div>
-                          <h4 className="font-medium">Termos de Uso</h4>
-                          <p className="text-sm text-muted-foreground">
-                            Última atualização: 01/05/2025
-                          </p>
-                        </div>
-                        <Button variant="outline">Editar Conteúdo</Button>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <h3 className="text-lg font-medium mb-3">Configurações de E-mail</h3>
-                    <p className="text-sm text-muted-foreground mb-4">
-                      Configure os templates e remetentes de e-mails automatizados.
-                    </p>
-                    
-                    <Button variant="outline">Gerenciar E-mails</Button>
-                  </div>
-                </div>
-              </div>
-            </TabsContent>
+            <AdminTabContent 
+              activeSection={activeSection}
+              processes={processes}
+              clients={clients}
+              serviceTypes={serviceTypes}
+            />
           </Tabs>
           
-          <div className="mt-8">
-            <h2 className="text-xl font-semibold mb-4">Clientes</h2>
-            <div className="bg-white rounded-lg shadow overflow-hidden">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Nome</TableHead>
-                    <TableHead>Email</TableHead>
-                    <TableHead>Processos</TableHead>
-                    <TableHead className="text-right">Ações</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {clients.map((client) => (
-                    <TableRow key={client.id}>
-                      <TableCell className="font-medium">{client.name}</TableCell>
-                      <TableCell>{client.email}</TableCell>
-                      <TableCell>{client.processes}</TableCell>
-                      <TableCell className="text-right">
-                        <Button variant="ghost" size="sm">
-                          Ver detalhes
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          </div>
+          <ClientsTable clients={clients} />
         </main>
       </div>
     </div>
