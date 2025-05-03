@@ -19,16 +19,82 @@ export default function Register() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
+  const [cpf, setCpf] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [cpfError, setCpfError] = useState("");
   
   const navigate = useNavigate();
   const { toast } = useToast();
 
+  const validateCPF = (cpf: string): boolean => {
+    // Remove non-numeric characters
+    const cpfClean = cpf.replace(/\D/g, '');
+    
+    // Check if length is 11
+    if (cpfClean.length !== 11) {
+      return false;
+    }
+
+    // Check if all digits are the same (invalid CPF)
+    if (/^(\d)\1{10}$/.test(cpfClean)) {
+      return false;
+    }
+
+    // Validate first check digit
+    let sum = 0;
+    for (let i = 0; i < 9; i++) {
+      sum += parseInt(cpfClean.charAt(i)) * (10 - i);
+    }
+    let checkDigit = 11 - (sum % 11);
+    if (checkDigit === 10 || checkDigit === 11) {
+      checkDigit = 0;
+    }
+    if (checkDigit !== parseInt(cpfClean.charAt(9))) {
+      return false;
+    }
+
+    // Validate second check digit
+    sum = 0;
+    for (let i = 0; i < 10; i++) {
+      sum += parseInt(cpfClean.charAt(i)) * (11 - i);
+    }
+    checkDigit = 11 - (sum % 11);
+    if (checkDigit === 10 || checkDigit === 11) {
+      checkDigit = 0;
+    }
+    if (checkDigit !== parseInt(cpfClean.charAt(10))) {
+      return false;
+    }
+
+    return true;
+  };
+
+  const handleCPFChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // Allow only numbers and format as ###.###.###-##
+    const value = e.target.value.replace(/\D/g, "");
+    setCpfError("");
+    
+    if (value.length <= 11) {
+      let formattedValue = value;
+      if (value.length > 3) {
+        formattedValue = `${value.slice(0, 3)}.${value.slice(3)}`;
+      }
+      if (value.length > 6) {
+        formattedValue = `${value.slice(0, 3)}.${value.slice(3, 6)}.${value.slice(6)}`;
+      }
+      if (value.length > 9) {
+        formattedValue = `${value.slice(0, 3)}.${value.slice(3, 6)}.${value.slice(6, 9)}-${value.slice(9)}`;
+      }
+      setCpf(formattedValue);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     
+    // Validate password
     if (password !== confirmPassword) {
       toast({
         variant: "destructive",
@@ -38,11 +104,39 @@ export default function Register() {
       return;
     }
     
+    // Validate CPF
+    if (!cpf || !validateCPF(cpf)) {
+      setCpfError("CPF inválido. Verifique o número inserido.");
+      toast({
+        variant: "destructive",
+        title: "Erro no cadastro",
+        description: "CPF inválido. Verifique o número inserido.",
+      });
+      return;
+    }
+
     setIsLoading(true);
 
     // Mock registration function - would be replaced with actual auth
     try {
-      // Simulate API call
+      // In a real implementation, we'd check if CPF already exists in the database
+      // For this mock version, we'll simulate a check
+      const cpfExists = Math.random() > 0.9; // 10% chance of CPF already existing
+      
+      if (cpfExists) {
+        toast({
+          variant: "destructive",
+          title: "Erro no cadastro",
+          description: "CPF já cadastrado no sistema.",
+        });
+        setIsLoading(false);
+        return;
+      }
+      
+      // Here we would create a hash of the CPF for storage
+      // const cpfHash = await createCPFHash(cpf); // In a real implementation
+      
+      // Simulate API call with delay
       await new Promise((resolve) => setTimeout(resolve, 1000));
       
       toast({
@@ -114,6 +208,22 @@ export default function Register() {
                     onChange={(e) => setEmail(e.target.value)}
                     required
                   />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="cpf">CPF</Label>
+                  <Input
+                    id="cpf"
+                    type="text"
+                    placeholder="000.000.000-00"
+                    value={cpf}
+                    onChange={handleCPFChange}
+                    required
+                    className={cpfError ? "border-red-500" : ""}
+                  />
+                  {cpfError && (
+                    <p className="text-xs text-red-500 mt-1">{cpfError}</p>
+                  )}
                 </div>
                 
                 <div className="space-y-2">
