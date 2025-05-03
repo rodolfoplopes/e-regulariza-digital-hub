@@ -27,6 +27,7 @@ export default function ChangePasswordModal({ isOpen, onClose }: ChangePasswordM
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [attemptCount, setAttemptCount] = useState(0);
   const { toast } = useToast();
   
   const [errors, setErrors] = useState({
@@ -50,6 +51,8 @@ export default function ChangePasswordModal({ isOpen, onClose }: ChangePasswordM
       newErrors.newPassword = "A nova senha é obrigatória";
     } else if (newPassword.length < 8) {
       newErrors.newPassword = "A senha deve ter pelo menos 8 caracteres";
+    } else if (!/^(?=.*[A-Za-z])(?=.*\d)/.test(newPassword)) {
+      newErrors.newPassword = "A senha deve conter letras e números";
     }
     
     if (!confirmPassword) {
@@ -73,20 +76,65 @@ export default function ChangePasswordModal({ isOpen, onClose }: ChangePasswordM
     setIsLoading(true);
     
     try {
-      // Mock API call to change password
+      // Check if we have reached the attempt limit
+      if (attemptCount >= 3) {
+        toast({
+          variant: "destructive",
+          title: "Muitas tentativas",
+          description: "Por favor, aguarde alguns minutos antes de tentar novamente.",
+        });
+        setIsLoading(false);
+        return;
+      }
+      
+      // This is where we would integrate with Supabase
+      // In a real implementation, you would use:
+      // 
+      // 1. First authenticate the current password:
+      // const { error: signInError } = await supabase.auth.signInWithPassword({
+      //   email: currentUserEmail, // You would need to get this from your auth context
+      //   password: currentPassword,
+      // });
+      // 
+      // 2. If current password is correct, update to the new password:
+      // if (!signInError) {
+      //   const { error: updateError } = await supabase.auth.updateUser({ 
+      //     password: newPassword 
+      //   });
+      //  
+      //   if (!updateError) {
+      //     // Success
+      //   }
+      // }
+      
+      // For now, we'll simulate the API call with a delay
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      toast({
-        title: "Senha alterada com sucesso",
-        description: "Sua senha foi atualizada com segurança.",
-      });
+      // Simulate random success/failure for demonstration
+      const isSuccessful = true; // In real implementation, this would depend on the API response
       
-      // Reset form and close modal
-      setCurrentPassword("");
-      setNewPassword("");
-      setConfirmPassword("");
-      onClose();
+      if (isSuccessful) {
+        toast({
+          title: "Senha alterada com sucesso",
+          description: "Sua senha foi atualizada com segurança.",
+        });
+        
+        // Reset form and close modal
+        setCurrentPassword("");
+        setNewPassword("");
+        setConfirmPassword("");
+        setAttemptCount(0);
+        onClose();
+      } else {
+        setAttemptCount(prev => prev + 1);
+        toast({
+          variant: "destructive",
+          title: "Erro ao alterar senha",
+          description: "Por favor, verifique se sua senha atual está correta.",
+        });
+      }
     } catch (error) {
+      setAttemptCount(prev => prev + 1);
       toast({
         variant: "destructive",
         title: "Erro ao alterar senha",
@@ -126,11 +174,13 @@ export default function ChangePasswordModal({ isOpen, onClose }: ChangePasswordM
                   value={currentPassword}
                   onChange={(e) => setCurrentPassword(e.target.value)}
                   className="pr-10"
+                  disabled={isLoading}
                 />
                 <button
                   type="button"
                   className="absolute inset-y-0 right-0 flex items-center pr-3"
                   onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                  disabled={isLoading}
                 >
                   {showCurrentPassword ? (
                     <EyeOff className="h-4 w-4 text-gray-400" />
@@ -153,11 +203,13 @@ export default function ChangePasswordModal({ isOpen, onClose }: ChangePasswordM
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
                   className="pr-10"
+                  disabled={isLoading}
                 />
                 <button
                   type="button"
                   className="absolute inset-y-0 right-0 flex items-center pr-3"
                   onClick={() => setShowNewPassword(!showNewPassword)}
+                  disabled={isLoading}
                 >
                   {showNewPassword ? (
                     <EyeOff className="h-4 w-4 text-gray-400" />
@@ -170,7 +222,7 @@ export default function ChangePasswordModal({ isOpen, onClose }: ChangePasswordM
                 <p className="text-sm text-destructive">{errors.newPassword}</p>
               ) : (
                 <p className="text-xs text-muted-foreground">
-                  A senha deve ter pelo menos 8 caracteres.
+                  A senha deve ter pelo menos 8 caracteres, incluindo letras e números.
                 </p>
               )}
             </div>
@@ -184,11 +236,13 @@ export default function ChangePasswordModal({ isOpen, onClose }: ChangePasswordM
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   className="pr-10"
+                  disabled={isLoading}
                 />
                 <button
                   type="button"
                   className="absolute inset-y-0 right-0 flex items-center pr-3"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  disabled={isLoading}
                 >
                   {showConfirmPassword ? (
                     <EyeOff className="h-4 w-4 text-gray-400" />
