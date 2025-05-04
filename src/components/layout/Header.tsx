@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Link, useLocation } from "react-router-dom";
 import { Menu, X, User, Bell, Settings } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Logo } from "@/components/brand/Logo";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -26,12 +27,7 @@ export default function Header() {
       <div className="container mx-auto flex justify-between items-center h-16 px-4 sm:px-6 lg:px-8">
         <div className="flex items-center">
           <Link to="/" className="flex items-center gap-2">
-            <div className="w-10 h-10 rounded-full eregulariza-gradient flex items-center justify-center">
-              <span className="font-bold text-white">e</span>
-            </div>
-            <span className="text-lg font-semibold hidden sm:inline-block">
-              e-regulariza
-            </span>
+            <Logo variant="default" />
           </Link>
         </div>
 
@@ -39,25 +35,25 @@ export default function Header() {
         <nav className="hidden md:flex items-center space-x-4">
           <Link 
             to="/" 
-            className={`px-3 py-2 text-sm font-medium ${location.pathname === "/" ? "text-eregulariza-primary" : "text-gray-700 hover:text-eregulariza-primary"}`}
+            className={`px-3 py-2 text-sm font-medium ${location.pathname === "/" ? "text-eregulariza-primary" : "text-eregulariza-darkgray hover:text-eregulariza-primary"}`}
           >
             Home
           </Link>
           <Link 
             to="/sobre" 
-            className={`px-3 py-2 text-sm font-medium ${location.pathname === "/sobre" ? "text-eregulariza-primary" : "text-gray-700 hover:text-eregulariza-primary"}`}
+            className={`px-3 py-2 text-sm font-medium ${location.pathname === "/sobre" ? "text-eregulariza-primary" : "text-eregulariza-darkgray hover:text-eregulariza-primary"}`}
           >
             Sobre
           </Link>
           <Link 
             to="/servicos" 
-            className={`px-3 py-2 text-sm font-medium ${location.pathname === "/servicos" ? "text-eregulariza-primary" : "text-gray-700 hover:text-eregulariza-primary"}`}
+            className={`px-3 py-2 text-sm font-medium ${location.pathname === "/servicos" ? "text-eregulariza-primary" : "text-eregulariza-darkgray hover:text-eregulariza-primary"}`}
           >
             Serviços
           </Link>
           <Link 
             to="/contato" 
-            className={`px-3 py-2 text-sm font-medium ${location.pathname === "/contato" ? "text-eregulariza-primary" : "text-gray-700 hover:text-eregulariza-primary"}`}
+            className={`px-3 py-2 text-sm font-medium ${location.pathname === "/contato" ? "text-eregulariza-primary" : "text-eregulariza-darkgray hover:text-eregulariza-primary"}`}
           >
             Contato
           </Link>
@@ -68,7 +64,7 @@ export default function Header() {
             <>
               <Button variant="ghost" size="icon" className="relative">
                 <Bell className="h-5 w-5" />
-                <span className="absolute top-1 right-1 block h-2 w-2 rounded-full bg-red-500"></span>
+                <span className="absolute top-1 right-1 block h-2 w-2 rounded-full bg-eregulariza-secondary"></span>
               </Button>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -102,8 +98,8 @@ export default function Header() {
               <Button variant="outline" size="sm" asChild className="hidden sm:flex">
                 <Link to="/login">Entrar</Link>
               </Button>
-              <Button size="sm" className="hidden sm:flex eregulariza-gradient hover:opacity-90">
-                <Link to="/register">Cadastrar</Link>
+              <Button size="sm" className="hidden sm:flex bg-eregulariza-primary hover:bg-eregulariza-primary/90">
+                <Link to="/register" className="text-white">Cadastrar</Link>
               </Button>
               <Button variant="ghost" size="sm" asChild className="sm:hidden">
                 <Link to="/login">
@@ -133,7 +129,7 @@ export default function Header() {
             <Link
               to="/"
               className={`block px-3 py-2 text-base font-medium rounded-md ${
-                location.pathname === "/" ? "bg-gray-50 text-eregulariza-primary" : "text-gray-700 hover:bg-gray-50"
+                location.pathname === "/" ? "bg-gray-50 text-eregulariza-primary" : "text-eregulariza-darkgray hover:bg-gray-50"
               }`}
               onClick={() => setIsMenuOpen(false)}
             >
@@ -142,7 +138,7 @@ export default function Header() {
             <Link
               to="/sobre"
               className={`block px-3 py-2 text-base font-medium rounded-md ${
-                location.pathname === "/sobre" ? "bg-gray-50 text-eregulariza-primary" : "text-gray-700 hover:bg-gray-50"
+                location.pathname === "/sobre" ? "bg-gray-50 text-eregulariza-primary" : "text-eregulariza-darkgray hover:bg-gray-50"
               }`}
               onClick={() => setIsMenuOpen(false)}
             >
@@ -151,7 +147,7 @@ export default function Header() {
             <Link
               to="/servicos"
               className={`block px-3 py-2 text-base font-medium rounded-md ${
-                location.pathname === "/servicos" ? "bg-gray-50 text-eregulariza-primary" : "text-gray-700 hover:bg-gray-50"
+                location.pathname === "/servicos" ? "bg-gray-50 text-eregulariza-primary" : "text-eregulariza-darkgray hover:bg-gray-50"
               }`}
               onClick={() => setIsMenuOpen(false)}
             >
@@ -160,19 +156,19 @@ export default function Header() {
             <Link
               to="/contato"
               className={`block px-3 py-2 text-base font-medium rounded-md ${
-                location.pathname === "/contato" ? "bg-gray-50 text-eregulariza-primary" : "text-gray-700 hover:bg-gray-50"
+                location.pathname === "/contato" ? "bg-gray-50 text-eregulariza-primary" : "text-eregulariza-darkgray hover:bg-gray-50"
               }`}
               onClick={() => setIsMenuOpen(false)}
             >
               Contato
             </Link>
             <div className="pt-4 flex flex-col space-y-2">
-              <Button asChild>
+              <Button asChild className="bg-eregulariza-primary hover:bg-eregulariza-primary/90">
                 <Link to="/login" onClick={() => setIsMenuOpen(false)}>
                   Entrar
                 </Link>
               </Button>
-              <Button asChild variant="outline">
+              <Button asChild variant="outline" className="border-eregulariza-primary text-eregulariza-primary hover:bg-eregulariza-primary/10">
                 <Link to="/register" onClick={() => setIsMenuOpen(false)}>
                   Cadastrar
                 </Link>

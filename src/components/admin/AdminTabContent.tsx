@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import ProcessesTabs from "./ProcessesTabs";
 import UserManagement from "./UserManagement";
 import ClientsTable from "./ClientsTable";
+import { FooterEditor } from "./FooterEditor";
 
 interface Process {
   id: string;
@@ -57,6 +58,25 @@ export default function AdminTabContent({
           
           <div className="space-y-6">
             <div>
+              <h3 className="text-lg font-medium mb-3">Rodapé do Site</h3>
+              <p className="text-sm text-muted-foreground mb-4">
+                Gerencie o conteúdo do rodapé que aparece em todas as páginas do site.
+              </p>
+              <Button 
+                variant="outline"
+                onClick={() => {
+                  const footerEditorSection = document.getElementById('footer-editor');
+                  if (footerEditorSection) {
+                    footerEditorSection.classList.remove('hidden');
+                    footerEditorSection.scrollIntoView({ behavior: 'smooth' });
+                  }
+                }}
+              >
+                Editar Rodapé
+              </Button>
+            </div>
+            
+            <div>
               <h3 className="text-lg font-medium mb-3">Páginas de Políticas</h3>
               <p className="text-sm text-muted-foreground mb-4">
                 Edite o conteúdo das páginas de políticas e termos do sistema.
@@ -104,6 +124,10 @@ export default function AdminTabContent({
               <Button variant="outline">Gerenciar E-mails</Button>
             </div>
           </div>
+        </div>
+        
+        <div id="footer-editor" className="mt-8 hidden">
+          <FooterEditor />
         </div>
       </TabsContent>
     </>

@@ -1,4 +1,6 @@
 
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -6,53 +8,53 @@
 @layer base {
   :root {
     --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    --foreground: 0 0% 20%;
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 0 0% 20%;
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    --primary: 221.2 83.2% 53.3%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --popover-foreground: 0 0% 20%;
+    --primary: 258 100% 49%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 167 95% 43%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 45%;
+    --accent: 258 100% 96%;
+    --accent-foreground: 258 100% 49%;
     --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 221.2 83.2% 53.3%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 0 0% 92%;
+    --input: 0 0% 92%;
+    --ring: 258 100% 49%;
     --radius: 0.5rem;
   }
  
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 217.2 91.2% 59.8%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
+    --background: 0 0% 20%;
+    --foreground: 0 0% 98%;
+    --card: 0 0% 20%;
+    --card-foreground: 0 0% 98%;
+    --popover: 0 0% 20%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 258 100% 49%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 167 95% 43%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 0 0% 30%;
+    --muted-foreground: 0 0% 75%;
+    --accent: 258 100% 25%;
+    --accent-foreground: 0 0% 100%;
     --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 224.3 76.5% 48%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 30%;
+    --input: 0 0% 30%;
+    --ring: 258 100% 49%;
   }
 }
 
 @layer utilities {
   .eregulariza-gradient {
-    background: linear-gradient(135deg, #9b87f5 0%, #7E69AB 100%);
+    background: linear-gradient(135deg, #3C00F8 0%, #06D7A5 100%);
   }
   
   .card-hover {
@@ -83,10 +85,54 @@
   .status-badge-rejected {
     @apply bg-red-100 text-red-700;
   }
+
+  .glass-effect {
+    @apply backdrop-blur-sm bg-white/30 border border-white/20;
+  }
 }
 
 :root {
-  --eregulariza-primary: #9b87f5;
-  --eregulariza-secondary: #7E69AB;
-  --eregulariza-tertiary: #6E59A5;
+  /* Design tokens */
+  --eregulariza-primary: #3C00F8;
+  --eregulariza-secondary: #06D7A5;
+  --eregulariza-darkgray: #373535;
+  --eregulariza-text: #333333;
+  
+  /* Font */
+  --font-main: 'Inter', sans-serif;
+}
+
+body {
+  font-family: var(--font-main);
+  color: var(--eregulariza-text);
+}
+
+/* Button with transparency */
+.btn-secondary {
+  background-color: rgba(60, 0, 248, 0.2);
+  color: #3C00F8;
+  transition: background-color 0.2s ease;
+}
+
+.btn-secondary:hover {
+  background-color: rgba(60, 0, 248, 0.4);
+}
+
+.btn-accent {
+  background-color: rgba(6, 215, 165, 0.2);
+  color: #06D7A5;
+  transition: background-color 0.2s ease;
+}
+
+.btn-accent:hover {
+  background-color: rgba(6, 215, 165, 0.4);
+}
+
+/* Progress bar styling */
+.progress-bar-bg {
+  background-color: rgba(60, 0, 248, 0.2);
+}
+
+.progress-bar-fill {
+  background-color: #3C00F8;
 }

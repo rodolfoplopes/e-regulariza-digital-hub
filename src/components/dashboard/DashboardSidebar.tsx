@@ -23,8 +23,8 @@ const SidebarItem = ({ icon, label, href, isActive }: SidebarItemProps) => (
     className={cn(
       "flex items-center py-2 px-3 rounded-md group transition-colors",
       isActive 
-        ? "bg-eregulariza-primary/10 text-eregulariza-primary" 
-        : "text-gray-700 hover:bg-gray-100"
+        ? "bg-eregulariza-primary-20 text-eregulariza-primary" 
+        : "text-eregulariza-darkgray hover:bg-gray-100"
     )}
   >
     <div className="mr-3">{icon}</div>

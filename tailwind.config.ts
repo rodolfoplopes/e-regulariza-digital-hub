@@ -64,11 +64,14 @@ export default {
 					ring: 'hsl(var(--sidebar-ring))'
 				},
 				eregulariza: {
-					primary: '#9b87f5',
-					secondary: '#7E69AB',
-					accent: '#E5DEFF',
-					highlight: '#8B5CF6',
-					link: '#1EAEDB',
+					primary: '#3C00F8',
+					secondary: '#06D7A5',
+					darkGray: '#373535',
+					text: '#333333',
+					'primary-20': 'rgba(60, 0, 248, 0.2)',
+					'primary-40': 'rgba(60, 0, 248, 0.4)',
+					'secondary-20': 'rgba(6, 215, 165, 0.2)',
+					'secondary-40': 'rgba(6, 215, 165, 0.4)',
 				}
 			},
 			fontFamily: {

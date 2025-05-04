@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Bell, Menu, X } from "lucide-react";
+import { Logo } from "@/components/brand/Logo";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -37,19 +38,14 @@ export default function DashboardHeader() {
           </Button>
 
           <Link to="/dashboard" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-full eregulariza-gradient flex items-center justify-center">
-              <span className="font-bold text-white text-sm">e</span>
-            </div>
-            <span className="text-lg font-semibold hidden sm:inline-block">
-              e-regulariza
-            </span>
+            <Logo variant="small" />
           </Link>
         </div>
 
         <div className="flex items-center space-x-2">
           <Button variant="ghost" size="icon" className="relative">
             <Bell className="h-5 w-5" />
-            <span className="absolute top-1 right-1 block h-2 w-2 rounded-full bg-red-500" />
+            <span className="absolute top-1 right-1 block h-2 w-2 rounded-full bg-eregulariza-secondary" />
           </Button>
           
           <DropdownMenu>
