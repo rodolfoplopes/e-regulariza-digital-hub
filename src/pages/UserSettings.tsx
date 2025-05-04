@@ -1,23 +1,17 @@
 
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { useToast } from "@/hooks/use-toast";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
 import MobileNav from "@/components/dashboard/MobileNav";
-import ChangePasswordModal from "@/components/user/ChangePasswordModal";
+import DadosPessoaisForm from "@/components/user/DadosPessoaisForm";
+import SecuritySettings from "@/components/user/SecuritySettings";
+import PreferenciasUsuario from "@/components/user/PreferenciasUsuario";
+import PoliciesLinks from "@/components/user/PoliciesLinks";
 
 export default function UserSettings() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
-  const { toast } = useToast();
-  const navigate = useNavigate();
   
   // Mock user data - would be fetched from authentication context
   const [userData, setUserData] = useState({
@@ -27,50 +21,8 @@ export default function UserSettings() {
     cpf: "123.456.789-00" // Read-only field
   });
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setUserData({ ...userData, [name]: value });
-  };
-
-  const handleSaveChanges = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setIsLoading(true);
-    
-    try {
-      // Mock API call to save user data
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Update user data in local state to ensure UI reflects changes
-      setUserData({
-        ...userData
-      });
-      
-      toast({
-        title: "Alterações salvas com sucesso",
-        description: "Seus dados foram atualizados.",
-      });
-      
-      // In a real implementation with Supabase, you would update the user profile here
-      // const { error } = await supabase
-      //   .from('profiles')
-      //   .update({ name: userData.name, phone: userData.phone })
-      //   .eq('email', userData.email);
-      
-      // if (error) throw error;
-      
-      // Correctly stay on the same page instead of redirecting
-      // If redirection is needed in the future, use:
-      // navigate('/perfil');
-    } catch (error) {
-      console.error("Error saving changes:", error);
-      toast({
-        variant: "destructive",
-        title: "Erro ao salvar alterações",
-        description: "Por favor, tente novamente mais tarde.",
-      });
-    } finally {
-      setIsLoading(false);
-    }
+  const handleUserDataUpdate = (updatedData: typeof userData) => {
+    setUserData(updatedData);
   };
 
   return (
@@ -95,169 +47,27 @@ export default function UserSettings() {
             </TabsList>
             
             <TabsContent value="personal">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Dados Pessoais</CardTitle>
-                  <CardDescription>
-                    Atualize suas informações pessoais. Seu CPF não pode ser alterado.
-                  </CardDescription>
-                </CardHeader>
-                <form onSubmit={handleSaveChanges}>
-                  <CardContent className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="name">Nome Completo</Label>
-                      <Input 
-                        id="name" 
-                        name="name"
-                        value={userData.name} 
-                        onChange={handleInputChange} 
-                      />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="email">Email</Label>
-                      <Input 
-                        id="email" 
-                        name="email"
-                        type="email" 
-                        value={userData.email} 
-                        onChange={handleInputChange} 
-                      />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="phone">Telefone</Label>
-                      <Input 
-                        id="phone" 
-                        name="phone"
-                        value={userData.phone} 
-                        onChange={handleInputChange}
-                        placeholder="(00) 00000-0000"
-                      />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="cpf">CPF</Label>
-                      <Input 
-                        id="cpf" 
-                        name="cpf"
-                        value={userData.cpf} 
-                        disabled 
-                        className="bg-gray-100"
-                      />
-                      <p className="text-xs text-muted-foreground">O CPF não pode ser alterado.</p>
-                    </div>
-                  </CardContent>
-                  
-                  <CardFooter>
-                    <Button type="submit" disabled={isLoading}>
-                      {isLoading ? "Salvando..." : "Salvar alterações"}
-                    </Button>
-                  </CardFooter>
-                </form>
-              </Card>
+              <DadosPessoaisForm 
+                initialData={userData}
+                onDataUpdate={handleUserDataUpdate}
+              />
             </TabsContent>
             
             <TabsContent value="security">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Segurança</CardTitle>
-                  <CardDescription>
-                    Gerencie sua senha e configurações de segurança.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-2">
-                    <Label>Senha</Label>
-                    <div className="flex items-center justify-between">
-                      <p className="text-sm text-muted-foreground">••••••••••••</p>
-                      <Button onClick={() => setIsPasswordModalOpen(true)} variant="outline">
-                        Alterar senha
-                      </Button>
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-2 pt-4">
-                    <Label>Autenticação de dois fatores</Label>
-                    <p className="text-sm text-muted-foreground">
-                      Aumente a segurança da sua conta ativando a autenticação de dois fatores.
-                    </p>
-                    <Button variant="outline" className="mt-2">
-                      Configurar 2FA
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
+              <SecuritySettings />
             </TabsContent>
             
             <TabsContent value="notifications">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Preferências de Notificações</CardTitle>
-                  <CardDescription>
-                    Escolha como e quando deseja receber notificações.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground">
-                    Preferências de notificação serão implementadas em breve.
-                  </p>
-                </CardContent>
-              </Card>
+              <PreferenciasUsuario />
             </TabsContent>
           </Tabs>
           
           <div className="mt-8">
             <h2 className="text-xl font-semibold mb-4">Políticas e Termos</h2>
-            <Card>
-              <CardContent className="pt-6">
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h3 className="font-medium">Política de Privacidade</h3>
-                      <p className="text-sm text-muted-foreground">
-                        Como seus dados são protegidos e utilizados.
-                      </p>
-                    </div>
-                    <Button variant="link" asChild>
-                      <a href="/politica-de-privacidade" target="_blank">Visualizar</a>
-                    </Button>
-                  </div>
-                  
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h3 className="font-medium">Política de Cookies</h3>
-                      <p className="text-sm text-muted-foreground">
-                        Como utilizamos cookies para melhorar sua experiência.
-                      </p>
-                    </div>
-                    <Button variant="link" asChild>
-                      <a href="/politica-de-cookies" target="_blank">Visualizar</a>
-                    </Button>
-                  </div>
-                  
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h3 className="font-medium">Termos de Uso</h3>
-                      <p className="text-sm text-muted-foreground">
-                        Termos e condições de uso da plataforma.
-                      </p>
-                    </div>
-                    <Button variant="link" asChild>
-                      <a href="/termos-de-uso" target="_blank">Visualizar</a>
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            <PoliciesLinks />
           </div>
         </main>
       </div>
-      
-      <ChangePasswordModal 
-        isOpen={isPasswordModalOpen} 
-        onClose={() => setIsPasswordModalOpen(false)} 
-      />
     </div>
   );
 }
