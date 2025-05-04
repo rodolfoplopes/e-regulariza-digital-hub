@@ -1,5 +1,6 @@
 
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,6 +17,7 @@ export default function UserSettings() {
   const [isLoading, setIsLoading] = useState(false);
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
   const { toast } = useToast();
+  const navigate = useNavigate();
   
   // Mock user data - would be fetched from authentication context
   const [userData, setUserData] = useState({
@@ -38,11 +40,29 @@ export default function UserSettings() {
       // Mock API call to save user data
       await new Promise(resolve => setTimeout(resolve, 1000));
       
+      // Update user data in local state to ensure UI reflects changes
+      setUserData({
+        ...userData
+      });
+      
       toast({
         title: "Alterações salvas com sucesso",
         description: "Seus dados foram atualizados.",
       });
+      
+      // In a real implementation with Supabase, you would update the user profile here
+      // const { error } = await supabase
+      //   .from('profiles')
+      //   .update({ name: userData.name, phone: userData.phone })
+      //   .eq('email', userData.email);
+      
+      // if (error) throw error;
+      
+      // Correctly stay on the same page instead of redirecting
+      // If redirection is needed in the future, use:
+      // navigate('/perfil');
     } catch (error) {
+      console.error("Error saving changes:", error);
       toast({
         variant: "destructive",
         title: "Erro ao salvar alterações",
@@ -130,7 +150,7 @@ export default function UserSettings() {
                   </CardContent>
                   
                   <CardFooter>
-                    <Button type="submit" className="eregulariza-gradient hover:opacity-90" disabled={isLoading}>
+                    <Button type="submit" disabled={isLoading}>
                       {isLoading ? "Salvando..." : "Salvar alterações"}
                     </Button>
                   </CardFooter>
