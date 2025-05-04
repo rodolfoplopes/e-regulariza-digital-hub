@@ -1,4 +1,3 @@
-
 import type { Config } from "tailwindcss";
 
 export default {
@@ -26,8 +25,9 @@ export default {
 				background: 'hsl(var(--background))',
 				foreground: 'hsl(var(--foreground))',
 				primary: {
-					DEFAULT: 'hsl(var(--primary))',
-					foreground: 'hsl(var(--primary-foreground))'
+					DEFAULT: "#06D7A5", // Verde institucional
+					foreground: 'hsl(var(--primary-foreground))',
+					transparent: "rgba(6, 215, 165, 0.1)"
 				},
 				secondary: {
 					DEFAULT: 'hsl(var(--secondary))',
@@ -64,12 +64,12 @@ export default {
 					ring: 'hsl(var(--sidebar-ring))'
 				},
 				eregulariza: {
-					primary: '#3C00F8',
+					primary: '#06D7A5', // Updated to green
 					secondary: '#06D7A5',
 					darkGray: '#373535',
 					text: '#333333',
-					'primary-20': 'rgba(60, 0, 248, 0.2)',
-					'primary-40': 'rgba(60, 0, 248, 0.4)',
+					'primary-20': 'rgba(6, 215, 165, 0.2)',
+					'primary-40': 'rgba(6, 215, 165, 0.4)',
 					'secondary-20': 'rgba(6, 215, 165, 0.2)',
 					'secondary-40': 'rgba(6, 215, 165, 0.4)',
 				}
@@ -114,7 +114,15 @@ export default {
 				'accordion-down': 'accordion-down 0.2s ease-out',
 				'accordion-up': 'accordion-up 0.2s ease-out',
 				'fade-in': 'fade-in 0.3s ease-out',
-			}
+			},
+			typography: {
+				DEFAULT: {
+					css: {
+						lineHeight: 1.6,
+						letterSpacing: '0.01em',
+					},
+				},
+			},
 		}
 	},
 	plugins: [require("tailwindcss-animate")],

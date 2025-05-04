@@ -1,4 +1,3 @@
-
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 @tailwind base;
@@ -13,19 +12,19 @@
     --card-foreground: 0 0% 20%;
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 20%;
-    --primary: 258 100% 49%;
+    --primary: 167 95% 43%;
     --primary-foreground: 0 0% 100%;
     --secondary: 167 95% 43%;
     --secondary-foreground: 0 0% 100%;
     --muted: 0 0% 96%;
     --muted-foreground: 0 0% 45%;
-    --accent: 258 100% 96%;
-    --accent-foreground: 258 100% 49%;
+    --accent: 167 95% 96%;
+    --accent-foreground: 167 95% 43%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 100%;
     --border: 0 0% 92%;
     --input: 0 0% 92%;
-    --ring: 258 100% 49%;
+    --ring: 167 95% 43%;
     --radius: 0.5rem;
   }
  
@@ -36,25 +35,32 @@
     --card-foreground: 0 0% 98%;
     --popover: 0 0% 20%;
     --popover-foreground: 0 0% 98%;
-    --primary: 258 100% 49%;
+    --primary: 167 95% 43%;
     --primary-foreground: 0 0% 100%;
     --secondary: 167 95% 43%;
     --secondary-foreground: 0 0% 100%;
     --muted: 0 0% 30%;
     --muted-foreground: 0 0% 75%;
-    --accent: 258 100% 25%;
+    --accent: 167 95% 25%;
     --accent-foreground: 0 0% 100%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
     --border: 0 0% 30%;
     --input: 0 0% 30%;
-    --ring: 258 100% 49%;
+    --ring: 167 95% 43%;
+  }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    color: #333333;
+    line-height: 1.6;
+    letter-spacing: 0.01em;
   }
 }
 
 @layer utilities {
   .eregulariza-gradient {
-    background: linear-gradient(135deg, #3C00F8 0%, #06D7A5 100%);
+    background: linear-gradient(135deg, #06D7A5 0%, #06D7A5 100%);
   }
   
   .card-hover {
@@ -93,7 +99,7 @@
 
 :root {
   /* Design tokens */
-  --eregulariza-primary: #3C00F8;
+  --eregulariza-primary: #06D7A5;
   --eregulariza-secondary: #06D7A5;
   --eregulariza-darkgray: #373535;
   --eregulariza-text: #333333;
@@ -105,17 +111,19 @@
 body {
   font-family: var(--font-main);
   color: var(--eregulariza-text);
+  line-height: 1.6;
+  letter-spacing: 0.01em;
 }
 
 /* Button with transparency */
 .btn-secondary {
-  background-color: rgba(60, 0, 248, 0.2);
-  color: #3C00F8;
+  background-color: rgba(6, 215, 165, 0.2);
+  color: #06D7A5;
   transition: background-color 0.2s ease;
 }
 
 .btn-secondary:hover {
-  background-color: rgba(60, 0, 248, 0.4);
+  background-color: rgba(6, 215, 165, 0.4);
 }
 
 .btn-accent {
@@ -130,9 +138,9 @@ body {
 
 /* Progress bar styling */
 .progress-bar-bg {
-  background-color: rgba(60, 0, 248, 0.2);
+  background-color: rgba(6, 215, 165, 0.2);
 }
 
 .progress-bar-fill {
-  background-color: #3C00F8;
+  background-color: #06D7A5;
 }
