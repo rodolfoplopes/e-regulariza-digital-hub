@@ -1,10 +1,10 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useState, useEffect } from "react";
+import { HelmetProvider } from "react-helmet-async";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import Login from "./pages/Login";
@@ -122,33 +122,40 @@ const App = () => {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/unauthorized" element={<Unauthorized />} />
-            
-            {/* Protected routes for all authenticated users */}
-            <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-            <Route path="/configuracoes" element={<ProtectedRoute><UserSettings /></ProtectedRoute>} />
-            <Route path="/contato" element={<ProtectedRoute><ContactPage /></ProtectedRoute>} />
-            <Route path="/processo/:processId" element={<ProtectedRoute><ProcessDetail /></ProtectedRoute>} />
-            <Route path="/notificacoes" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />
-            
-            {/* Admin routes */}
-            <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
-            <Route path="/admin/novo-processo" element={<AdminRoute><ProcessCreate /></AdminRoute>} />
-            
-            {/* Public pages */}
-            <Route path="/:policyType" element={<PolicyPage />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </TooltipProvider>
+      <HelmetProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/unauthorized" element={<Unauthorized />} />
+              
+              {/* Protected routes for all authenticated users */}
+              <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+              <Route path="/configuracoes" element={<ProtectedRoute><UserSettings /></ProtectedRoute>} />
+              <Route path="/contato" element={<ProtectedRoute><ContactPage /></ProtectedRoute>} />
+              <Route path="/processo/:processId" element={<ProtectedRoute><ProcessDetail /></ProtectedRoute>} />
+              <Route path="/notificacoes" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />
+              
+              {/* Admin routes */}
+              <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
+              <Route path="/admin/novo-processo" element={<AdminRoute><ProcessCreate /></AdminRoute>} />
+              
+              {/* Public policy pages */}
+              <Route path="/politica-de-privacidade" element={<PolicyPage />} />
+              <Route path="/termos-de-uso" element={<PolicyPage />} />
+              <Route path="/politica-de-cookies" element={<PolicyPage />} />
+              
+              {/* Legacy route - keep for backwards compatibility */}
+              <Route path="/:policyType" element={<PolicyPage />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </TooltipProvider>
+      </HelmetProvider>
     </QueryClientProvider>
   );
 };

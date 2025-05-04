@@ -1,12 +1,17 @@
 
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import Layout from "@/components/layout/Layout";
 import { Card } from "@/components/ui/card";
+import { ChevronLeft } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 type PolicyContent = {
   title: string;
   content: string;
+  description: string;
+  lastUpdated: string;
 };
 
 const policyTypes: Record<string, PolicyContent> = {
@@ -61,7 +66,9 @@ const policyTypes: Record<string, PolicyContent> = {
       
       <h3>7. Contato</h3>
       <p>Para questões sobre privacidade, entre em contato pelo e-mail: privacidade@eregulariza.com.br</p>
-    `
+    `,
+    description: "Informações sobre como a e-regulariza coleta, usa e protege seus dados pessoais, bem como seus direitos em relação a essas informações.",
+    lastUpdated: "2025-05-01"
   },
   "politica-de-cookies": {
     title: "Política de Cookies",
@@ -96,7 +103,9 @@ const policyTypes: Record<string, PolicyContent> = {
       
       <h3>6. Contato</h3>
       <p>Para dúvidas sobre nossa política de cookies, entre em contato pelo e-mail: privacidade@eregulariza.com.br</p>
-    `
+    `,
+    description: "Saiba como a e-regulariza utiliza cookies e outras tecnologias de rastreamento para melhorar sua experiência em nossa plataforma.",
+    lastUpdated: "2025-05-01"
   },
   "termos-de-uso": {
     title: "Termos de Uso",
@@ -139,7 +148,9 @@ const policyTypes: Record<string, PolicyContent> = {
       
       <h3>8. Contato</h3>
       <p>Para questões sobre estes termos, entre em contato pelo e-mail: contato@eregulariza.com.br</p>
-    `
+    `,
+    description: "Os termos e condições que regem o uso da plataforma e-regulariza, incluindo os direitos e responsabilidades dos usuários e da empresa.",
+    lastUpdated: "2025-05-01"
   }
 };
 
@@ -158,10 +169,21 @@ export default function PolicyPage() {
   if (!policy) {
     return (
       <Layout>
+        <Helmet>
+          <title>Página não encontrada | e-regulariza</title>
+          <meta name="description" content="A página solicitada não está disponível." />
+          <meta name="robots" content="noindex, nofollow" />
+        </Helmet>
         <div className="container mx-auto py-12 px-4">
           <Card className="p-6">
             <h1 className="text-2xl font-bold mb-4">Política não encontrada</h1>
             <p>A política solicitada não está disponível.</p>
+            <Button asChild className="mt-4">
+              <Link to="/">
+                <ChevronLeft className="mr-2 h-4 w-4" />
+                Voltar para o início
+              </Link>
+            </Button>
           </Card>
         </div>
       </Layout>
@@ -170,13 +192,26 @@ export default function PolicyPage() {
 
   return (
     <Layout>
+      <Helmet>
+        <title>{policy.title} | e-regulariza</title>
+        <meta name="description" content={policy.description} />
+        <meta name="robots" content="index, follow" />
+        <meta property="og:title" content={`${policy.title} | e-regulariza`} />
+        <meta property="og:description" content={policy.description} />
+        <meta property="og:type" content="article" />
+        <meta name="author" content="e-regulariza" />
+        <meta name="revisit-after" content="7 days" />
+      </Helmet>
       <div className="container mx-auto py-12 px-4">
-        <Card className="p-6">
-          <h1 className="text-2xl font-bold mb-6">{policy.title}</h1>
+        <Card className="p-6 md:p-8">
+          <h1 className="text-3xl font-bold mb-6">{policy.title}</h1>
           <div 
             className="prose max-w-none"
             dangerouslySetInnerHTML={{ __html: policy.content }}
           />
+          <div className="mt-8 pt-4 border-t text-sm text-muted-foreground">
+            <p>Última atualização: {new Date(policy.lastUpdated).toLocaleDateString()}</p>
+          </div>
         </Card>
       </div>
     </Layout>

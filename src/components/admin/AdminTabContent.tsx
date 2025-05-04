@@ -1,11 +1,12 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import ProcessesTabs from "./ProcessesTabs";
 import UserManagement from "./UserManagement";
 import ClientsTable from "./ClientsTable";
 import { FooterEditor } from "./FooterEditor";
+import { PolicyEditor } from "./PolicyEditor";
 
 interface Process {
   id: string;
@@ -38,6 +39,8 @@ export default function AdminTabContent({
   clients,
   serviceTypes 
 }: AdminTabContentProps) {
+  const [activeConfigSection, setActiveConfigSection] = useState<'footer' | 'policies' | null>(null);
+
   return (
     <>
       <TabsContent value="processos" className="mt-4">
@@ -65,6 +68,7 @@ export default function AdminTabContent({
               <Button 
                 variant="outline"
                 onClick={() => {
+                  setActiveConfigSection('footer');
                   const footerEditorSection = document.getElementById('footer-editor');
                   if (footerEditorSection) {
                     footerEditorSection.classList.remove('hidden');
@@ -82,37 +86,19 @@ export default function AdminTabContent({
                 Edite o conteúdo das páginas de políticas e termos do sistema.
               </p>
               
-              <div className="space-y-3">
-                <div className="flex items-center justify-between p-3 border rounded-md">
-                  <div>
-                    <h4 className="font-medium">Política de Privacidade</h4>
-                    <p className="text-sm text-muted-foreground">
-                      Última atualização: 01/05/2025
-                    </p>
-                  </div>
-                  <Button variant="outline">Editar Conteúdo</Button>
-                </div>
-                
-                <div className="flex items-center justify-between p-3 border rounded-md">
-                  <div>
-                    <h4 className="font-medium">Política de Cookies</h4>
-                    <p className="text-sm text-muted-foreground">
-                      Última atualização: 01/05/2025
-                    </p>
-                  </div>
-                  <Button variant="outline">Editar Conteúdo</Button>
-                </div>
-                
-                <div className="flex items-center justify-between p-3 border rounded-md">
-                  <div>
-                    <h4 className="font-medium">Termos de Uso</h4>
-                    <p className="text-sm text-muted-foreground">
-                      Última atualização: 01/05/2025
-                    </p>
-                  </div>
-                  <Button variant="outline">Editar Conteúdo</Button>
-                </div>
-              </div>
+              <Button 
+                variant="outline"
+                onClick={() => {
+                  setActiveConfigSection('policies');
+                  const policyEditorSection = document.getElementById('policy-editor');
+                  if (policyEditorSection) {
+                    policyEditorSection.classList.remove('hidden');
+                    policyEditorSection.scrollIntoView({ behavior: 'smooth' });
+                  }
+                }}
+              >
+                Editar Políticas
+              </Button>
             </div>
             
             <div>
@@ -126,8 +112,26 @@ export default function AdminTabContent({
           </div>
         </div>
         
-        <div id="footer-editor" className="mt-8 hidden">
+        <div id="footer-editor" className={activeConfigSection === 'footer' ? 'mt-8' : 'mt-8 hidden'}>
+          <Button 
+            variant="ghost" 
+            className="mb-4"
+            onClick={() => setActiveConfigSection(null)}
+          >
+            ← Voltar para Configurações
+          </Button>
           <FooterEditor />
+        </div>
+        
+        <div id="policy-editor" className={activeConfigSection === 'policies' ? 'mt-8' : 'mt-8 hidden'}>
+          <Button 
+            variant="ghost" 
+            className="mb-4"
+            onClick={() => setActiveConfigSection(null)}
+          >
+            ← Voltar para Configurações
+          </Button>
+          <PolicyEditor />
         </div>
       </TabsContent>
     </>

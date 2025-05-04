@@ -30,9 +30,9 @@ const footerContent = {
     { platform: "LinkedIn", url: "https://linkedin.com/company/eregulariza", icon: <Linkedin className="h-5 w-5" /> }
   ],
   legalLinks: [
-    { label: "Política de Privacidade", url: "/privacidade" },
-    { label: "Termos de Uso", url: "/termos" },
-    { label: "Política de Cookies", url: "/cookies" }
+    { label: "Política de Privacidade", url: "/politica-de-privacidade" },
+    { label: "Termos de Uso", url: "/termos-de-uso" },
+    { label: "Política de Cookies", url: "/politica-de-cookies" }
   ],
   copyright: "© 2025 e-regulariza. Todos os direitos reservados."
 };
@@ -99,6 +99,7 @@ export default function Footer() {
                     className="text-gray-500 hover:text-eregulariza-primary"
                     target="_blank" 
                     rel="noopener noreferrer"
+                    aria-label={`Visite nossa página no ${social.platform}`}
                   >
                     <span className="sr-only">{social.platform}</span>
                     {social.icon}
