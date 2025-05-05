@@ -1,5 +1,5 @@
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -52,10 +52,28 @@
   }
 
   body {
-    font-family: 'Inter', sans-serif;
+    font-family: 'Montserrat', sans-serif;
     color: #333333;
     line-height: 1.6;
     letter-spacing: 0.01em;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    font-weight: 700;
+  }
+  
+  h1 {
+    font-size: 24px;
+  }
+  
+  h2, h3 {
+    font-size: 18px;
+    font-weight: 600;
+  }
+  
+  p, span, div {
+    font-size: 16px;
+    font-weight: 400;
   }
 }
 
@@ -65,7 +83,7 @@
   }
   
   .card-hover {
-    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
   }
   
   .card-hover:hover {
@@ -116,6 +134,28 @@
   .focus-ring {
     @apply focus:outline-none focus:ring-2 focus:ring-eregulariza-primary focus:ring-opacity-50;
   }
+  
+  /* Button transition animations */
+  .btn-transition {
+    @apply transition-all duration-300 ease-in-out;
+  }
+  
+  /* Toast animations */
+  .toast-enter {
+    @apply transform transition-all duration-300 ease-in-out;
+  }
+  
+  .toast-enter-active {
+    @apply translate-y-0 opacity-100;
+  }
+  
+  .toast-exit {
+    @apply transform transition-all duration-300 ease-in-out opacity-100;
+  }
+  
+  .toast-exit-active {
+    @apply translate-y-2 opacity-0;
+  }
 }
 
 :root {
@@ -126,7 +166,7 @@
   --eregulariza-text: #333333;
   
   /* Font */
-  --font-main: 'Inter', sans-serif;
+  --font-main: 'Montserrat', sans-serif;
 }
 
 body {
@@ -136,25 +176,27 @@ body {
   letter-spacing: 0.01em;
 }
 
-/* Button with transparency */
+/* Button with transparency and transitions */
 .btn-secondary {
   background-color: rgba(6, 215, 165, 0.2);
   color: #06D7A5;
-  transition: background-color 0.2s ease;
+  transition: all 0.3s ease-in-out;
 }
 
 .btn-secondary:hover {
   background-color: rgba(6, 215, 165, 0.4);
+  transform: translateY(-2px);
 }
 
 .btn-accent {
   background-color: rgba(6, 215, 165, 0.2);
   color: #06D7A5;
-  transition: background-color 0.2s ease;
+  transition: all 0.3s ease-in-out;
 }
 
 .btn-accent:hover {
   background-color: rgba(6, 215, 165, 0.4);
+  transform: translateY(-2px);
 }
 
 /* Progress bar styling */
@@ -164,6 +206,7 @@ body {
 
 .progress-bar-fill {
   background-color: #06D7A5;
+  transition: width 0.3s ease-in-out;
 }
 
 /* Button loading state */
@@ -207,4 +250,17 @@ body {
     padding-top: 0.75rem;
     padding-bottom: 0.75rem;
   }
+}
+
+/* Interactive elements animations */
+button, a, .card, .interactive-element {
+  transition: all 0.3s ease-in-out;
+}
+
+button:hover, a:hover, .card:hover, .interactive-element:hover {
+  transform: translateY(-2px);
+}
+
+button:active, a:active, .interactive-element:active {
+  transform: translateY(0);
 }

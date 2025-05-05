@@ -35,9 +35,11 @@ export function Logo({ variant = "default", className = "" }: LogoProps) {
           className={`${sizeClass} w-auto object-contain p-1.5`}
         />
       </div>
-      <span className={`font-semibold ${variant === "small" ? "text-base" : "text-xl"} text-[#373535]`}>
-        e-regulariza
-      </span>
+      {variant !== "icon-only" && (
+        <span className={`font-semibold ${variant === "small" ? "text-base" : "text-xl"} text-[#373535]`}>
+          e-regulariza
+        </span>
+      )}
     </div>
   );
 }

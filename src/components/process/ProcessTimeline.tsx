@@ -88,7 +88,8 @@ export default function ProcessTimeline({
         return (
           <div 
             key={stage.id} 
-            className={cn("relative pl-10 transition-all", 
+            className={cn(
+              "relative pl-10 transition-all duration-300 ease-in-out", 
               isActive ? "scale-[1.02]" : "",
               onStageClick ? "cursor-pointer hover:scale-[1.02]" : ""
             )}
@@ -96,9 +97,9 @@ export default function ProcessTimeline({
           >
             <div 
               className={cn(
-                "absolute left-0 flex h-8 w-8 items-center justify-center rounded-full border text-white",
+                "absolute left-0 flex h-8 w-8 items-center justify-center rounded-full border text-white transition-all duration-300",
                 isCompleted ? "bg-green-500 border-green-600" : 
-                isActive ? "bg-[#06D7A5] border-[#06D7A5]/70" : 
+                isActive ? "bg-[#06D7A5] border-[#06D7A5]/70 shadow-md" : 
                 isInProgress ? "bg-blue-500 border-blue-600" :
                 "bg-gray-300 border-gray-400"
               )}
@@ -106,14 +107,14 @@ export default function ProcessTimeline({
               {getStageIcon(stage.status)}
             </div>
             <div className={cn(
-              "rounded-lg border p-4 shadow-sm",
+              "rounded-lg border p-4 shadow-sm transition-all duration-300 hover:shadow-md",
               isActive ? "border-[#06D7A5]/30 bg-[#06D7A5]/5" : 
               isCompleted ? "border-green-100 bg-green-50" :
               isInProgress ? "border-blue-100 bg-blue-50" :
               "bg-white"
             )}>
               <h3 className={cn(
-                "font-medium flex items-center",
+                "font-bold flex items-center",
                 isActive ? "text-[#06D7A5]" : 
                 isCompleted ? "text-green-600" :
                 isInProgress ? "text-blue-600" :
@@ -127,7 +128,7 @@ export default function ProcessTimeline({
               <p className="mt-2 text-sm text-gray-600">{stage.description}</p>
               
               {isActive && (
-                <div className="mt-3 bg-[#06D7A5]/10 p-2 rounded-md flex items-center">
+                <div className="mt-3 bg-[#06D7A5]/10 p-2 rounded-md flex items-center transition-all duration-300 hover:bg-[#06D7A5]/20">
                   <ArrowRight className="h-4 w-4 text-[#06D7A5] mr-1" />
                   <span className="text-sm font-medium text-[#06D7A5]">
                     Próxima ação: {getNextActionText(stage)}

@@ -75,9 +75,9 @@ export default function ProcessCard({ process }: { process: ProcessProps }) {
         <div className="flex justify-between items-start">
           <CardTitle className="text-lg flex items-center">
             {getTypeIcon(process.type)}
-            <span>{process.title}</span>
+            <span className="font-bold">{process.title}</span>
           </CardTitle>
-          <span className={`status-badge ${statusClasses[process.status]} flex items-center`}>
+          <span className={`status-badge ${statusClasses[process.status]} flex items-center transition-all duration-300`}>
             {statusIcons[process.status]}
             {statusLabels[process.status]}
           </span>
@@ -85,7 +85,7 @@ export default function ProcessCard({ process }: { process: ProcessProps }) {
         <p className="text-sm text-gray-500 ml-5">{process.type}</p>
       </CardHeader>
       <CardContent className="py-2">
-        <div className="bg-gray-50 p-3 rounded-md mb-3 border-l-4 border-[#06D7A5] flex items-center shadow-sm">
+        <div className="bg-gray-50 p-3 rounded-md mb-3 border-l-4 border-[#06D7A5] flex items-center shadow-sm hover:shadow-md transition-all duration-300">
           <ArrowRight className="h-4 w-4 text-[#06D7A5] mr-2 flex-shrink-0" />
           <span className="text-sm font-medium">Próxima ação: {getNextAction(process.status)}</span>
         </div>
@@ -94,7 +94,7 @@ export default function ProcessCard({ process }: { process: ProcessProps }) {
             <span>Progresso</span>
             <span className="font-medium">{process.progress}%</span>
           </div>
-          <Progress value={process.progress} className="h-2" />
+          <Progress value={process.progress} className="h-2 transition-all duration-300" />
           <p className="text-xs text-gray-500 flex items-center mt-2">
             <Clock className="h-3 w-3 mr-1 inline text-gray-400" />
             Última atualização: {process.lastUpdate}
@@ -102,10 +102,10 @@ export default function ProcessCard({ process }: { process: ProcessProps }) {
         </div>
       </CardContent>
       <CardFooter className="pt-2">
-        <Button asChild variant="outline" className="w-full hover:border-eregulariza-primary hover:text-eregulariza-primary transition-colors">
+        <Button asChild variant="outline" className="w-full hover:border-eregulariza-primary hover:text-eregulariza-primary transition-all duration-300 hover:shadow-sm">
           <Link to={`/processo/${process.id}`} className="flex items-center justify-center gap-2">
             Ver detalhes
-            <ArrowRight className="h-4 w-4" />
+            <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
           </Link>
         </Button>
       </CardFooter>
