@@ -1,5 +1,5 @@
 
-import { CheckIcon, ClockIcon, AlertTriangle, FileText } from "lucide-react";
+import { CheckIcon, ClockIcon, AlertTriangle, FileText, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export interface ProcessStage {
@@ -45,6 +45,39 @@ export default function ProcessTimeline({
     }
   };
 
+  // Helper function to get the next action text based on stage status
+  const getNextActionText = (stage: ProcessStage) => {
+    switch (stage.status) {
+      case "completed":
+      case "concluido":
+        return "Etapa concluída";
+      case "in_progress":
+      case "em_andamento":
+        return "Em andamento";
+      case "pending":
+      case "pendente":
+        return "Aguardando início";
+      default:
+        return "Status indeterminado";
+    }
+  };
+
+  // Format date for display
+  const formatDate = (dateString?: string) => {
+    if (!dateString) return "Data não definida";
+    
+    try {
+      const date = new Date(dateString);
+      return new Intl.DateTimeFormat('pt-BR', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+      }).format(date);
+    } catch (e) {
+      return dateString; // Fallback to the string if parsing fails
+    }
+  };
+
   return (
     <div className="space-y-8 relative before:absolute before:inset-0 before:left-4 before:h-full before:w-0.5 before:bg-gray-200">
       {stages.map((stage, index) => {
@@ -73,23 +106,48 @@ export default function ProcessTimeline({
               {getStageIcon(stage.status)}
             </div>
             <div className={cn(
-              "rounded-lg border p-4",
-              isActive ? "border-[#06D7A5]/20 bg-[#06D7A5]/5" : "bg-white"
+              "rounded-lg border p-4 shadow-sm",
+              isActive ? "border-[#06D7A5]/30 bg-[#06D7A5]/5" : 
+              isCompleted ? "border-green-100 bg-green-50" :
+              isInProgress ? "border-blue-100 bg-blue-50" :
+              "bg-white"
             )}>
               <h3 className={cn(
                 "font-medium flex items-center",
-                isActive ? "text-[#06D7A5]" : "text-gray-900"
+                isActive ? "text-[#06D7A5]" : 
+                isCompleted ? "text-green-600" :
+                isInProgress ? "text-blue-600" :
+                "text-gray-900"
               )}>
                 {isCompleted && <CheckIcon className="h-4 w-4 mr-1 text-green-500" />}
                 {isInProgress && <ClockIcon className="h-4 w-4 mr-1 text-blue-500" />}
                 {!isCompleted && !isInProgress && <AlertTriangle className="h-4 w-4 mr-1 text-yellow-500" />}
                 {stage.title}
               </h3>
-              <p className="mt-1 text-sm text-gray-500">{stage.description}</p>
+              <p className="mt-2 text-sm text-gray-600">{stage.description}</p>
+              
+              {isActive && (
+                <div className="mt-3 bg-[#06D7A5]/10 p-2 rounded-md flex items-center">
+                  <ArrowRight className="h-4 w-4 text-[#06D7A5] mr-1" />
+                  <span className="text-sm font-medium text-[#06D7A5]">
+                    Próxima ação: {getNextActionText(stage)}
+                  </span>
+                </div>
+              )}
+              
               {stage.date && (
-                <p className="mt-1 text-xs text-gray-400">
-                  {isCompleted ? "Concluído em: " : isActive ? "Iniciado em: " : "Previsto para: "}
-                  {stage.date}
+                <p className="mt-2 text-xs flex items-center text-gray-500">
+                  <ClockIcon className="h-3 w-3 mr-1" />
+                  {isCompleted ? "Concluído em: " : 
+                   isActive ? "Iniciado em: " : 
+                   "Previsto para: "}
+                  {formatDate(stage.date)}
+                </p>
+              )}
+              
+              {stage.estimatedDays && !isCompleted && (
+                <p className="mt-1 text-xs text-gray-500">
+                  Estimativa: {stage.estimatedDays} {stage.estimatedDays === 1 ? 'dia' : 'dias'}
                 </p>
               )}
             </div>

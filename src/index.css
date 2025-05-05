@@ -1,3 +1,4 @@
+
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 @tailwind base;
@@ -64,7 +65,7 @@
   }
   
   .card-hover {
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
   }
   
   .card-hover:hover {
@@ -73,15 +74,15 @@
   }
   
   .status-badge {
-    @apply text-xs font-medium py-1 px-2 rounded-full;
+    @apply text-xs font-medium py-1 px-2 rounded-full flex items-center;
   }
   
   .status-badge-pending {
-    @apply bg-gray-100 text-gray-700;
+    @apply bg-yellow-100 text-yellow-700;
   }
   
   .status-badge-in-progress {
-    @apply bg-yellow-100 text-yellow-700;
+    @apply bg-blue-100 text-blue-700;
   }
   
   .status-badge-completed {
@@ -94,6 +95,26 @@
 
   .glass-effect {
     @apply backdrop-blur-sm bg-white/30 border border-white/20;
+  }
+  
+  /* Mobile-specific utilities */
+  @media (max-width: 640px) {
+    .mobile-card {
+      @apply p-3 !important;
+    }
+    
+    .mobile-text-sm {
+      @apply text-sm !important;
+    }
+    
+    .mobile-full-width {
+      @apply w-full !important;
+    }
+  }
+  
+  /* Accessibility focus styles */
+  .focus-ring {
+    @apply focus:outline-none focus:ring-2 focus:ring-eregulariza-primary focus:ring-opacity-50;
   }
 }
 
@@ -143,4 +164,47 @@ body {
 
 .progress-bar-fill {
   background-color: #06D7A5;
+}
+
+/* Button loading state */
+.btn-loading {
+  position: relative;
+  color: transparent !important;
+}
+
+.btn-loading::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 50%;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  transform: translate(-50%, -50%);
+  animation: button-loading-spinner 0.75s linear infinite;
+}
+
+@keyframes button-loading-spinner {
+  from {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
+/* Focus styles for accessibility */
+:focus-visible {
+  outline: 2px solid var(--eregulariza-primary);
+  outline-offset: 2px;
+}
+
+/* Mobile navigation enhancements */
+@media (max-width: 768px) {
+  .mobile-nav-item {
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+  }
 }

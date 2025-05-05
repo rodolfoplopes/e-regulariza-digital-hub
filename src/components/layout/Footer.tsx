@@ -45,8 +45,8 @@ export default function Footer() {
       <div className="container mx-auto px-4 py-12 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="space-y-4">
-            <Link to="/" className="inline-block">
-              <Logo />
+            <Link to="/" className="inline-block" aria-label="e-regulariza">
+              <Logo variant="icon-only" className="h-10 w-10" />
             </Link>
             <p className="text-sm text-gray-500">
               {footerContent.about}
@@ -58,7 +58,7 @@ export default function Footer() {
             <ul className="space-y-2">
               {footerContent.companyLinks.map((link) => (
                 <li key={link.label}>
-                  <Link to={link.url} className="text-gray-500 hover:text-eregulariza-primary text-sm">
+                  <Link to={link.url} className="text-gray-500 hover:text-eregulariza-primary text-sm transition-colors">
                     {link.label}
                   </Link>
                 </li>
@@ -71,7 +71,7 @@ export default function Footer() {
             <ul className="space-y-2">
               {footerContent.serviceLinks.map((link) => (
                 <li key={link.label}>
-                  <Link to={link.url} className="text-gray-500 hover:text-eregulariza-primary text-sm">
+                  <Link to={link.url} className="text-gray-500 hover:text-eregulariza-primary text-sm transition-colors">
                     {link.label}
                   </Link>
                 </li>
@@ -96,7 +96,7 @@ export default function Footer() {
                   <a 
                     key={social.platform} 
                     href={social.url} 
-                    className="text-gray-500 hover:text-eregulariza-primary"
+                    className="text-gray-500 hover:text-eregulariza-primary transition-colors"
                     target="_blank" 
                     rel="noopener noreferrer"
                     aria-label={`Visite nossa página no ${social.platform}`}
@@ -115,7 +115,7 @@ export default function Footer() {
           </p>
           <div className="flex space-x-4">
             {footerContent.legalLinks.map((link) => (
-              <Link key={link.label} to={link.url} className="text-xs text-gray-500 hover:text-eregulariza-primary">
+              <Link key={link.label} to={link.url} className="text-xs text-gray-500 hover:text-eregulariza-primary transition-colors">
                 {link.label}
               </Link>
             ))}

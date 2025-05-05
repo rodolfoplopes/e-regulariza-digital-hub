@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,17 +14,112 @@ import {
 } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
 import Layout from "@/components/layout/Layout";
+import { AlertCircle } from "lucide-react";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [loginAttempts, setLoginAttempts] = useState(0);
+  const [cooldownActive, setCooldownActive] = useState(false);
+  const [cooldownTimer, setCooldownTimer] = useState(0);
   
   const navigate = useNavigate();
   const { toast } = useToast();
 
+  // Handle cooldown timer
+  useEffect(() => {
+    // Check for existing cooldown from localStorage
+    const storedCooldown = localStorage.getItem('loginCooldown');
+    const storedAttempts = localStorage.getItem('loginAttempts');
+    
+    if (storedCooldown) {
+      const expiryTime = parseInt(storedCooldown, 10);
+      if (expiryTime > Date.now()) {
+        setCooldownActive(true);
+        setCooldownTimer(Math.ceil((expiryTime - Date.now()) / 1000));
+      } else {
+        localStorage.removeItem('loginCooldown');
+      }
+    }
+    
+    if (storedAttempts) {
+      setLoginAttempts(parseInt(storedAttempts, 10));
+    }
+  }, []);
+
+  // Countdown timer
+  useEffect(() => {
+    let interval: number | undefined;
+    
+    if (cooldownActive && cooldownTimer > 0) {
+      interval = window.setInterval(() => {
+        setCooldownTimer(prev => {
+          if (prev <= 1) {
+            setCooldownActive(false);
+            localStorage.removeItem('loginCooldown');
+            clearInterval(interval);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+    
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [cooldownActive, cooldownTimer]);
+
+  const activateCooldown = () => {
+    // Set a 30-second cooldown after 5 failed attempts
+    const cooldownDuration = 30 * 1000; // 30 seconds
+    const expiryTime = Date.now() + cooldownDuration;
+    
+    localStorage.setItem('loginCooldown', expiryTime.toString());
+    setCooldownActive(true);
+    setCooldownTimer(30);
+  };
+
+  const handleFailedLogin = () => {
+    const newAttempts = loginAttempts + 1;
+    setLoginAttempts(newAttempts);
+    localStorage.setItem('loginAttempts', newAttempts.toString());
+    
+    if (newAttempts >= 5) {
+      activateCooldown();
+      toast({
+        variant: "destructive",
+        title: "Muitas tentativas de login",
+        description: "Por segurança, aguarde 30 segundos antes de tentar novamente.",
+      });
+    } else {
+      toast({
+        variant: "destructive",
+        title: "Erro ao fazer login",
+        description: `E-mail ou senha inválidos. Tentativa ${newAttempts} de 5.`,
+      });
+    }
+  };
+
+  const resetLoginAttempts = () => {
+    setLoginAttempts(0);
+    localStorage.removeItem('loginAttempts');
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    
+    // Prevent login attempt during cooldown
+    if (cooldownActive) {
+      toast({
+        variant: "destructive",
+        title: "Aguarde para tentar novamente",
+        description: `Por segurança, tente novamente em ${cooldownTimer} segundos.`,
+      });
+      return;
+    }
+    
     setIsLoading(true);
 
     // Mock login function - would be replaced with actual auth
@@ -34,24 +129,19 @@ export default function Login() {
       
       // For demo, just check if email exists and password is not empty
       if (email && password) {
+        // Successful login - reset attempts
+        resetLoginAttempts();
+        
         toast({
           title: "Login bem-sucedido",
           description: "Redirecionando para o dashboard...",
         });
         navigate("/dashboard");
       } else {
-        toast({
-          variant: "destructive",
-          title: "Erro ao fazer login",
-          description: "E-mail ou senha inválidos. Tente novamente.",
-        });
+        handleFailedLogin();
       }
     } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Erro ao fazer login",
-        description: "Ocorreu um erro. Tente novamente mais tarde.",
-      });
+      handleFailedLogin();
     } finally {
       setIsLoading(false);
     }
@@ -73,6 +163,15 @@ export default function Login() {
             </CardHeader>
             <form onSubmit={handleSubmit}>
               <CardContent className="space-y-4">
+                {cooldownActive && (
+                  <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg flex items-start">
+                    <AlertCircle className="h-5 w-5 mr-2 mt-0.5 flex-shrink-0" />
+                    <div>
+                      <p className="font-medium">Muitas tentativas de login</p>
+                      <p className="text-sm">Por segurança, aguarde {cooldownTimer} segundos antes de tentar novamente.</p>
+                    </div>
+                  </div>
+                )}
                 <div className="space-y-2">
                   <Label htmlFor="email">Email</Label>
                   <Input
@@ -82,6 +181,7 @@ export default function Login() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
+                    disabled={cooldownActive || isLoading}
                   />
                 </div>
                 <div className="space-y-2">
@@ -98,6 +198,7 @@ export default function Login() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
+                    disabled={cooldownActive || isLoading}
                   />
                 </div>
               </CardContent>
@@ -105,7 +206,7 @@ export default function Login() {
                 <Button
                   type="submit"
                   className="w-full eregulariza-gradient hover:opacity-90"
-                  disabled={isLoading}
+                  disabled={cooldownActive || isLoading}
                 >
                   {isLoading ? "Entrando..." : "Entrar"}
                 </Button>
