@@ -1,10 +1,12 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
 import MobileNav from "@/components/dashboard/MobileNav";
 import ProcessCard, { ProcessProps } from "@/components/dashboard/ProcessCard";
 import NotificationCard, { NotificationProps } from "@/components/dashboard/NotificationCard";
+import { Card, CardContent } from "@/components/ui/card";
+import { CheckCircle, Clock, AlertTriangle } from "lucide-react";
 
 export default function Dashboard() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -65,6 +67,13 @@ export default function Dashboard() {
     }
   ];
 
+  // Process counters
+  const processCounters = {
+    active: processes.filter(p => p.status === "em_andamento").length,
+    pending: processes.filter(p => p.status === "pendente").length,
+    completed: processes.filter(p => p.status === "concluido").length
+  };
+
   return (
     <div className="flex h-screen bg-gray-50">
       <DashboardSidebar />
@@ -74,14 +83,53 @@ export default function Dashboard() {
         <DashboardHeader />
         
         <main className="flex-1 overflow-y-auto p-4 md:p-6">
-          <div className="mb-8">
+          <div className="mb-6">
             <h1 className="text-2xl font-bold">Olá, João!</h1>
             <p className="text-gray-500">Bem-vindo ao seu painel de regularização imobiliária.</p>
           </div>
           
+          {/* Status Counters */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+            <Card className="border-l-4 border-blue-500">
+              <CardContent className="p-4 flex items-center">
+                <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center mr-3">
+                  <Clock className="h-5 w-5 text-blue-500" />
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Processos Ativos</p>
+                  <p className="text-2xl font-bold">{processCounters.active}</p>
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Card className="border-l-4 border-green-500">
+              <CardContent className="p-4 flex items-center">
+                <div className="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center mr-3">
+                  <CheckCircle className="h-5 w-5 text-green-500" />
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Finalizados</p>
+                  <p className="text-2xl font-bold">{processCounters.completed}</p>
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Card className="border-l-4 border-yellow-500">
+              <CardContent className="p-4 flex items-center">
+                <div className="h-10 w-10 rounded-full bg-yellow-100 flex items-center justify-center mr-3">
+                  <AlertTriangle className="h-5 w-5 text-yellow-500" />
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Pendências</p>
+                  <p className="text-2xl font-bold">{processCounters.pending}</p>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+          
           <div className="mb-8">
             <h2 className="text-xl font-semibold mb-4">Meus Processos</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {processes.map((process) => (
                 <ProcessCard key={process.id} process={process} />
               ))}
