@@ -17,6 +17,7 @@ import ProcessCreate from "./pages/ProcessCreate";
 import UserSettings from "./pages/UserSettings";
 import PolicyPage from "./pages/PolicyPage";
 import Notifications from "./pages/Notifications";
+import LogoManagementPage from "./pages/LogoManagementPage";
 
 const queryClient = new QueryClient();
 
@@ -222,6 +223,7 @@ const App = () => {
                 {/* Admin routes */}
                 <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
                 <Route path="/admin/novo-processo" element={<AdminRoute><ProcessCreate /></AdminRoute>} />
+                <Route path="/admin/logo" element={<AdminRoute><LogoManagementPage /></AdminRoute>} />
                 
                 {/* Public policy pages */}
                 <Route path="/politica-de-privacidade" element={<PolicyPage />} />

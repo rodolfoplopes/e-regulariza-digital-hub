@@ -4,40 +4,54 @@ import React from "react";
 interface LogoProps {
   variant?: "default" | "small" | "icon-only";
   className?: string;
+  size?: "sm" | "md" | "lg";
+  customUrl?: string;
 }
 
-export function Logo({ variant = "default", className = "" }: LogoProps) {
+export function Logo({ 
+  variant = "default", 
+  className = "",
+  size = "md",
+  customUrl 
+}: LogoProps) {
+  // Determine size based on the size prop
+  const sizeClasses = {
+    sm: "h-8 w-8",
+    md: "h-10 w-10",
+    lg: "h-12 w-12",
+  };
+  
+  const logoSize = sizeClasses[size];
+  
   // Common base classes for the logo container
   const baseClasses = "flex items-center justify-center";
   
-  // Apply different styling based on variant
+  // Use custom URL if provided, otherwise use the default logo
+  const logoUrl = customUrl || "/lovable-uploads/3b439cb9-4071-4319-8787-a968cea832a7.png";
+  
+  // For icon-only variant (just the logo in a circle)
   if (variant === "icon-only") {
     return (
-      <div className={`${baseClasses} ${className} rounded-full bg-[#06D7A5] h-10 w-10 overflow-hidden flex-shrink-0`}>
+      <div className={`${baseClasses} ${className} rounded-full bg-[#06D7A5] ${logoSize} overflow-hidden flex-shrink-0`}>
         <img 
-          src="/lovable-uploads/3b439cb9-4071-4319-8787-a968cea832a7.png"
+          src={logoUrl}
           alt="e-regulariza"
-          className="h-10 w-10 object-contain p-1.5"
+          className={`${logoSize} object-contain p-1.5`}
         />
       </div>
     );
   }
 
   // For default and small variants
-  const sizeClass = variant === "small" ? "h-8" : "h-10";
-  
   return (
     <div className={`${baseClasses} gap-2 ${className}`}>
-      <div className={`rounded-full bg-[#06D7A5] ${sizeClass} ${variant === "small" ? "w-8" : "w-10"} flex items-center justify-center overflow-hidden flex-shrink-0`}>
+      <div className={`rounded-full bg-[#06D7A5] ${logoSize} flex items-center justify-center overflow-hidden flex-shrink-0`}>
         <img 
-          src="/lovable-uploads/3b439cb9-4071-4319-8787-a968cea832a7.png"
+          src={logoUrl}
           alt="e-regulariza"
-          className={`${sizeClass} w-auto object-contain p-1.5`}
+          className={`${logoSize} w-auto object-contain p-1.5`}
         />
       </div>
-      <span className={`font-semibold ${variant === "small" ? "text-base" : "text-xl"} text-[#373535]`}>
-        e-regulariza
-      </span>
     </div>
   );
 }

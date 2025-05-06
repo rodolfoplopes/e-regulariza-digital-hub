@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -13,15 +13,29 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export default function DashboardHeader() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [logoUrl, setLogoUrl] = useState<string | null>(null);
+  const isMobile = useIsMobile();
+
+  useEffect(() => {
+    // In a real app with Supabase, we would fetch the custom logo URL
+    // For now we'll just use the default logo
+    // This would be something like: const { data } = await supabase.from('settings').select('logo_url').single();
+    // setLogoUrl(data?.logo_url || null);
+  }, []);
 
   // Mock user data
   const user = {
     name: "João Silva",
     initials: "JS",
     role: "Cliente",
+  };
+
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
   };
 
   return (
@@ -32,13 +46,22 @@ export default function DashboardHeader() {
             variant="ghost"
             size="icon"
             className="md:hidden mr-2"
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            onClick={toggleMobileMenu}
+            aria-label={isMobileMenuOpen ? "Fechar menu" : "Abrir menu"}
           >
             {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </Button>
 
           <Link to="/dashboard" className="flex items-center gap-2">
-            <Logo variant="small" />
+            <Logo 
+              variant={isMobile ? "icon-only" : "small"} 
+              customUrl={logoUrl || undefined} 
+            />
+            {!isMobile && (
+              <span className="font-semibold text-lg text-[#373535]">
+                e-regulariza
+              </span>
+            )}
           </Link>
         </div>
 

@@ -9,6 +9,9 @@ import AdminStats from "@/components/admin/AdminStats";
 import AdminHeader from "@/components/admin/AdminHeader";
 import AdminTabContent from "@/components/admin/AdminTabContent";
 import ClientsTable from "@/components/admin/ClientsTable";
+import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Settings } from "lucide-react";
 
 export default function AdminDashboard() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -73,7 +76,10 @@ export default function AdminDashboard() {
   return (
     <div className="flex h-screen bg-gray-50">
       <DashboardSidebar />
-      <MobileNav isOpen={isMobileMenuOpen} />
+      <MobileNav 
+        isOpen={isMobileMenuOpen} 
+        onClose={() => setIsMobileMenuOpen(false)} 
+      />
       
       <div className="flex-1 flex flex-col overflow-hidden">
         <DashboardHeader />
@@ -84,10 +90,19 @@ export default function AdminDashboard() {
             serviceTypes={serviceTypes}
           />
           
-          <AdminStats 
-            processes={processes}
-            clientsCount={clients.length}
-          />
+          <div className="flex items-center justify-between mb-6">
+            <AdminStats 
+              processes={processes}
+              clientsCount={clients.length}
+            />
+            
+            <Link to="/admin/logo">
+              <Button variant="outline" size="sm" className="hidden md:flex">
+                <Settings className="h-4 w-4 mr-2" />
+                Configurar Logo
+              </Button>
+            </Link>
+          </div>
           
           <Tabs value={activeSection} onValueChange={setActiveSection} className="mb-6">
             <TabsList>

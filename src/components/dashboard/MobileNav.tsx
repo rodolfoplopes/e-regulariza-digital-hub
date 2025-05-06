@@ -7,12 +7,42 @@ import {
   MessageSquare, 
   Bell, 
   Settings,
-  User
+  User,
+  X
 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useEffect } from "react";
 
-export default function MobileNav({ isOpen }: { isOpen: boolean }) {
+export default function MobileNav({ isOpen, onClose }: { isOpen: boolean, onClose?: () => void }) {
   const location = useLocation();
   const currentPath = location.pathname;
+  
+  // Close mobile nav when clicking outside or on ESC key
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isOpen && onClose) {
+        onClose();
+      }
+    };
+
+    document.addEventListener('keydown', handleEscape);
+    return () => {
+      document.removeEventListener('keydown', handleEscape);
+    };
+  }, [isOpen, onClose]);
+
+  // Prevent scrolling when mobile menu is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'auto';
+    }
+    
+    return () => {
+      document.body.style.overflow = 'auto';
+    };
+  }, [isOpen]);
   
   const navItems = [
     { 
@@ -51,22 +81,32 @@ export default function MobileNav({ isOpen }: { isOpen: boolean }) {
 
   return (
     <div className="fixed inset-0 z-40 md:hidden">
-      <div className="fixed inset-0 bg-black/20" />
-      <nav className="fixed top-16 left-0 w-3/4 max-w-xs h-full bg-white overflow-y-auto pb-10">
+      <div className="fixed inset-0 bg-black/20" onClick={onClose} />
+      <nav className="fixed top-16 left-0 w-3/4 max-w-xs h-full bg-white overflow-y-auto pb-10 shadow-lg animate-fade-in">
+        <div className="flex items-center justify-between p-4 border-b">
+          <h2 className="font-semibold text-lg">Menu</h2>
+          {onClose && (
+            <Button variant="ghost" size="sm" onClick={onClose} className="h-8 w-8">
+              <X className="h-4 w-4" />
+            </Button>
+          )}
+        </div>
+        
         <div className="p-4 space-y-1">
           {navItems.map((item) => (
             <Link
               key={item.href}
               to={item.href}
               className={cn(
-                "flex items-center py-2 px-3 rounded-md group transition-colors",
+                "flex items-center py-3 px-3 rounded-md group transition-colors",
                 currentPath === item.href 
                   ? "bg-eregulariza-primary/10 text-eregulariza-primary" 
                   : "text-gray-700 hover:bg-gray-100"
               )}
+              onClick={onClose}
             >
-              <div className="mr-3">{item.icon}</div>
-              <span>{item.label}</span>
+              <div className="mr-3 flex-shrink-0">{item.icon}</div>
+              <span className="font-medium">{item.label}</span>
             </Link>
           ))}
         </div>

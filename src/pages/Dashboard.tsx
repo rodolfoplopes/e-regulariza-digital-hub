@@ -1,15 +1,16 @@
-
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
 import MobileNav from "@/components/dashboard/MobileNav";
 import ProcessCard, { ProcessProps } from "@/components/dashboard/ProcessCard";
 import NotificationCard, { NotificationProps } from "@/components/dashboard/NotificationCard";
 import { Card, CardContent } from "@/components/ui/card";
-import { CheckCircle, Clock, AlertTriangle, FileWarning } from "lucide-react";
+import { CheckCircle, Clock, AlertTriangle, FileWarning, Hourglass } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export default function Dashboard() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const isMobile = useIsMobile();
   
   // Mock data for processes
   const processes: ProcessProps[] = [
@@ -79,10 +80,17 @@ export default function Dashboard() {
     pendingDocs: processes.reduce((acc, curr) => acc + (curr.pendingDocuments || 0), 0)
   };
 
+  const handleToggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
   return (
     <div className="flex h-screen bg-gray-50">
       <DashboardSidebar />
-      <MobileNav isOpen={isMobileMenuOpen} />
+      <MobileNav 
+        isOpen={isMobileMenuOpen} 
+        onClose={() => setIsMobileMenuOpen(false)}
+      />
       
       <div className="flex-1 flex flex-col overflow-hidden">
         <DashboardHeader />
@@ -98,7 +106,7 @@ export default function Dashboard() {
             <Card className="border-l-4 border-blue-500">
               <CardContent className="p-4 flex items-center">
                 <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center mr-3">
-                  <Clock className="h-5 w-5 text-blue-500" />
+                  <Hourglass className="h-5 w-5 text-blue-500" />
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">Processos Ativos</p>

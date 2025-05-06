@@ -1,8 +1,22 @@
+
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { ArrowRight, Clock, CheckCircle, AlertTriangle, FileText, Calendar, File, MessageSquare, X, FileWarning, CalendarClock } from "lucide-react";
+import { 
+  ArrowRight, 
+  Clock, 
+  CheckCircle, 
+  AlertTriangle, 
+  FileText, 
+  Calendar, 
+  File, 
+  MessageSquare, 
+  X, 
+  FileWarning, 
+  CalendarClock,
+  Hourglass
+} from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
@@ -35,8 +49,8 @@ export default function ProcessCard({ process }: { process: ProcessProps }) {
 
   // Status icons mapping
   const statusIcons = {
-    pendente: <AlertTriangle className="h-4 w-4 mr-1 text-yellow-500" />,
-    em_andamento: <Clock className="h-4 w-4 mr-1 text-blue-500" />,
+    pendente: <Clock className="h-4 w-4 mr-1 text-yellow-500" />,
+    em_andamento: <Hourglass className="h-4 w-4 mr-1 text-blue-500" />,
     concluido: <CheckCircle className="h-4 w-4 mr-1 text-green-500" />,
     rejeitado: <X className="h-4 w-4 mr-1 text-red-500" />
   };
@@ -127,16 +141,16 @@ export default function ProcessCard({ process }: { process: ProcessProps }) {
         <p className="text-sm text-gray-500 ml-5">{process.type}</p>
       </CardHeader>
       <CardContent className="py-2">
-        <div className="bg-gray-50 p-3 rounded-md mb-3 border-l-4 border-[#06D7A5] flex items-center shadow-sm hover:shadow-md transition-all duration-300">
+        <div className="bg-[#fefae0] p-3 rounded-md mb-3 border-l-4 border-[#06D7A5] flex items-center shadow-sm hover:shadow-md transition-all duration-300">
           {getNextActionIcon()}
-          <span className="text-sm font-medium">Próxima ação: {getNextAction()}</span>
+          <span className="text-sm font-medium">📌 Próxima ação: {getNextAction()}</span>
         </div>
         
         {process.pendingDocuments && process.pendingDocuments > 0 && (
           <div className="bg-yellow-50 p-2 rounded-md mb-3 border-l-4 border-yellow-500 flex items-center">
             <FileWarning className="h-4 w-4 text-yellow-500 mr-2 flex-shrink-0" />
             <span className="text-sm text-yellow-800">
-              {process.pendingDocuments} documento{process.pendingDocuments > 1 ? 's' : ''} pendente{process.pendingDocuments > 1 ? 's' : ''}
+              📄 {process.pendingDocuments} documento{process.pendingDocuments > 1 ? 's' : ''} pendente{process.pendingDocuments > 1 ? 's' : ''}
             </span>
           </div>
         )}
@@ -144,7 +158,7 @@ export default function ProcessCard({ process }: { process: ProcessProps }) {
         {process.deadline && (
           <div className="flex items-center mb-2 text-sm">
             <CalendarClock className="h-4 w-4 text-gray-500 mr-1" />
-            <span>Prazo: <span className="font-semibold">{process.deadline}</span></span>
+            <span>🕒 Prazo: <span className="font-semibold">{process.deadline}</span></span>
           </div>
         )}
         
