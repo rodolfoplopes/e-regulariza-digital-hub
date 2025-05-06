@@ -9,9 +9,11 @@ import DadosPessoaisForm from "@/components/user/DadosPessoaisForm";
 import SecuritySettings from "@/components/user/SecuritySettings";
 import PreferenciasUsuario from "@/components/user/PreferenciasUsuario";
 import PoliciesLinks from "@/components/user/PoliciesLinks";
+import { useToast } from "@/hooks/use-toast";
 
 export default function UserSettings() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { toast } = useToast();
   
   // Mock user data - would be fetched from authentication context
   const [userData, setUserData] = useState({
@@ -23,6 +25,13 @@ export default function UserSettings() {
 
   const handleUserDataUpdate = (updatedData: typeof userData) => {
     setUserData(updatedData);
+    
+    // Show success toast notification
+    toast({
+      title: "Dados atualizados",
+      description: "Suas informações foram salvas com sucesso.",
+      className: "bg-white border-green-100",
+    });
   };
 
   return (
