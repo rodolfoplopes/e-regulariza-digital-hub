@@ -4,17 +4,19 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Paperclip, Send, X as CloseIcon, AlertCircle, Clock, CheckCircle, User } from "lucide-react";
+import { Paperclip, Send, X as CloseIcon, AlertCircle, Clock, CheckCircle, User, FileWarning, FileQuestion, AlertOctagon } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
+import { useToast } from "@/hooks/use-toast";
 
 export interface MessageAttachment {
   name: string;
   url: string;
   type: string;
+  size?: number;
 }
 
-export type MessageTag = "important" | "answered" | "pending" | "internal";
+export type MessageTag = "important" | "answered" | "pending" | "internal" | "document" | "urgent" | "question";
 
 export interface Message {
   id: string;
@@ -37,6 +39,11 @@ export interface ProcessMessagesProps {
   isAdmin?: boolean;
 }
 
+// Maximum file size in bytes (10MB)
+const MAX_FILE_SIZE = 10 * 1024 * 1024;
+// Allowed file extensions
+const ALLOWED_EXTENSIONS = ['.pdf', '.doc', '.docx', '.jpg', '.jpeg', '.png'];
+
 export default function ProcessMessages({
   messages = [],
   onSendMessage = async () => {},
@@ -47,9 +54,10 @@ export default function ProcessMessages({
   const [attachments, setAttachments] = useState<File[]>([]);
   const [selectedTags, setSelectedTags] = useState<MessageTag[]>([]);
   const [isSending, setIsSending] = useState(false);
-  const [filter, setFilter] = useState<"all" | "internal" | "external">("all");
+  const [filter, setFilter] = useState<"all" | "internal" | "external" | "document" | "urgent">("all");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const { toast } = useToast();
   
   // Simulando mensagens caso não sejam passadas
   const mockMessages: Message[] = messages.length > 0 ? messages : [
@@ -117,6 +125,32 @@ export default function ProcessMessages({
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
+
+  const validateFile = (file: File): boolean => {
+    // Check file size
+    if (file.size > MAX_FILE_SIZE) {
+      toast({
+        title: "Arquivo muito grande",
+        description: `O tamanho máximo permitido é de 10MB. Seu arquivo tem ${(file.size / (1024 * 1024)).toFixed(2)}MB`,
+        variant: "destructive"
+      });
+      return false;
+    }
+
+    // Check file extension
+    const fileName = file.name.toLowerCase();
+    const fileExtension = fileName.substring(fileName.lastIndexOf('.'));
+    if (!ALLOWED_EXTENSIONS.includes(fileExtension)) {
+      toast({
+        title: "Formato não suportado",
+        description: `Apenas arquivos ${ALLOWED_EXTENSIONS.join(', ')} são permitidos.`,
+        variant: "destructive"
+      });
+      return false;
+    }
+
+    return true;
+  };
   
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -130,8 +164,20 @@ export default function ProcessMessages({
       setNewMessage("");
       setAttachments([]);
       setSelectedTags([]);
+      
+      toast({
+        title: "Mensagem enviada",
+        description: attachments.length > 0 
+          ? `Mensagem enviada com ${attachments.length} anexo(s)` 
+          : "Sua mensagem foi enviada com sucesso",
+      });
     } catch (error) {
       console.error("Error sending message:", error);
+      toast({
+        title: "Erro ao enviar mensagem",
+        description: "Não foi possível enviar sua mensagem. Tente novamente.",
+        variant: "destructive",
+      });
     } finally {
       setIsSending(false);
     }
@@ -139,9 +185,16 @@ export default function ProcessMessages({
   
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
-      // Convert FileList to Array and add to attachments
+      // Convert FileList to Array
       const newFiles = Array.from(e.target.files);
-      setAttachments(prev => [...prev, ...newFiles]);
+      
+      // Validate each file
+      const validFiles = newFiles.filter(validateFile);
+      
+      // Add valid files to attachments
+      if (validFiles.length > 0) {
+        setAttachments(prev => [...prev, ...validFiles]);
+      }
       
       // Reset file input
       if (fileInputRef.current) {
@@ -167,6 +220,8 @@ export default function ProcessMessages({
     if (filter === "all") return true;
     if (filter === "internal") return message.tags?.includes("internal");
     if (filter === "external") return !message.tags?.includes("internal");
+    if (filter === "document") return message.tags?.includes("document");
+    if (filter === "urgent") return message.tags?.includes("urgent") || message.tags?.includes("important");
     return true;
   });
   
@@ -176,6 +231,12 @@ export default function ProcessMessages({
         return (
           <Badge variant="outline" className="bg-red-100 text-red-800 border-red-200">
             <AlertCircle className="h-3 w-3 mr-1" /> Importante
+          </Badge>
+        );
+      case "urgent":
+        return (
+          <Badge variant="outline" className="bg-red-100 text-red-700 border-red-200">
+            <AlertOctagon className="h-3 w-3 mr-1" /> Urgente
           </Badge>
         );
       case "answered":
@@ -194,6 +255,18 @@ export default function ProcessMessages({
         return (
           <Badge variant="outline" className="bg-blue-100 text-blue-800 border-blue-200">
             <User className="h-3 w-3 mr-1" /> Interno
+          </Badge>
+        );
+      case "document":
+        return (
+          <Badge variant="outline" className="bg-purple-100 text-purple-800 border-purple-200">
+            <FileWarning className="h-3 w-3 mr-1" /> Documento
+          </Badge>
+        );
+      case "question":
+        return (
+          <Badge variant="outline" className="bg-orange-100 text-orange-800 border-orange-200">
+            <FileQuestion className="h-3 w-3 mr-1" /> Dúvida
           </Badge>
         );
     }
@@ -217,15 +290,15 @@ export default function ProcessMessages({
           Entre em contato com a equipe de suporte
         </p>
         
-        {isAdmin && (
-          <div className="flex mt-2 space-x-2">
-            <Button 
-              variant={filter === "all" ? "default" : "outline"} 
-              size="sm"
-              onClick={() => setFilter("all")}
-            >
-              Todas
-            </Button>
+        <div className="flex mt-2 space-x-2 overflow-x-auto pb-2">
+          <Button 
+            variant={filter === "all" ? "default" : "outline"} 
+            size="sm"
+            onClick={() => setFilter("all")}
+          >
+            Todas
+          </Button>
+          {isAdmin && (
             <Button 
               variant={filter === "internal" ? "default" : "outline"} 
               size="sm"
@@ -233,15 +306,29 @@ export default function ProcessMessages({
             >
               Internas
             </Button>
-            <Button 
-              variant={filter === "external" ? "default" : "outline"} 
-              size="sm"
-              onClick={() => setFilter("external")}
-            >
-              Externas
-            </Button>
-          </div>
-        )}
+          )}
+          <Button 
+            variant={filter === "external" ? "default" : "outline"} 
+            size="sm"
+            onClick={() => setFilter("external")}
+          >
+            Externas
+          </Button>
+          <Button 
+            variant={filter === "document" ? "default" : "outline"} 
+            size="sm"
+            onClick={() => setFilter("document")}
+          >
+            Documentos
+          </Button>
+          <Button 
+            variant={filter === "urgent" ? "default" : "outline"} 
+            size="sm"
+            onClick={() => setFilter("urgent")}
+          >
+            Urgentes
+          </Button>
+        </div>
       </div>
       
       <ScrollArea className="flex-grow p-4">
@@ -319,6 +406,11 @@ export default function ProcessMessages({
                                   >
                                     <Paperclip className="h-3 w-3 mr-1" />
                                     {attachment.name}
+                                    {attachment.size && (
+                                      <span className="ml-1 text-xs opacity-75">
+                                        ({(attachment.size / 1024).toFixed(0)}KB)
+                                      </span>
+                                    )}
                                   </a>
                                 ))}
                               </div>
@@ -361,6 +453,9 @@ export default function ProcessMessages({
             >
               <Paperclip className="h-3 w-3 mr-1" />
               <span className="truncate max-w-[100px]">{file.name}</span>
+              <span className="ml-1 text-xs opacity-75">
+                ({(file.size / 1024).toFixed(0)}KB)
+              </span>
               <button 
                 type="button"
                 onClick={() => removeAttachment(index)}
@@ -404,6 +499,33 @@ export default function ProcessMessages({
             </Button>
             <Button 
               type="button"
+              variant={selectedTags.includes("urgent") ? "default" : "outline"}
+              size="sm"
+              className="text-xs h-7"
+              onClick={() => toggleTag("urgent")}
+            >
+              <AlertOctagon className="h-3 w-3 mr-1" /> Urgente
+            </Button>
+            <Button 
+              type="button"
+              variant={selectedTags.includes("document") ? "default" : "outline"}
+              size="sm"
+              className="text-xs h-7"
+              onClick={() => toggleTag("document")}
+            >
+              <FileWarning className="h-3 w-3 mr-1" /> Documento
+            </Button>
+            <Button 
+              type="button"
+              variant={selectedTags.includes("question") ? "default" : "outline"}
+              size="sm"
+              className="text-xs h-7"
+              onClick={() => toggleTag("question")}
+            >
+              <FileQuestion className="h-3 w-3 mr-1" /> Dúvida
+            </Button>
+            <Button 
+              type="button"
               variant={selectedTags.includes("answered") ? "default" : "outline"}
               size="sm"
               className="text-xs h-7"
@@ -439,6 +561,7 @@ export default function ProcessMessages({
             size="sm"
             className="px-2"
             onClick={() => fileInputRef.current?.click()}
+            title="Anexar arquivo (máx. 10MB)"
           >
             <Paperclip className="h-5 w-5" />
           </Button>
@@ -462,6 +585,7 @@ export default function ProcessMessages({
             type="submit"
             size="sm"
             disabled={isSending || (!newMessage.trim() && !attachments.length)}
+            className="transition-all duration-300 hover:bg-primary-transparent"
           >
             {isSending ? "Enviando..." : "Enviar"}
             <Send className="h-4 w-4 ml-2" />

@@ -109,12 +109,30 @@ export default {
 						opacity: '1',
 						transform: 'translateY(0)'
 					}
+				},
+				'pulse-slow': {
+					'0%, 100%': {
+						opacity: '1'
+					},
+					'50%': {
+						opacity: '0.7'
+					}
+				},
+				'progress-loading': {
+					'0%': {
+						backgroundPosition: '200% 0'
+					},
+					'100%': {
+						backgroundPosition: '-200% 0'
+					}
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
 				'accordion-up': 'accordion-up 0.2s ease-out',
 				'fade-in': 'fade-in 0.3s ease-out',
+				'pulse-slow': 'pulse-slow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+				'progress-loading': 'progress-loading 3s ease infinite'
 			},
 			typography: {
 				DEFAULT: {
@@ -124,6 +142,12 @@ export default {
 					},
 				},
 			},
+			backgroundImage: {
+				'progress-gradient': 'linear-gradient(270deg, #06D7A5, #06D7A5, #06D7A5, #06D7A5)',
+			},
+			backgroundSize: {
+				'400%': '400% 100%'
+			}
 		}
 	},
 	plugins: [require("tailwindcss-animate")],

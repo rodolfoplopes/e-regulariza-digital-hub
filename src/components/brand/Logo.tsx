@@ -15,7 +15,7 @@ export function Logo({ variant = "default", className = "" }: LogoProps) {
     return (
       <div className={`${baseClasses} ${className} rounded-full bg-[#06D7A5] h-10 w-10 overflow-hidden flex-shrink-0`}>
         <img 
-          src="/lovable-uploads/58cc8e50-0d45-414e-8ce1-33ba4dd6d6e7.png"
+          src="/lovable-uploads/3b439cb9-4071-4319-8787-a968cea832a7.png"
           alt="e-regulariza"
           className="h-10 w-10 object-contain p-1.5"
         />
@@ -30,7 +30,7 @@ export function Logo({ variant = "default", className = "" }: LogoProps) {
     <div className={`${baseClasses} gap-2 ${className}`}>
       <div className={`rounded-full bg-[#06D7A5] ${sizeClass} ${variant === "small" ? "w-8" : "w-10"} flex items-center justify-center overflow-hidden flex-shrink-0`}>
         <img 
-          src="/lovable-uploads/58cc8e50-0d45-414e-8ce1-33ba4dd6d6e7.png"
+          src="/lovable-uploads/3b439cb9-4071-4319-8787-a968cea832a7.png"
           alt="e-regulariza"
           className={`${sizeClass} w-auto object-contain p-1.5`}
         />

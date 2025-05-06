@@ -6,7 +6,7 @@ import MobileNav from "@/components/dashboard/MobileNav";
 import ProcessCard, { ProcessProps } from "@/components/dashboard/ProcessCard";
 import NotificationCard, { NotificationProps } from "@/components/dashboard/NotificationCard";
 import { Card, CardContent } from "@/components/ui/card";
-import { CheckCircle, Clock, AlertTriangle } from "lucide-react";
+import { CheckCircle, Clock, AlertTriangle, FileWarning } from "lucide-react";
 
 export default function Dashboard() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -19,7 +19,9 @@ export default function Dashboard() {
       type: "Usucapião",
       status: "em_andamento",
       progress: 45,
-      lastUpdate: "10/04/2023"
+      lastUpdate: "10/04/2023",
+      pendingDocuments: 2,
+      deadline: "15/07/2023"
     },
     {
       id: "proc-002",
@@ -27,7 +29,8 @@ export default function Dashboard() {
       type: "Retificação de Área",
       status: "pendente",
       progress: 15,
-      lastUpdate: "02/05/2023"
+      lastUpdate: "02/05/2023",
+      nextAction: "Enviar documentação de posse do imóvel"
     },
     {
       id: "proc-003",
@@ -35,7 +38,8 @@ export default function Dashboard() {
       type: "Inventário",
       status: "concluido",
       progress: 100,
-      lastUpdate: "20/02/2023"
+      lastUpdate: "20/02/2023",
+      nextAction: "Processo concluído com sucesso"
     }
   ];
   
@@ -71,7 +75,8 @@ export default function Dashboard() {
   const processCounters = {
     active: processes.filter(p => p.status === "em_andamento").length,
     pending: processes.filter(p => p.status === "pendente").length,
-    completed: processes.filter(p => p.status === "concluido").length
+    completed: processes.filter(p => p.status === "concluido").length,
+    pendingDocs: processes.reduce((acc, curr) => acc + (curr.pendingDocuments || 0), 0)
   };
 
   return (
@@ -89,7 +94,7 @@ export default function Dashboard() {
           </div>
           
           {/* Status Counters */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
             <Card className="border-l-4 border-blue-500">
               <CardContent className="p-4 flex items-center">
                 <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center mr-3">
@@ -98,6 +103,18 @@ export default function Dashboard() {
                 <div>
                   <p className="text-sm text-gray-500">Processos Ativos</p>
                   <p className="text-2xl font-bold">{processCounters.active}</p>
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Card className="border-l-4 border-yellow-500">
+              <CardContent className="p-4 flex items-center">
+                <div className="h-10 w-10 rounded-full bg-yellow-100 flex items-center justify-center mr-3">
+                  <AlertTriangle className="h-5 w-5 text-yellow-500" />
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Processos Pendentes</p>
+                  <p className="text-2xl font-bold">{processCounters.pending}</p>
                 </div>
               </CardContent>
             </Card>
@@ -114,21 +131,24 @@ export default function Dashboard() {
               </CardContent>
             </Card>
             
-            <Card className="border-l-4 border-yellow-500">
+            <Card className="border-l-4 border-orange-500">
               <CardContent className="p-4 flex items-center">
-                <div className="h-10 w-10 rounded-full bg-yellow-100 flex items-center justify-center mr-3">
-                  <AlertTriangle className="h-5 w-5 text-yellow-500" />
+                <div className="h-10 w-10 rounded-full bg-orange-100 flex items-center justify-center mr-3">
+                  <FileWarning className="h-5 w-5 text-orange-500" />
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">Pendências</p>
-                  <p className="text-2xl font-bold">{processCounters.pending}</p>
+                  <p className="text-sm text-gray-500">Docs. Pendentes</p>
+                  <p className="text-2xl font-bold">{processCounters.pendingDocs}</p>
                 </div>
               </CardContent>
             </Card>
           </div>
           
           <div className="mb-8">
-            <h2 className="text-xl font-semibold mb-4">Meus Processos</h2>
+            <h2 className="text-xl font-semibold mb-4 flex items-center">
+              <Clock className="h-5 w-5 mr-2 text-[#06D7A5]" />
+              Meus Processos
+            </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {processes.map((process) => (
                 <ProcessCard key={process.id} process={process} />
@@ -137,7 +157,10 @@ export default function Dashboard() {
           </div>
           
           <div>
-            <h2 className="text-xl font-semibold mb-4">Notificações Recentes</h2>
+            <h2 className="text-xl font-semibold mb-4 flex items-center">
+              <AlertTriangle className="h-5 w-5 mr-2 text-[#06D7A5]" />
+              Notificações Recentes
+            </h2>
             <div className="space-y-4">
               {notifications.map((notification) => (
                 <NotificationCard key={notification.id} notification={notification} />

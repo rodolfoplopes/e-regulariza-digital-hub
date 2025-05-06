@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
-import { FileText, File } from "lucide-react";
+import { FileText, File, Download, AlertCircle } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -24,6 +24,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
+import { Progress } from "@/components/ui/progress";
 
 // Type definitions
 interface Client {
@@ -46,9 +47,11 @@ interface ReportExportProps {
 export default function ReportExport({ clients = [], serviceTypes = [] }: ReportExportProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [exportProgress, setExportProgress] = useState(0);
   const [selectedClient, setSelectedClient] = useState<string>("");
   const [selectedService, setSelectedService] = useState<string>("");
   const [selectedStatus, setSelectedStatus] = useState<ProcessStatus | "">("");
+  const [processNumber, setProcessNumber] = useState<string>("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [exportFormat, setExportFormat] = useState<"csv" | "pdf">("csv");
@@ -82,6 +85,22 @@ export default function ReportExport({ clients = [], serviceTypes = [] }: Report
     { value: "concluido", label: "Concluído" },
     { value: "rejeitado", label: "Rejeitado" }
   ];
+
+  // Simulated export progress function
+  const simulateExportProgress = () => {
+    setExportProgress(0);
+    const interval = setInterval(() => {
+      setExportProgress(prev => {
+        if (prev >= 100) {
+          clearInterval(interval);
+          return 100;
+        }
+        return prev + 10;
+      });
+    }, 200);
+
+    return () => clearInterval(interval);
+  };
   
   const handleGenerateReport = async () => {
     // Validate dates if both are provided
@@ -96,11 +115,15 @@ export default function ReportExport({ clients = [], serviceTypes = [] }: Report
 
     setIsGenerating(true);
     
+    // Start progress simulation
+    const stopProgress = simulateExportProgress();
+    
     // Prepare filter parameters
     const filters = {
       clientId: selectedClient || null,
       serviceId: selectedService || null,
       status: selectedStatus || null,
+      processNumber: processNumber || null,
       startDate: startDate || null,
       endDate: endDate || null,
       includeFields,
@@ -114,15 +137,27 @@ export default function ReportExport({ clients = [], serviceTypes = [] }: Report
       // Simulate API call delay
       await new Promise(resolve => setTimeout(resolve, 2000));
       
+      // Handle download based on format
+      const filename = `relatorio-processos-${new Date().toISOString().split('T')[0]}`;
+      const extension = exportFormat === 'csv' ? 'csv' : 'pdf';
+      
+      // Simulate file download - in a real app, this would be a blob from the API
+      const link = document.createElement('a');
+      link.setAttribute('download', `${filename}.${extension}`);
+      
+      // In a real implementation, this would be the URL to the generated report
+      // For now, we're just simulating the download
+      link.setAttribute('href', '#');
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
       // Mock success
       toast({
         title: "Relatório gerado com sucesso!",
         description: `O relatório em formato ${exportFormat.toUpperCase()} foi gerado e está pronto para download.`,
+        className: "bg-white border-green-100",
       });
-      
-      // In a real app, this would trigger a file download
-      // For demo purposes, we'll just log and close the dialog
-      console.log("Report generated. Download would start now.");
       
       setIsOpen(false);
       resetForm();
@@ -134,6 +169,8 @@ export default function ReportExport({ clients = [], serviceTypes = [] }: Report
         variant: "destructive",
       });
     } finally {
+      stopProgress();
+      setExportProgress(0);
       setIsGenerating(false);
     }
   };
@@ -142,6 +179,7 @@ export default function ReportExport({ clients = [], serviceTypes = [] }: Report
     setSelectedClient("");
     setSelectedService("");
     setSelectedStatus("");
+    setProcessNumber("");
     setStartDate("");
     setEndDate("");
     setExportFormat("csv");
@@ -156,7 +194,7 @@ export default function ReportExport({ clients = [], serviceTypes = [] }: Report
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline">
+        <Button variant="outline" className="flex items-center hover:bg-primary-transparent hover:text-primary transition-colors">
           <FileText className="mr-2 h-4 w-4" />
           Exportar Relatório
         </Button>
@@ -193,6 +231,19 @@ export default function ReportExport({ clients = [], serviceTypes = [] }: Report
                 </SelectGroup>
               </SelectContent>
             </Select>
+          </div>
+
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="process-number" className="text-right">
+              Nº Processo
+            </Label>
+            <Input
+              id="process-number"
+              placeholder="Digite o número do processo"
+              value={processNumber}
+              onChange={(e) => setProcessNumber(e.target.value)}
+              className="col-span-3"
+            />
           </div>
           
           <div className="grid grid-cols-4 items-center gap-4">
@@ -347,6 +398,16 @@ export default function ReportExport({ clients = [], serviceTypes = [] }: Report
               </div>
             </div>
           </div>
+
+          {isGenerating && (
+            <div className="mt-2 space-y-2">
+              <div className="flex justify-between text-sm text-gray-600">
+                <span>Gerando relatório...</span>
+                <span>{exportProgress}%</span>
+              </div>
+              <Progress value={exportProgress} className="h-2" />
+            </div>
+          )}
         </div>
         
         <DialogFooter>
@@ -364,8 +425,13 @@ export default function ReportExport({ clients = [], serviceTypes = [] }: Report
             type="button" 
             onClick={handleGenerateReport}
             disabled={isGenerating}
+            className="relative flex items-center"
           >
-            {isGenerating ? "Gerando..." : "Gerar Relatório"}
+            {isGenerating ? (
+              <>Gerando...<Download className="ml-2 h-4 w-4 animate-pulse" /></>
+            ) : (
+              <>Gerar Relatório<Download className="ml-2 h-4 w-4" /></>
+            )}
           </Button>
         </DialogFooter>
       </DialogContent>
