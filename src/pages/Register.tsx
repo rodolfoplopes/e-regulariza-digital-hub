@@ -14,6 +14,9 @@ import {
 } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
 import Layout from "@/components/layout/Layout";
+import { createCPFHash, validateCPF, formatCPF } from "@/utils/userUtils";
+import { AlertCircle, Check, Eye, EyeOff } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 export default function Register() {
   const [name, setName] = useState("");
@@ -24,51 +27,51 @@ export default function Register() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [cpfError, setCpfError] = useState("");
+  const [passwordVisible, setPasswordVisible] = useState(false);
+  const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
+  const [passwordStrength, setPasswordStrength] = useState<number>(0);
   
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const validateCPF = (cpf: string): boolean => {
-    // Remove non-numeric characters
-    const cpfClean = cpf.replace(/\D/g, '');
+  const validateEmail = (email: string): boolean => {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(email);
+  };
+
+  const checkPasswordStrength = (password: string): number => {
+    let strength = 0;
     
-    // Check if length is 11
-    if (cpfClean.length !== 11) {
-      return false;
-    }
+    // Length check
+    if (password.length >= 8) strength += 1;
+    
+    // Contains lowercase
+    if (/[a-z]/.test(password)) strength += 1;
+    
+    // Contains uppercase
+    if (/[A-Z]/.test(password)) strength += 1;
+    
+    // Contains number
+    if (/[0-9]/.test(password)) strength += 1;
+    
+    // Contains special character
+    if (/[^A-Za-z0-9]/.test(password)) strength += 1;
+    
+    return strength;
+  };
 
-    // Check if all digits are the same (invalid CPF)
-    if (/^(\d)\1{10}$/.test(cpfClean)) {
-      return false;
-    }
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newPassword = e.target.value;
+    setPassword(newPassword);
+    setPasswordStrength(checkPasswordStrength(newPassword));
+  };
 
-    // Validate first check digit
-    let sum = 0;
-    for (let i = 0; i < 9; i++) {
-      sum += parseInt(cpfClean.charAt(i)) * (10 - i);
-    }
-    let checkDigit = 11 - (sum % 11);
-    if (checkDigit === 10 || checkDigit === 11) {
-      checkDigit = 0;
-    }
-    if (checkDigit !== parseInt(cpfClean.charAt(9))) {
-      return false;
-    }
-
-    // Validate second check digit
-    sum = 0;
-    for (let i = 0; i < 10; i++) {
-      sum += parseInt(cpfClean.charAt(i)) * (11 - i);
-    }
-    checkDigit = 11 - (sum % 11);
-    if (checkDigit === 10 || checkDigit === 11) {
-      checkDigit = 0;
-    }
-    if (checkDigit !== parseInt(cpfClean.charAt(10))) {
-      return false;
-    }
-
-    return true;
+  const getPasswordStrengthText = (): { text: string; color: string } => {
+    if (passwordStrength === 0) return { text: "Muito fraca", color: "bg-red-500" };
+    if (passwordStrength <= 2) return { text: "Fraca", color: "bg-red-500" };
+    if (passwordStrength <= 3) return { text: "Média", color: "bg-yellow-500" };
+    if (passwordStrength <= 4) return { text: "Forte", color: "bg-green-500" };
+    return { text: "Muito forte", color: "bg-green-700" };
   };
 
   const handleCPFChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -77,24 +80,34 @@ export default function Register() {
     setCpfError("");
     
     if (value.length <= 11) {
-      let formattedValue = value;
-      if (value.length > 3) {
-        formattedValue = `${value.slice(0, 3)}.${value.slice(3)}`;
-      }
-      if (value.length > 6) {
-        formattedValue = `${value.slice(0, 3)}.${value.slice(3, 6)}.${value.slice(6)}`;
-      }
-      if (value.length > 9) {
-        formattedValue = `${value.slice(0, 3)}.${value.slice(3, 6)}.${value.slice(6, 9)}-${value.slice(9)}`;
-      }
-      setCpf(formattedValue);
+      setCpf(formatCPF(value));
     }
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     
-    // Validate password
+    // Validate email
+    if (!validateEmail(email)) {
+      toast({
+        variant: "destructive",
+        title: "E-mail inválido",
+        description: "Por favor, insira um endereço de e-mail válido.",
+      });
+      return;
+    }
+    
+    // Validate password strength
+    if (passwordStrength < 3) {
+      toast({
+        variant: "destructive",
+        title: "Senha muito fraca",
+        description: "A senha deve conter pelo menos 8 caracteres, incluindo letras maiúsculas, minúsculas e números.",
+      });
+      return;
+    }
+    
+    // Validate password match
     if (password !== confirmPassword) {
       toast({
         variant: "destructive",
@@ -119,8 +132,22 @@ export default function Register() {
 
     // Mock registration function - would be replaced with actual auth
     try {
-      // In a real implementation, we'd check if CPF already exists in the database
+      // In a real Supabase implementation, we'd check if CPF already exists in the database
       // For this mock version, we'll simulate a check
+      const cpfHash = await createCPFHash(cpf);
+      const emailExists = Math.random() > 0.9; // 10% chance of email already existing
+      
+      if (emailExists) {
+        toast({
+          variant: "destructive",
+          title: "Erro no cadastro",
+          description: "E-mail já cadastrado no sistema.",
+        });
+        setIsLoading(false);
+        return;
+      }
+      
+      // Simulate CPF check
       const cpfExists = Math.random() > 0.9; // 10% chance of CPF already existing
       
       if (cpfExists) {
@@ -132,9 +159,6 @@ export default function Register() {
         setIsLoading(false);
         return;
       }
-      
-      // Here we would create a hash of the CPF for storage
-      // const cpfHash = await createCPFHash(cpf); // In a real implementation
       
       // Simulate API call with delay
       await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -169,6 +193,8 @@ export default function Register() {
       setPhone(formattedValue);
     }
   };
+
+  const strength = getPasswordStrengthText();
 
   return (
     <Layout hideFooter>
@@ -240,26 +266,77 @@ export default function Register() {
                 
                 <div className="space-y-2">
                   <Label htmlFor="password">Senha</Label>
-                  <Input
-                    id="password"
-                    type="password"
-                    placeholder="••••••••"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                  />
+                  <div className="relative">
+                    <Input
+                      id="password"
+                      type={passwordVisible ? "text" : "password"}
+                      placeholder="••••••••"
+                      value={password}
+                      onChange={handlePasswordChange}
+                      required
+                    />
+                    <button
+                      type="button"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
+                      onClick={() => setPasswordVisible(!passwordVisible)}
+                    >
+                      {passwordVisible ? (
+                        <EyeOff className="h-4 w-4" />
+                      ) : (
+                        <Eye className="h-4 w-4" />
+                      )}
+                    </button>
+                  </div>
+                  
+                  {password && (
+                    <>
+                      <div className="h-1.5 w-full bg-gray-200 rounded-full overflow-hidden mt-2">
+                        <div 
+                          className={`h-full ${strength.color} transition-all duration-300`} 
+                          style={{ width: `${(passwordStrength / 5) * 100}%` }} 
+                        />
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Força: {strength.text}
+                      </p>
+                    </>
+                  )}
                 </div>
                 
                 <div className="space-y-2">
                   <Label htmlFor="confirmPassword">Confirme sua senha</Label>
-                  <Input
-                    id="confirmPassword"
-                    type="password"
-                    placeholder="••••••••"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    required
-                  />
+                  <div className="relative">
+                    <Input
+                      id="confirmPassword"
+                      type={confirmPasswordVisible ? "text" : "password"}
+                      placeholder="••••••••"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      required
+                    />
+                    <button
+                      type="button"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
+                      onClick={() => setConfirmPasswordVisible(!confirmPasswordVisible)}
+                    >
+                      {confirmPasswordVisible ? (
+                        <EyeOff className="h-4 w-4" />
+                      ) : (
+                        <Eye className="h-4 w-4" />
+                      )}
+                    </button>
+                  </div>
+                  
+                  {confirmPassword && password && (
+                    confirmPassword === password ? (
+                      <div className="flex items-center text-green-600 text-xs gap-1 mt-1">
+                        <Check className="h-3 w-3" />
+                        <span>As senhas coincidem</span>
+                      </div>
+                    ) : (
+                      <p className="text-xs text-red-500 mt-1">As senhas não coincidem</p>
+                    )
+                  )}
                 </div>
               </CardContent>
               <CardFooter className="flex flex-col">

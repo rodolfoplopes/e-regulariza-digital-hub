@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation, Outlet } from "react-router-dom";
 import { useState, useEffect, createContext, useContext } from "react";
 import { HelmetProvider } from "react-helmet-async";
 import Index from "./pages/Index";
@@ -37,6 +37,7 @@ interface AuthContextType {
   role: string | null;
   login: (email: string, password: string) => Promise<boolean>;
   logout: () => void;
+  checkPermission: (requiredRole: "admin" | "cliente" | "any") => boolean;
 }
 
 // Create Auth Context
@@ -112,6 +113,17 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = () => {
     setUser(null);
     localStorage.removeItem('user');
+    // Also clear any auth-related items
+    localStorage.removeItem('loginAttempts');
+    localStorage.removeItem('loginCooldown');
+  };
+
+  // Function to check if user has required permissions
+  const checkPermission = (requiredRole: "admin" | "cliente" | "any"): boolean => {
+    if (!user) return false;
+    if (requiredRole === "any") return true;
+    if (requiredRole === "admin") return user.role === "admin";
+    return true; // For "cliente" role, both admins and clients can access
   };
 
   const authContextValue: AuthContextType = {
@@ -120,7 +132,8 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
     isAuthenticated: Boolean(user),
     role: user?.role || null,
     login,
-    logout
+    logout,
+    checkPermission
   };
 
   return (
@@ -139,49 +152,49 @@ export const useAuth = () => {
   return context;
 };
 
-// Secure Route component for admin only access
-const AdminRoute = ({ children }: { children: React.ReactNode }) => {
-  const { user, isLoading, isAuthenticated, role } = useAuth();
+// Route protection components
+const ProtectedRoute = ({ 
+  requiredRole = "any" 
+}: { 
+  requiredRole?: "admin" | "cliente" | "any" 
+}) => {
+  const { isLoading, isAuthenticated, checkPermission } = useAuth();
   const location = useLocation();
   
   if (isLoading) {
     // Show loading indicator
-    return <div className="flex items-center justify-center min-h-screen">
-      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-eregulariza-primary"></div>
-    </div>;
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-eregulariza-primary"></div>
+      </div>
+    );
   }
   
   if (!isAuthenticated) {
     // Redirect to login if not authenticated, preserving the intended destination
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
-  
-  if (role !== "admin") {
-    // Redirect to unauthorized page if not admin
+
+  if (!checkPermission(requiredRole)) {
+    // Redirect to unauthorized page if lacking permission
     return <Navigate to="/unauthorized" replace />;
   }
   
-  return <>{children}</>;
+  return <Outlet />;
 };
 
-// Secure Route component for authenticated users
-const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const { isLoading, isAuthenticated } = useAuth();
+// Public routes - accessible to all users
+const PublicRoute = () => {
+  const { isAuthenticated } = useAuth();
   const location = useLocation();
-  
-  if (isLoading) {
-    // Show loading indicator
-    return <div className="flex items-center justify-center min-h-screen">
-      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-eregulariza-primary"></div>
-    </div>;
+
+  // If user is already authenticated and trying to access login/register,
+  // redirect them to dashboard
+  if (isAuthenticated && ['/login', '/register'].includes(location.pathname)) {
+    return <Navigate to="/dashboard" replace />;
   }
-  
-  if (!isAuthenticated) {
-    // Redirect to login if not authenticated, preserving the intended destination
-    return <Navigate to="/login" state={{ from: location }} replace />;
-  }
-  
-  return <>{children}</>;
+
+  return <Outlet />;
 };
 
 // Unauthorized page component
@@ -208,30 +221,35 @@ const App = () => {
             <Sonner />
             <BrowserRouter>
               <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/register" element={<Register />} />
+                {/* Public routes (accessible to all) */}
+                <Route element={<PublicRoute />}>
+                  <Route path="/" element={<Index />} />
+                  <Route path="/login" element={<Login />} />
+                  <Route path="/register" element={<Register />} />
+                  <Route path="/politica-de-privacidade" element={<PolicyPage />} />
+                  <Route path="/termos-de-uso" element={<PolicyPage />} />
+                  <Route path="/politica-de-cookies" element={<PolicyPage />} />
+                  <Route path="/:policyType" element={<PolicyPage />} />
+                </Route>
+
+                {/* Protected routes for authenticated users */}
+                <Route element={<ProtectedRoute requiredRole="cliente" />}>
+                  <Route path="/dashboard" element={<Dashboard />} />
+                  <Route path="/configuracoes" element={<UserSettings />} />
+                  <Route path="/contato" element={<ContactPage />} />
+                  <Route path="/processo/:processId" element={<ProcessDetail />} />
+                  <Route path="/notificacoes" element={<Notifications />} />
+                </Route>
+                
+                {/* Admin-only routes */}
+                <Route element={<ProtectedRoute requiredRole="admin" />}>
+                  <Route path="/admin" element={<AdminDashboard />} />
+                  <Route path="/admin/novo-processo" element={<ProcessCreate />} />
+                  <Route path="/admin/logo" element={<LogoManagementPage />} />
+                </Route>
+                
+                {/* Other routes */}
                 <Route path="/unauthorized" element={<Unauthorized />} />
-                
-                {/* Protected routes for all authenticated users */}
-                <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-                <Route path="/configuracoes" element={<ProtectedRoute><UserSettings /></ProtectedRoute>} />
-                <Route path="/contato" element={<ProtectedRoute><ContactPage /></ProtectedRoute>} />
-                <Route path="/processo/:processId" element={<ProtectedRoute><ProcessDetail /></ProtectedRoute>} />
-                <Route path="/notificacoes" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />
-                
-                {/* Admin routes */}
-                <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
-                <Route path="/admin/novo-processo" element={<AdminRoute><ProcessCreate /></AdminRoute>} />
-                <Route path="/admin/logo" element={<AdminRoute><LogoManagementPage /></AdminRoute>} />
-                
-                {/* Public policy pages */}
-                <Route path="/politica-de-privacidade" element={<PolicyPage />} />
-                <Route path="/termos-de-uso" element={<PolicyPage />} />
-                <Route path="/politica-de-cookies" element={<PolicyPage />} />
-                
-                {/* Legacy route - keep for backwards compatibility */}
-                <Route path="/:policyType" element={<PolicyPage />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </BrowserRouter>

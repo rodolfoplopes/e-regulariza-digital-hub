@@ -72,13 +72,13 @@ export default function Login() {
   }, [cooldownActive, cooldownTimer]);
 
   const activateCooldown = () => {
-    // Set a 30-second cooldown after 5 failed attempts
-    const cooldownDuration = 30 * 1000; // 30 seconds
+    // Set a 5-minute cooldown after 3 failed attempts
+    const cooldownDuration = 5 * 60 * 1000; // 5 minutes in milliseconds
     const expiryTime = Date.now() + cooldownDuration;
     
     localStorage.setItem('loginCooldown', expiryTime.toString());
     setCooldownActive(true);
-    setCooldownTimer(30);
+    setCooldownTimer(5 * 60); // 5 minutes in seconds
   };
 
   const handleFailedLogin = () => {
@@ -86,18 +86,18 @@ export default function Login() {
     setLoginAttempts(newAttempts);
     localStorage.setItem('loginAttempts', newAttempts.toString());
     
-    if (newAttempts >= 5) {
+    if (newAttempts >= 3) {
       activateCooldown();
       toast({
         variant: "destructive",
         title: "Muitas tentativas de login",
-        description: "Por segurança, aguarde 30 segundos antes de tentar novamente.",
+        description: "Por segurança, aguarde 5 minutos antes de tentar novamente.",
       });
     } else {
       toast({
         variant: "destructive",
         title: "Erro ao fazer login",
-        description: `E-mail ou senha inválidos. Tentativa ${newAttempts} de 5.`,
+        description: `E-mail ou senha inválidos. Tentativa ${newAttempts} de 3.`,
       });
     }
   };

@@ -1,9 +1,9 @@
 
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Bell, Menu, X } from "lucide-react";
+import { Bell, Menu, X, LogOut, Settings, User } from "lucide-react";
 import { Logo } from "@/components/brand/Logo";
 import {
   DropdownMenu,
@@ -14,11 +14,20 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useAuth } from "@/App";
+import { useToast } from "@/components/ui/use-toast";
+import ProcessNotifications from "../process/ProcessNotifications";
 
 export default function DashboardHeader() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
+  const [sessionTimeout, setSessionTimeout] = useState<NodeJS.Timeout | null>(null);
+  const [lastActivity, setLastActivity] = useState<number>(Date.now());
+  
   const isMobile = useIsMobile();
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+  const { toast } = useToast();
 
   useEffect(() => {
     // In a real app with Supabase, we would fetch the custom logo URL
@@ -27,15 +36,80 @@ export default function DashboardHeader() {
     // setLogoUrl(data?.logo_url || null);
   }, []);
 
-  // Mock user data
-  const user = {
-    name: "João Silva",
-    initials: "JS",
-    role: "Cliente",
-  };
+  // Setup activity monitoring for session security
+  useEffect(() => {
+    const activityEvents = ['mousedown', 'keydown', 'touchstart', 'scroll'];
+    
+    const resetTimer = () => {
+      setLastActivity(Date.now());
+    };
+    
+    // Add event listeners for user activity
+    activityEvents.forEach(event => {
+      window.addEventListener(event, resetTimer);
+    });
+    
+    // Session timeout check (30 minutes of inactivity)
+    const SESSION_TIMEOUT = 30 * 60 * 1000; // 30 minutes in milliseconds
+    
+    const interval = setInterval(() => {
+      const currentTime = Date.now();
+      const inactiveTime = currentTime - lastActivity;
+      
+      if (inactiveTime >= SESSION_TIMEOUT) {
+        // Session expired - log user out
+        handleLogout(true);
+      } else if (inactiveTime >= SESSION_TIMEOUT - (5 * 60 * 1000)) {
+        // Session about to expire in 5 minutes - show warning
+        toast({
+          title: "Sessão prestes a expirar",
+          description: "Sua sessão irá expirar em 5 minutos por inatividade.",
+          duration: 10000,
+        });
+      }
+    }, 60000); // Check every minute
+    
+    setSessionTimeout(interval);
+    
+    return () => {
+      // Clean up event listeners and interval
+      activityEvents.forEach(event => {
+        window.removeEventListener(event, resetTimer);
+      });
+      
+      if (sessionTimeout) {
+        clearInterval(sessionTimeout);
+      }
+    };
+  }, [lastActivity]);
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
+  const handleLogout = (isTimeout = false) => {
+    logout();
+    
+    if (isTimeout) {
+      toast({
+        title: "Sessão expirada",
+        description: "Sua sessão expirou por inatividade. Por favor, faça login novamente.",
+      });
+    } else {
+      toast({
+        title: "Logout realizado",
+        description: "Você foi desconectado com sucesso.",
+      });
+    }
+    
+    navigate("/login");
+  };
+
+  // Mock user data or use actual user data from context
+  const userData = user || {
+    name: "João Silva",
+    initials: "JS",
+    role: "Cliente",
   };
 
   return (
@@ -54,7 +128,8 @@ export default function DashboardHeader() {
 
           <Link to="/dashboard" className="flex items-center gap-2">
             <Logo 
-              variant={isMobile ? "icon-only" : "small"} 
+              variant="icon-only" 
+              size="md"
               customUrl={logoUrl || undefined} 
             />
             {!isMobile && (
@@ -66,38 +141,45 @@ export default function DashboardHeader() {
         </div>
 
         <div className="flex items-center space-x-2">
-          <Button variant="ghost" size="icon" className="relative">
-            <Bell className="h-5 w-5" />
-            <span className="absolute top-1 right-1 block h-2 w-2 rounded-full bg-eregulariza-secondary" />
-          </Button>
+          <ProcessNotifications />
           
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="relative h-8 w-8 rounded-full">
                 <Avatar className="h-8 w-8">
                   <AvatarFallback className="bg-eregulariza-primary text-white">
-                    {user.initials}
+                    {userData.name.split(' ').map(name => name[0]).join('').slice(0, 2).toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
+            <DropdownMenuContent align="end" className="w-56">
               <DropdownMenuLabel>
                 <div className="flex flex-col">
-                  <span>{user.name}</span>
-                  <span className="text-xs text-muted-foreground">{user.role}</span>
+                  <span>{userData.name}</span>
+                  <span className="text-xs text-muted-foreground">{userData.role}</span>
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild>
-                <Link to="/perfil">Meu Perfil</Link>
+                <Link to="/perfil" className="cursor-pointer flex w-full items-center">
+                  <User className="mr-2 h-4 w-4" />
+                  <span>Meu Perfil</span>
+                </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link to="/configuracoes">Configurações</Link>
+                <Link to="/configuracoes" className="cursor-pointer flex w-full items-center">
+                  <Settings className="mr-2 h-4 w-4" />
+                  <span>Configurações</span>
+                </Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem asChild>
-                <Link to="/">Sair</Link>
+              <DropdownMenuItem 
+                onClick={() => handleLogout()}
+                className="cursor-pointer text-red-600 focus:text-red-600"
+              >
+                <LogOut className="mr-2 h-4 w-4" />
+                <span>Sair</span>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
