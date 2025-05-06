@@ -22,7 +22,7 @@ export default function DashboardHeader() {
 
   useEffect(() => {
     // In a real app with Supabase, we would fetch the custom logo URL
-    // For now we'll just use the default logo
+    // For now, we'll just use a mock implementation
     // This would be something like: const { data } = await supabase.from('settings').select('logo_url').single();
     // setLogoUrl(data?.logo_url || null);
   }, []);
