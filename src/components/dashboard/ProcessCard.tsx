@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
@@ -156,9 +155,8 @@ export default function ProcessCard({ process }: { process: ProcessProps }) {
           </div>
           <Progress 
             value={process.progress} 
-            className="h-2 transition-all duration-300" 
-            indicatorClassName={cn(
-              "transition-all duration-500",
+            className={cn(
+              "h-2 transition-all duration-300",
               getProgressColor()
             )}
           />
