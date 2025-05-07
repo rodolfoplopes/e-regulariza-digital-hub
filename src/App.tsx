@@ -76,11 +76,11 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
     
     // Mock validation logic (in a real app, this would be a proper API call)
     if (email && password) {
-      // Check if admin credentials
-      if (email.includes('admin')) {
+      // Check for specific admin email
+      if (email === 'lopes.rod@gmail.com' || email.includes('admin')) {
         const adminUser: User = {
           id: "1",
-          name: "Admin E-regulariza",
+          name: email === 'lopes.rod@gmail.com' ? "Rodrigo Lopes" : "Admin E-regulariza",
           email: email,
           role: "admin",
           cpf: "123.456.789-00"

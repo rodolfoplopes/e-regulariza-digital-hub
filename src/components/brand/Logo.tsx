@@ -2,7 +2,7 @@
 import React from "react";
 
 interface LogoProps {
-  variant?: "default" | "small" | "icon-only";
+  variant?: "default" | "small" | "icon-only" | "without-circle";
   className?: string;
   size?: "sm" | "md" | "lg";
   customUrl?: string;
@@ -28,6 +28,19 @@ export function Logo({
   
   // Use custom URL if provided, otherwise use the default logo
   const logoUrl = customUrl || "/lovable-uploads/3b439cb9-4071-4319-8787-a968cea832a7.png";
+  
+  // For without-circle variant (just the logo without the circle background)
+  if (variant === "without-circle") {
+    return (
+      <div className={`${baseClasses} ${className}`}>
+        <img 
+          src={logoUrl}
+          alt="e-regulariza"
+          className={`${logoSize} object-contain`}
+        />
+      </div>
+    );
+  }
   
   // For icon-only variant (just the logo in a circle)
   if (variant === "icon-only") {

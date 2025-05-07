@@ -27,7 +27,7 @@ export default function Header() {
       <div className="container mx-auto flex justify-between items-center h-16 px-4 sm:px-6 lg:px-8">
         <div className="flex items-center">
           <Link to="/" className="flex items-center gap-2">
-            <Logo variant="default" />
+            <Logo variant="without-circle" size="lg" />
           </Link>
         </div>
 

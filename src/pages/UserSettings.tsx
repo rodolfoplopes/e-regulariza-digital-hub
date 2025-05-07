@@ -1,5 +1,4 @@
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
@@ -10,27 +9,65 @@ import SecuritySettings from "@/components/user/SecuritySettings";
 import PreferenciasUsuario from "@/components/user/PreferenciasUsuario";
 import PoliciesLinks from "@/components/user/PoliciesLinks";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/App";
 
 export default function UserSettings() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { toast } = useToast();
+  const { user } = useAuth();
   
   // Mock user data - would be fetched from authentication context
   const [userData, setUserData] = useState({
-    name: "João Silva",
-    email: "joao.silva@example.com",
+    name: user?.name || "João Silva",
+    email: user?.email || "joao.silva@example.com",
     phone: "(11) 98765-4321",
-    cpf: "123.456.789-00" // Read-only field
+    cpf: user?.cpf || "123.456.789-00" // Read-only field
   });
+
+  // Effect to sync dashboard data with settings
+  useEffect(() => {
+    if (user) {
+      setUserData(prevData => ({
+        ...prevData,
+        name: user.name || prevData.name,
+        email: user.email || prevData.email,
+        cpf: user.cpf || prevData.cpf
+      }));
+    }
+  }, [user]);
 
   const handleUserDataUpdate = (updatedData: typeof userData) => {
     setUserData(updatedData);
     
-    // Show success toast notification
-    toast({
-      title: "Dados atualizados",
-      description: "Suas informações foram salvas com sucesso.",
-    });
+    // Validate that the data matches what's in the dashboard
+    const isDataValid = 
+      (user?.name === updatedData.name || !user?.name) &&
+      (user?.email === updatedData.email || !user?.email) &&
+      (user?.cpf === updatedData.cpf || !user?.cpf);
+
+    // Show appropriate toast notification
+    if (isDataValid) {
+      toast({
+        title: "Dados atualizados",
+        description: "Suas informações foram salvas com sucesso.",
+      });
+    } else {
+      toast({
+        title: "Atenção",
+        description: "Alguns dados não correspondem ao seu perfil principal.",
+        variant: "destructive"
+      });
+
+      // Update user data in local storage to keep in sync
+      if (user) {
+        const updatedUser = {
+          ...user,
+          name: updatedData.name,
+          email: updatedData.email
+        };
+        localStorage.setItem('user', JSON.stringify(updatedUser));
+      }
+    }
   };
 
   return (
