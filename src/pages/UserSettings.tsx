@@ -30,14 +30,13 @@ export default function UserSettings() {
     toast({
       title: "Dados atualizados",
       description: "Suas informações foram salvas com sucesso.",
-      className: "bg-white border-green-100",
     });
   };
 
   return (
     <div className="flex h-screen bg-gray-50">
       <DashboardSidebar />
-      <MobileNav isOpen={isMobileMenuOpen} />
+      <MobileNav isOpen={isMobileMenuOpen} onClose={() => setIsMobileMenuOpen(false)} />
       
       <div className="flex-1 flex flex-col overflow-hidden">
         <DashboardHeader />

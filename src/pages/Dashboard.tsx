@@ -1,4 +1,5 @@
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
 import MobileNav from "@/components/dashboard/MobileNav";
@@ -7,13 +8,16 @@ import NotificationCard, { NotificationProps } from "@/components/dashboard/Noti
 import { Card, CardContent } from "@/components/ui/card";
 import { CheckCircle, Clock, AlertTriangle, FileWarning, Hourglass } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useToast } from "@/hooks/use-toast";
 
 export default function Dashboard() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const isMobile = useIsMobile();
+  const { toast } = useToast();
   
   // Mock data for processes
-  const processes: ProcessProps[] = [
+  const [processes, setProcesses] = useState<ProcessProps[]>([
     {
       id: "proc-001",
       title: "Usucapião Extraordinária",
@@ -42,10 +46,10 @@ export default function Dashboard() {
       lastUpdate: "20/02/2023",
       nextAction: "Processo concluído com sucesso"
     }
-  ];
+  ]);
   
   // Mock data for notifications
-  const notifications: NotificationProps[] = [
+  const [notifications, setNotifications] = useState<NotificationProps[]>([
     {
       id: "notif-001",
       title: "Documento aprovado",
@@ -70,15 +74,41 @@ export default function Dashboard() {
       isRead: true,
       type: "warning"
     }
-  ];
+  ]);
 
   // Process counters
-  const processCounters = {
-    active: processes.filter(p => p.status === "em_andamento").length,
-    pending: processes.filter(p => p.status === "pendente").length,
-    completed: processes.filter(p => p.status === "concluido").length,
-    pendingDocs: processes.reduce((acc, curr) => acc + (curr.pendingDocuments || 0), 0)
-  };
+  const [processCounters, setProcessCounters] = useState({
+    active: 0,
+    pending: 0,
+    completed: 0,
+    pendingDocs: 0
+  });
+
+  // Simular carregamento de dados e calcular contadores
+  useEffect(() => {
+    const fetchData = async () => {
+      // Simulação de carregamento de dados (em um app real, isso seria uma chamada de API)
+      setIsLoading(true);
+      await new Promise(resolve => setTimeout(resolve, 800));
+      
+      // Calcular contadores baseados nos processos
+      const active = processes.filter(p => p.status === "em_andamento").length;
+      const pending = processes.filter(p => p.status === "pendente").length;
+      const completed = processes.filter(p => p.status === "concluido").length;
+      const pendingDocs = processes.reduce((acc, curr) => acc + (curr.pendingDocuments || 0), 0);
+      
+      setProcessCounters({
+        active,
+        pending,
+        completed,
+        pendingDocs
+      });
+      
+      setIsLoading(false);
+    };
+    
+    fetchData();
+  }, [processes]);
 
   const handleToggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -110,7 +140,7 @@ export default function Dashboard() {
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">Processos Ativos</p>
-                  <p className="text-2xl font-bold">{processCounters.active}</p>
+                  <p className="text-2xl font-bold">{isLoading ? '...' : processCounters.active}</p>
                 </div>
               </CardContent>
             </Card>
@@ -122,7 +152,7 @@ export default function Dashboard() {
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">Processos Pendentes</p>
-                  <p className="text-2xl font-bold">{processCounters.pending}</p>
+                  <p className="text-2xl font-bold">{isLoading ? '...' : processCounters.pending}</p>
                 </div>
               </CardContent>
             </Card>
@@ -134,7 +164,7 @@ export default function Dashboard() {
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">Finalizados</p>
-                  <p className="text-2xl font-bold">{processCounters.completed}</p>
+                  <p className="text-2xl font-bold">{isLoading ? '...' : processCounters.completed}</p>
                 </div>
               </CardContent>
             </Card>
@@ -146,7 +176,7 @@ export default function Dashboard() {
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">Docs. Pendentes</p>
-                  <p className="text-2xl font-bold">{processCounters.pendingDocs}</p>
+                  <p className="text-2xl font-bold">{isLoading ? '...' : processCounters.pendingDocs}</p>
                 </div>
               </CardContent>
             </Card>
@@ -157,11 +187,18 @@ export default function Dashboard() {
               <Clock className="h-5 w-5 mr-2 text-[#06D7A5]" />
               Meus Processos
             </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {processes.map((process) => (
-                <ProcessCard key={process.id} process={process} />
-              ))}
-            </div>
+            {isLoading ? (
+              <div className="text-center py-8">
+                <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] text-[#06D7A5]"></div>
+                <p className="mt-2 text-gray-500">Carregando processos...</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {processes.map((process) => (
+                  <ProcessCard key={process.id} process={process} />
+                ))}
+              </div>
+            )}
           </div>
           
           <div>
@@ -169,11 +206,18 @@ export default function Dashboard() {
               <AlertTriangle className="h-5 w-5 mr-2 text-[#06D7A5]" />
               Notificações Recentes
             </h2>
-            <div className="space-y-4">
-              {notifications.map((notification) => (
-                <NotificationCard key={notification.id} notification={notification} />
-              ))}
-            </div>
+            {isLoading ? (
+              <div className="text-center py-8">
+                <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] text-[#06D7A5]"></div>
+                <p className="mt-2 text-gray-500">Carregando notificações...</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {notifications.map((notification) => (
+                  <NotificationCard key={notification.id} notification={notification} />
+                ))}
+              </div>
+            )}
           </div>
         </main>
       </div>

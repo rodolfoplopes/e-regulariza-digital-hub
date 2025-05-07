@@ -41,18 +41,7 @@ export default function DadosPessoaisForm({ initialData, onDataUpdate }: DadosPe
         onDataUpdate(userData);
       }
       
-      toast({
-        title: "Alterações salvas com sucesso",
-        description: "Seus dados foram atualizados.",
-      });
-      
-      // In a real implementation with Supabase, you would update the user profile here
-      // const { error } = await supabase
-      //   .from('profiles')
-      //   .update({ name: userData.name, phone: userData.phone })
-      //   .eq('email', userData.email);
-      
-      // if (error) throw error;
+      // Toast is now handled by the parent component
     } catch (error) {
       console.error("Error saving changes:", error);
       toast({
