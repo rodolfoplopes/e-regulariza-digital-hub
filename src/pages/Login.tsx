@@ -15,6 +15,7 @@ import {
 import { useToast } from "@/components/ui/use-toast";
 import Layout from "@/components/layout/Layout";
 import { AlertCircle } from "lucide-react";
+import { useAuth } from "../App";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -26,6 +27,7 @@ export default function Login() {
   
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { login } = useAuth();
 
   // Handle cooldown timer
   useEffect(() => {
@@ -122,25 +124,26 @@ export default function Login() {
     
     setIsLoading(true);
 
-    // Mock login function - would be replaced with actual auth
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      // Use the login function from AuthContext instead of the mock implementation
+      const success = await login(email, password);
       
-      // For demo, just check if email exists and password is not empty
-      if (email && password) {
+      if (success) {
         // Successful login - reset attempts
         resetLoginAttempts();
-        
         toast({
           title: "Login bem-sucedido",
           description: "Redirecionando para o dashboard...",
         });
-        navigate("/dashboard");
+        // Add a small delay to ensure the toast is displayed before redirecting
+        setTimeout(() => {
+          navigate("/dashboard");
+        }, 500);
       } else {
         handleFailedLogin();
       }
     } catch (error) {
+      console.error("Login error:", error);
       handleFailedLogin();
     } finally {
       setIsLoading(false);
