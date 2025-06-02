@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
@@ -12,6 +11,7 @@ import ClientsTable from "@/components/admin/ClientsTable";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Settings } from "lucide-react";
+import SystemSettings from "@/components/admin/SystemSettings";
 
 export default function AdminDashboard() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -109,6 +109,7 @@ export default function AdminDashboard() {
               <TabsTrigger value="processos">Processos</TabsTrigger>
               <TabsTrigger value="usuarios">Usuários</TabsTrigger>
               <TabsTrigger value="configuracoes">Configurações</TabsTrigger>
+              <TabsTrigger value="sistema">Sistema</TabsTrigger>
             </TabsList>
             
             <AdminTabContent 
@@ -117,6 +118,8 @@ export default function AdminDashboard() {
               clients={clients}
               serviceTypes={serviceTypes}
             />
+            
+            {activeSection === 'sistema' && <SystemSettings />}
           </Tabs>
           
           <ClientsTable clients={clients} />

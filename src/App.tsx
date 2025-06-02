@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -19,6 +18,8 @@ import UserSettings from "./pages/UserSettings";
 import PolicyPage from "./pages/PolicyPage";
 import Notifications from "./pages/Notifications";
 import LogoManagementPage from "./pages/LogoManagementPage";
+import GTMManager from '@/components/tracking/GTMManager';
+import { analytics } from '@/services/analyticsService';
 
 const queryClient = new QueryClient();
 
@@ -213,14 +214,24 @@ const Unauthorized = () => (
 );
 
 const App = () => {
+  const gtmId = localStorage.getItem('gtm_id') || '';
+  const gtmEnabled = localStorage.getItem('gtm_enabled') === 'true';
+
+  // Initialize analytics on app load
+  useEffect(() => {
+    if (user?.id) {
+      analytics.setUser(user.id);
+    }
+  }, [user]);
+
   return (
-    <QueryClientProvider client={queryClient}>
-      <HelmetProvider>
-        <TooltipProvider>
-          <AuthProvider>
-            <Toaster />
-            <Sonner />
-            <BrowserRouter>
+    <HelmetProvider>
+      <QueryClient client={queryClient}>
+        <AuthContext.Provider value={{ user, login, logout, isAuthenticated, role }}>
+          <BrowserRouter>
+            <div className="min-h-screen bg-background font-sans antialiased">
+              <Toaster />
+              {gtmEnabled && gtmId && <GTMManager gtmId={gtmId} />}
               <Routes>
                 {/* Public routes (accessible to all) */}
                 <Route element={<PublicRoute />}>
@@ -254,11 +265,11 @@ const App = () => {
                 <Route path="/unauthorized" element={<Unauthorized />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
-            </BrowserRouter>
-          </AuthProvider>
-        </TooltipProvider>
-      </HelmetProvider>
-    </QueryClientProvider>
+            </div>
+          </BrowserRouter>
+        </AuthContext.Provider>
+      </QueryClient>
+    </HelmetProvider>
   );
 };
 
