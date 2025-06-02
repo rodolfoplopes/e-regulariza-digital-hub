@@ -5,8 +5,8 @@ import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
 import MobileNav from "@/components/dashboard/MobileNav";
 import ProcessCard, { ProcessProps } from "@/components/dashboard/ProcessCard";
 import NotificationCard, { NotificationProps } from "@/components/dashboard/NotificationCard";
-import { Card, CardContent } from "@/components/ui/card";
-import { CheckCircle, Clock, AlertTriangle, FileWarning, Hourglass } from "lucide-react";
+import EnhancedDashboardStats from "@/components/dashboard/EnhancedDashboardStats";
+import { Clock, AlertTriangle } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useToast } from "@/hooks/use-toast";
 
@@ -76,39 +76,16 @@ export default function Dashboard() {
     }
   ]);
 
-  // Process counters
-  const [processCounters, setProcessCounters] = useState({
-    active: 0,
-    pending: 0,
-    completed: 0,
-    pendingDocs: 0
-  });
-
-  // Simular carregamento de dados e calcular contadores
+  // Simular carregamento de dados
   useEffect(() => {
     const fetchData = async () => {
-      // Simulação de carregamento de dados (em um app real, isso seria uma chamada de API)
       setIsLoading(true);
       await new Promise(resolve => setTimeout(resolve, 800));
-      
-      // Calcular contadores baseados nos processos
-      const active = processes.filter(p => p.status === "em_andamento").length;
-      const pending = processes.filter(p => p.status === "pendente").length;
-      const completed = processes.filter(p => p.status === "concluido").length;
-      const pendingDocs = processes.reduce((acc, curr) => acc + (curr.pendingDocuments || 0), 0);
-      
-      setProcessCounters({
-        active,
-        pending,
-        completed,
-        pendingDocs
-      });
-      
       setIsLoading(false);
     };
     
     fetchData();
-  }, [processes]);
+  }, []);
 
   const handleToggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -131,56 +108,8 @@ export default function Dashboard() {
             <p className="text-gray-500">Bem-vindo ao seu painel de regularização imobiliária.</p>
           </div>
           
-          {/* Status Counters */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-            <Card className="border-l-4 border-blue-500">
-              <CardContent className="p-4 flex items-center">
-                <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center mr-3">
-                  <Hourglass className="h-5 w-5 text-blue-500" />
-                </div>
-                <div>
-                  <p className="text-sm text-gray-500">Processos Ativos</p>
-                  <p className="text-2xl font-bold">{isLoading ? '...' : processCounters.active}</p>
-                </div>
-              </CardContent>
-            </Card>
-            
-            <Card className="border-l-4 border-yellow-500">
-              <CardContent className="p-4 flex items-center">
-                <div className="h-10 w-10 rounded-full bg-yellow-100 flex items-center justify-center mr-3">
-                  <AlertTriangle className="h-5 w-5 text-yellow-500" />
-                </div>
-                <div>
-                  <p className="text-sm text-gray-500">Processos Pendentes</p>
-                  <p className="text-2xl font-bold">{isLoading ? '...' : processCounters.pending}</p>
-                </div>
-              </CardContent>
-            </Card>
-            
-            <Card className="border-l-4 border-green-500">
-              <CardContent className="p-4 flex items-center">
-                <div className="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center mr-3">
-                  <CheckCircle className="h-5 w-5 text-green-500" />
-                </div>
-                <div>
-                  <p className="text-sm text-gray-500">Finalizados</p>
-                  <p className="text-2xl font-bold">{isLoading ? '...' : processCounters.completed}</p>
-                </div>
-              </CardContent>
-            </Card>
-            
-            <Card className="border-l-4 border-orange-500">
-              <CardContent className="p-4 flex items-center">
-                <div className="h-10 w-10 rounded-full bg-orange-100 flex items-center justify-center mr-3">
-                  <FileWarning className="h-5 w-5 text-orange-500" />
-                </div>
-                <div>
-                  <p className="text-sm text-gray-500">Docs. Pendentes</p>
-                  <p className="text-2xl font-bold">{isLoading ? '...' : processCounters.pendingDocs}</p>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+          {/* Enhanced Dashboard Stats */}
+          <EnhancedDashboardStats processes={processes} isLoading={isLoading} />
           
           <div className="mb-8">
             <h2 className="text-xl font-semibold mb-4 flex items-center">

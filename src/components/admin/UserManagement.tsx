@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import {
   Table,
@@ -20,6 +19,7 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import { usePermissions } from "@/hooks/usePermissions";
 import { User, Key, Mail } from "lucide-react";
 
 type UserData = {
@@ -33,6 +33,8 @@ type UserData = {
 };
 
 export default function UserManagement() {
+  const permissions = usePermissions();
+  
   const [users, setUsers] = useState<UserData[]>([
     {
       id: "user-001",
@@ -95,6 +97,16 @@ export default function UserManagement() {
   );
   
   const handleEditUser = (user: UserData) => {
+    // Only allow editing if user has permission or it's their own profile
+    if (!permissions.canEditAllUsers && user.id !== "current-user-id") {
+      toast({
+        variant: "destructive",
+        title: "Acesso negado",
+        description: "Você não tem permissão para editar outros usuários."
+      });
+      return;
+    }
+    
     setEditingUser({...user});
     setIsEditDialogOpen(true);
   };
@@ -168,10 +180,15 @@ export default function UserManagement() {
     setEditingUser({ ...editingUser, [name]: value });
   };
 
+  // Show only clients if not admin
+  const displayUsers = permissions.canEditAllUsers ? filteredUsers : filteredUsers.filter(u => u.role === "cliente");
+
   return (
     <div className="space-y-4">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <h2 className="text-xl font-semibold">Gerenciar Usuários</h2>
+        <h2 className="text-xl font-semibold">
+          {permissions.canEditAllUsers ? "Gerenciar Usuários" : "Usuários do Sistema"}
+        </h2>
         <div className="relative w-full sm:w-[300px]">
           <Input
             placeholder="Buscar por nome, e-mail ou CPF..."
@@ -189,56 +206,60 @@ export default function UserManagement() {
               <TableHead>E-mail</TableHead>
               <TableHead>CPF</TableHead>
               <TableHead>Telefone</TableHead>
-              <TableHead>Tipo</TableHead>
+              {permissions.canEditAllUsers && <TableHead>Tipo</TableHead>}
               <TableHead>Cadastrado em</TableHead>
-              <TableHead className="text-right">Ações</TableHead>
+              {permissions.canEditAllUsers && <TableHead className="text-right">Ações</TableHead>}
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredUsers.map((user) => (
+            {displayUsers.map((user) => (
               <TableRow key={user.id}>
                 <TableCell className="font-medium">{user.name}</TableCell>
                 <TableCell>{user.email}</TableCell>
                 <TableCell>{user.cpf}</TableCell>
                 <TableCell>{user.phone}</TableCell>
-                <TableCell>
-                  <span className={`text-xs font-medium py-1 px-2 rounded-full ${
-                    user.role === "admin" 
-                      ? "bg-purple-100 text-purple-700" 
-                      : "bg-blue-100 text-blue-700"
-                  }`}>
-                    {user.role === "admin" ? "Administrador" : "Cliente"}
-                  </span>
-                </TableCell>
+                {permissions.canEditAllUsers && (
+                  <TableCell>
+                    <span className={`text-xs font-medium py-1 px-2 rounded-full ${
+                      user.role === "admin" 
+                        ? "bg-purple-100 text-purple-700" 
+                        : "bg-blue-100 text-blue-700"
+                    }`}>
+                      {user.role === "admin" ? "Administrador" : "Cliente"}
+                    </span>
+                  </TableCell>
+                )}
                 <TableCell>{user.createdAt}</TableCell>
-                <TableCell className="text-right space-x-2">
-                  {user.role !== "admin" && (
-                    <>
-                      <Button 
-                        variant="ghost" 
-                        size="sm"
-                        onClick={() => handleEditUser(user)}
-                      >
-                        <User className="h-4 w-4 mr-1" />
-                        Editar
-                      </Button>
-                      <Button 
-                        variant="ghost" 
-                        size="sm"
-                        onClick={() => handleResetPassword(user)}
-                      >
-                        <Key className="h-4 w-4 mr-1" />
-                        Redefinir Senha
-                      </Button>
-                    </>
-                  )}
-                </TableCell>
+                {permissions.canEditAllUsers && (
+                  <TableCell className="text-right space-x-2">
+                    {user.role !== "admin" && (
+                      <>
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          onClick={() => handleEditUser(user)}
+                        >
+                          <User className="h-4 w-4 mr-1" />
+                          Editar
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          onClick={() => handleResetPassword(user)}
+                        >
+                          <Key className="h-4 w-4 mr-1" />
+                          Redefinir Senha
+                        </Button>
+                      </>
+                    )}
+                  </TableCell>
+                )}
               </TableRow>
             ))}
             
-            {filteredUsers.length === 0 && (
+            {displayUsers.length === 0 && (
               <TableRow>
-                <TableCell colSpan={7} className="text-center py-8 text-gray-500">
+                <TableCell colSpan={permissions.canEditAllUsers ? 7 : 6} className="text-center py-8 text-gray-500">
                   Nenhum usuário encontrado com os filtros selecionados.
                 </TableCell>
               </TableRow>

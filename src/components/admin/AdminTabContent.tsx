@@ -7,6 +7,7 @@ import UserManagement from "./UserManagement";
 import ClientsTable from "./ClientsTable";
 import { FooterEditor } from "./FooterEditor";
 import { PolicyEditor } from "./PolicyEditor";
+import IntegrationSettings from "./IntegrationSettings";
 
 interface Process {
   id: string;
@@ -39,7 +40,7 @@ export default function AdminTabContent({
   clients,
   serviceTypes 
 }: AdminTabContentProps) {
-  const [activeConfigSection, setActiveConfigSection] = useState<'footer' | 'policies' | null>(null);
+  const [activeConfigSection, setActiveConfigSection] = useState<'footer' | 'policies' | 'integrations' | null>(null);
 
   return (
     <>
@@ -102,6 +103,27 @@ export default function AdminTabContent({
             </div>
             
             <div>
+              <h3 className="text-lg font-medium mb-3">Integrações</h3>
+              <p className="text-sm text-muted-foreground mb-4">
+                Configure integrações com HubSpot, Google Sheets e outras ferramentas.
+              </p>
+              
+              <Button 
+                variant="outline"
+                onClick={() => {
+                  setActiveConfigSection('integrations');
+                  const integrationSection = document.getElementById('integration-settings');
+                  if (integrationSection) {
+                    integrationSection.classList.remove('hidden');
+                    integrationSection.scrollIntoView({ behavior: 'smooth' });
+                  }
+                }}
+              >
+                Gerenciar Integrações
+              </Button>
+            </div>
+            
+            <div>
               <h3 className="text-lg font-medium mb-3">Configurações de E-mail</h3>
               <p className="text-sm text-muted-foreground mb-4">
                 Configure os templates e remetentes de e-mails automatizados.
@@ -132,6 +154,17 @@ export default function AdminTabContent({
             ← Voltar para Configurações
           </Button>
           <PolicyEditor />
+        </div>
+        
+        <div id="integration-settings" className={activeConfigSection === 'integrations' ? 'mt-8' : 'mt-8 hidden'}>
+          <Button 
+            variant="ghost" 
+            className="mb-4"
+            onClick={() => setActiveConfigSection(null)}
+          >
+            ← Voltar para Configurações
+          </Button>
+          <IntegrationSettings />
         </div>
       </TabsContent>
     </>

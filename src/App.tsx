@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -185,13 +186,13 @@ const ProtectedRoute = ({
 
 // Public routes - accessible to all users
 const PublicRoute = () => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, role } = useAuth();
   const location = useLocation();
 
   // If user is already authenticated and trying to access login/register,
-  // redirect them to dashboard
+  // redirect them to appropriate dashboard
   if (isAuthenticated && ['/login', '/register'].includes(location.pathname)) {
-    return <Navigate to="/dashboard" replace />;
+    return <Navigate to={role === 'admin' ? '/admin' : '/dashboard'} replace />;
   }
 
   return <Outlet />;
@@ -244,6 +245,7 @@ const App = () => {
                 {/* Admin-only routes */}
                 <Route element={<ProtectedRoute requiredRole="admin" />}>
                   <Route path="/admin" element={<AdminDashboard />} />
+                  <Route path="/admin-dashboard" element={<Navigate to="/admin" replace />} />
                   <Route path="/admin/novo-processo" element={<ProcessCreate />} />
                   <Route path="/admin/logo" element={<LogoManagementPage />} />
                 </Route>

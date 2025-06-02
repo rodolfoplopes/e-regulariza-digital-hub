@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -11,6 +10,8 @@ import ProcessTimeline, { ProcessStage } from "@/components/process/ProcessTimel
 import ProcessMessages from "@/components/process/ProcessMessages";
 import ProcessNotifications from "@/components/process/ProcessNotifications";
 import DocumentManager from "@/components/process/DocumentManager";
+import ProcessActions from "@/components/admin/ProcessActions";
+import { useAuth } from "@/App";
 
 // Mock process data
 const process = {
@@ -71,8 +72,9 @@ const stages: ProcessStage[] = [
 export default function ProcessDetail() {
   const { processId } = useParams<{ processId: string }>();
   const [activeTab, setActiveTab] = useState("timeline");
-  const [activeStage, setActiveStage] = useState(stages[1].id); // Currently active stage
+  const [activeStage, setActiveStage] = useState(stages[1].id);
   const { toast } = useToast();
+  const { role } = useAuth();
 
   // Get deadline info
   const deadlineInfo = getDeadlineInfo(process.estimatedDays, process.startDate);
@@ -80,8 +82,8 @@ export default function ProcessDetail() {
   // Find active stage details
   const currentStage = stages.find(stage => stage.id === activeStage);
   
-  // Check if user is admin (in a real app, this would come from auth context)
-  const isAdmin = true;
+  // Check if user is admin
+  const isAdmin = role === "admin";
 
   // Format status for display
   const formatStatus = (status: string) => {
@@ -183,72 +185,94 @@ export default function ProcessDetail() {
           </div>
         </div>
 
-        <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="mb-4">
-            <TabsTrigger value="timeline">Linha do Tempo</TabsTrigger>
-            <TabsTrigger value="documents">Documentos</TabsTrigger>
-            <TabsTrigger value="messages">Mensagens</TabsTrigger>
-            <TabsTrigger value="notifications">Notificações</TabsTrigger>
-          </TabsList>
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          <div className="lg:col-span-3">
+            <Tabs value={activeTab} onValueChange={setActiveTab}>
+              <TabsList className="mb-4">
+                <TabsTrigger value="timeline">Linha do Tempo</TabsTrigger>
+                <TabsTrigger value="documents">Documentos</TabsTrigger>
+                <TabsTrigger value="messages">Mensagens</TabsTrigger>
+                <TabsTrigger value="notifications">Notificações</TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="timeline">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Linha do Tempo do Processo</CardTitle>
+                    <CardDescription>
+                      Acompanhe o progresso de cada etapa do seu processo
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <ProcessTimeline 
+                      stages={stages} 
+                      activeStage={activeStage}
+                      onStageClick={(stageId) => setActiveStage(stageId)}
+                      isAdmin={isAdmin}
+                    />
+                  </CardContent>
+                </Card>
+              </TabsContent>
+              
+              <TabsContent value="documents">
+                {currentStage && (
+                  <DocumentManager
+                    processId={process.id}
+                    etapaId={currentStage.id}
+                    etapaNome={currentStage.title}
+                    isAdmin={isAdmin}
+                  />
+                )}
+              </TabsContent>
+              
+              <TabsContent value="messages">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Mensagens</CardTitle>
+                    <CardDescription>
+                      Comunicações relacionadas a este processo
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <ProcessMessages processId={process.id} isAdmin={isAdmin} />
+                  </CardContent>
+                </Card>
+              </TabsContent>
+              
+              <TabsContent value="notifications">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Notificações</CardTitle>
+                    <CardDescription>
+                      Histórico de notificações relacionadas a este processo
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <ProcessNotifications processId={process.id} isAdmin={isAdmin} />
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            </Tabs>
+          </div>
           
-          <TabsContent value="timeline">
-            <Card>
-              <CardHeader>
-                <CardTitle>Linha do Tempo do Processo</CardTitle>
-                <CardDescription>
-                  Acompanhe o progresso de cada etapa do seu processo
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ProcessTimeline 
-                  stages={stages} 
-                  activeStage={activeStage}
-                  onStageClick={(stageId) => setActiveStage(stageId)}
-                  isAdmin={isAdmin}
-                />
-              </CardContent>
-            </Card>
-          </TabsContent>
-          
-          <TabsContent value="documents">
-            {currentStage && (
-              <DocumentManager
-                processId={process.id}
-                etapaId={currentStage.id}
-                etapaNome={currentStage.title}
-                isAdmin={isAdmin}
-              />
-            )}
-          </TabsContent>
-          
-          <TabsContent value="messages">
-            <Card>
-              <CardHeader>
-                <CardTitle>Mensagens</CardTitle>
-                <CardDescription>
-                  Comunicações relacionadas a este processo
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ProcessMessages processId={process.id} isAdmin={isAdmin} />
-              </CardContent>
-            </Card>
-          </TabsContent>
-          
-          <TabsContent value="notifications">
-            <Card>
-              <CardHeader>
-                <CardTitle>Notificações</CardTitle>
-                <CardDescription>
-                  Histórico de notificações relacionadas a este processo
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ProcessNotifications processId={process.id} isAdmin={isAdmin} />
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
+          {/* Admin Actions Sidebar */}
+          {isAdmin && (
+            <div className="lg:col-span-1">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Ações Administrativas</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ProcessActions 
+                    processId={process.id}
+                    currentStage={process.currentStage}
+                    isAdmin={isAdmin}
+                  />
+                </CardContent>
+              </Card>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
