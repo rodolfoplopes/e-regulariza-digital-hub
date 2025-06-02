@@ -8,7 +8,7 @@ import { FooterData } from "@/types/footer";
 
 interface ContactTabProps {
   footerData: FooterData;
-  updateContactInfo: (field: keyof typeof FooterData.prototype.contactInfo, value: string) => void;
+  updateContactInfo: (field: keyof FooterData['contactInfo'], value: string) => void;
   updateLink: (section: 'companyLinks' | 'serviceLinks' | 'legalLinks' | 'socialLinks', index: number, field: string, value: string) => void;
   removeLink: (section: 'companyLinks' | 'serviceLinks' | 'legalLinks' | 'socialLinks', index: number) => void;
   addLink: (section: 'companyLinks' | 'serviceLinks' | 'legalLinks' | 'socialLinks') => void;
