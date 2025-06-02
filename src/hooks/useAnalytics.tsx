@@ -10,12 +10,12 @@ export const useAnalytics = () => {
     if (user?.id) {
       analytics.setUser(user.id);
     }
-  }, [user]);
+  }, [user?.id]);
 
   return {
     trackPageView: analytics.trackPageView.bind(analytics),
-    trackInteraction: analytics.trackInteraction.bind(analytics),
     trackFunnelStep: analytics.trackFunnelStep.bind(analytics),
+    trackInteraction: analytics.trackInteraction.bind(analytics),
     trackRegistrationStart: analytics.trackRegistrationStart.bind(analytics),
     trackRegistrationComplete: analytics.trackRegistrationComplete.bind(analytics),
     trackFirstLogin: analytics.trackFirstLogin.bind(analytics),

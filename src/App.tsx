@@ -226,49 +226,52 @@ const App = () => {
 
   return (
     <HelmetProvider>
-      <QueryClient client={queryClient}>
-        <AuthContext.Provider value={{ user, login, logout, isAuthenticated, role }}>
-          <BrowserRouter>
-            <div className="min-h-screen bg-background font-sans antialiased">
-              <Toaster />
-              {gtmEnabled && gtmId && <GTMManager gtmId={gtmId} />}
-              <Routes>
-                {/* Public routes (accessible to all) */}
-                <Route element={<PublicRoute />}>
-                  <Route path="/" element={<Index />} />
-                  <Route path="/login" element={<Login />} />
-                  <Route path="/register" element={<Register />} />
-                  <Route path="/politica-de-privacidade" element={<PolicyPage />} />
-                  <Route path="/termos-de-uso" element={<PolicyPage />} />
-                  <Route path="/politica-de-cookies" element={<PolicyPage />} />
-                  <Route path="/:policyType" element={<PolicyPage />} />
-                </Route>
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
+          <TooltipProvider>
+            <BrowserRouter>
+              <div className="min-h-screen bg-background font-sans antialiased">
+                <Toaster />
+                <Sonner />
+                {gtmEnabled && gtmId && <GTMManager gtmId={gtmId} />}
+                <Routes>
+                  {/* Public routes (accessible to all) */}
+                  <Route element={<PublicRoute />}>
+                    <Route path="/" element={<Index />} />
+                    <Route path="/login" element={<Login />} />
+                    <Route path="/register" element={<Register />} />
+                    <Route path="/politica-de-privacidade" element={<PolicyPage />} />
+                    <Route path="/termos-de-uso" element={<PolicyPage />} />
+                    <Route path="/politica-de-cookies" element={<PolicyPage />} />
+                    <Route path="/:policyType" element={<PolicyPage />} />
+                  </Route>
 
-                {/* Protected routes for authenticated users */}
-                <Route element={<ProtectedRoute requiredRole="cliente" />}>
-                  <Route path="/dashboard" element={<Dashboard />} />
-                  <Route path="/configuracoes" element={<UserSettings />} />
-                  <Route path="/contato" element={<ContactPage />} />
-                  <Route path="/processo/:processId" element={<ProcessDetail />} />
-                  <Route path="/notificacoes" element={<Notifications />} />
-                </Route>
-                
-                {/* Admin-only routes */}
-                <Route element={<ProtectedRoute requiredRole="admin" />}>
-                  <Route path="/admin" element={<AdminDashboard />} />
-                  <Route path="/admin-dashboard" element={<Navigate to="/admin" replace />} />
-                  <Route path="/admin/novo-processo" element={<ProcessCreate />} />
-                  <Route path="/admin/logo" element={<LogoManagementPage />} />
-                </Route>
-                
-                {/* Other routes */}
-                <Route path="/unauthorized" element={<Unauthorized />} />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </div>
-          </BrowserRouter>
-        </AuthContext.Provider>
-      </QueryClient>
+                  {/* Protected routes for authenticated users */}
+                  <Route element={<ProtectedRoute requiredRole="cliente" />}>
+                    <Route path="/dashboard" element={<Dashboard />} />
+                    <Route path="/configuracoes" element={<UserSettings />} />
+                    <Route path="/contato" element={<ContactPage />} />
+                    <Route path="/processo/:processId" element={<ProcessDetail />} />
+                    <Route path="/notificacoes" element={<Notifications />} />
+                  </Route>
+                  
+                  {/* Admin-only routes */}
+                  <Route element={<ProtectedRoute requiredRole="admin" />}>
+                    <Route path="/admin" element={<AdminDashboard />} />
+                    <Route path="/admin-dashboard" element={<Navigate to="/admin" replace />} />
+                    <Route path="/admin/novo-processo" element={<ProcessCreate />} />
+                    <Route path="/admin/logo" element={<LogoManagementPage />} />
+                  </Route>
+                  
+                  {/* Other routes */}
+                  <Route path="/unauthorized" element={<Unauthorized />} />
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </div>
+            </BrowserRouter>
+          </TooltipProvider>
+        </AuthProvider>
+      </QueryClientProvider>
     </HelmetProvider>
   );
 };

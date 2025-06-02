@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
@@ -8,10 +9,11 @@ import AdminStats from "@/components/admin/AdminStats";
 import AdminHeader from "@/components/admin/AdminHeader";
 import AdminTabContent from "@/components/admin/AdminTabContent";
 import ClientsTable from "@/components/admin/ClientsTable";
+import SystemSettings from "@/components/admin/SystemSettings";
+import SystemValidation from "@/components/admin/SystemValidation";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Settings } from "lucide-react";
-import SystemSettings from "@/components/admin/SystemSettings";
 
 export default function AdminDashboard() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -110,6 +112,7 @@ export default function AdminDashboard() {
               <TabsTrigger value="usuarios">Usuários</TabsTrigger>
               <TabsTrigger value="configuracoes">Configurações</TabsTrigger>
               <TabsTrigger value="sistema">Sistema</TabsTrigger>
+              <TabsTrigger value="validacao">Validação</TabsTrigger>
             </TabsList>
             
             <AdminTabContent 
@@ -120,9 +123,10 @@ export default function AdminDashboard() {
             />
             
             {activeSection === 'sistema' && <SystemSettings />}
+            {activeSection === 'validacao' && <SystemValidation />}
           </Tabs>
           
-          <ClientsTable clients={clients} />
+          {activeSection === 'processos' && <ClientsTable clients={clients} />}
         </main>
       </div>
     </div>
