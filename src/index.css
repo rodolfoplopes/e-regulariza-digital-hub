@@ -1,4 +1,3 @@
-
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap');
 
 @tailwind base;
@@ -99,6 +98,10 @@
   .font-bold {
     font-weight: 700;
   }
+
+  .font-montserrat {
+    font-family: 'Montserrat', sans-serif !important;
+  }
 }
 
 @layer utilities {
@@ -161,7 +164,32 @@
   
   /* Button transition animations */
   .btn-transition {
-    @apply transition-all duration-300 ease-in-out;
+    @apply transition-all duration-300 ease-in-out transform hover:scale-105 focus:scale-95;
+  }
+  
+  /* Enhanced button hover effects */
+  .btn-enhanced-hover {
+    @apply transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-lg focus:scale-95;
+  }
+  
+  /* Loading button animation */
+  .btn-loading-state {
+    @apply relative overflow-hidden;
+  }
+  
+  .btn-loading-state::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s;
+  }
+  
+  .btn-loading-state:hover::before {
+    left: 100%;
   }
   
   /* E-regulariza specific styles */

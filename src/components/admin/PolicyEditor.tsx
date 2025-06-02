@@ -5,9 +5,9 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { CalendarIcon, Save } from "lucide-react";
+import { CalendarIcon, Save, Eye, FileText } from "lucide-react";
 import { format } from "date-fns";
 
 interface PolicyData {
@@ -97,6 +97,7 @@ export function PolicyEditor() {
   const [activePolicy, setActivePolicy] = useState<PolicyType>("politica-de-privacidade");
   const [policies, setPolicies] = useState<Record<PolicyType, PolicyData>>(initialPolicies);
   const [isSaving, setIsSaving] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
 
   const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setPolicies({
@@ -134,38 +135,52 @@ export function PolicyEditor() {
     try {
       // Here you would typically save to a database or API
       // For now, we'll simulate a successful save
-      setTimeout(() => {
-        setPolicies({
-          ...policies,
-          [activePolicy]: {
-            ...policies[activePolicy],
-            lastUpdated: new Date().toISOString().split('T')[0]
-          }
-        });
-        
-        toast({
-          title: "Conteúdo salvo com sucesso",
-          description: `${policies[activePolicy].title} foi atualizado.`,
-        });
-        
-        setIsSaving(false);
-      }, 1000);
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      setPolicies({
+        ...policies,
+        [activePolicy]: {
+          ...policies[activePolicy],
+          lastUpdated: new Date().toISOString().split('T')[0]
+        }
+      });
+      
+      toast({
+        title: "Conteúdo salvo com sucesso",
+        description: `${policies[activePolicy].title} foi atualizado.`,
+        className: "bg-white border-green-100",
+      });
+      
     } catch (error) {
       toast({
         title: "Erro ao salvar",
         description: "Ocorreu um erro ao salvar o conteúdo.",
         variant: "destructive",
       });
+    } finally {
       setIsSaving(false);
     }
   };
 
   return (
-    <div className="container mx-auto py-6">
-      <h1 className="text-2xl font-bold mb-6">Editor de Políticas</h1>
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-eregulariza-text">Editor de Políticas</h1>
+          <p className="text-gray-600">Gerencie o conteúdo das páginas institucionais</p>
+        </div>
+        <Button 
+          variant="outline" 
+          onClick={() => setShowPreview(!showPreview)}
+          className="border-eregulariza-primary text-eregulariza-primary hover:bg-eregulariza-primary hover:text-white"
+        >
+          <Eye className="h-4 w-4 mr-2" />
+          {showPreview ? "Ocultar" : "Mostrar"} Prévia
+        </Button>
+      </div>
       
       <Tabs value={activePolicy} onValueChange={(value) => setActivePolicy(value as PolicyType)} className="space-y-6">
-        <TabsList>
+        <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="politica-de-privacidade">Política de Privacidade</TabsTrigger>
           <TabsTrigger value="termos-de-uso">Termos de Uso</TabsTrigger>
           <TabsTrigger value="politica-de-cookies">Política de Cookies</TabsTrigger>
@@ -173,81 +188,95 @@ export function PolicyEditor() {
         
         {Object.entries(policies).map(([key, policy]) => (
           <TabsContent key={key} value={key} className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>Editar {policy.title}</CardTitle>
-                <div className="flex items-center text-sm text-muted-foreground">
-                  <CalendarIcon className="mr-1 h-4 w-4" />
-                  Última atualização: {format(new Date(policy.lastUpdated), "dd/MM/yyyy")}
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="title">Título</Label>
-                  <Input 
-                    id="title" 
-                    value={policy.title}
-                    onChange={handleTitleChange}
-                    placeholder="Título da política"
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="description">Meta Descrição (para SEO)</Label>
-                  <Input 
-                    id="description" 
-                    value={policy.description}
-                    onChange={handleDescriptionChange}
-                    placeholder="Breve descrição para SEO (140+ caracteres)"
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    {policy.description.length} caracteres - recomendado mínimo de 140
-                  </p>
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="content">Conteúdo HTML</Label>
-                  <Textarea 
-                    id="content" 
-                    value={policy.content}
-                    onChange={handleContentChange}
-                    placeholder="Conteúdo HTML da política"
-                    rows={15}
-                    className="font-mono text-sm"
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    Este editor aceita tags HTML como &lt;h2&gt;, &lt;h3&gt;, &lt;p&gt;, &lt;ul&gt;, &lt;li&gt;, &lt;a&gt;, &lt;strong&gt;
-                  </p>
-                </div>
-                
-                <div className="flex justify-end">
-                  <Button 
-                    onClick={handleSave} 
-                    disabled={isSaving}
-                    className="bg-eregulariza-primary hover:bg-eregulariza-primary/90"
-                  >
-                    {isSaving ? "Salvando..." : (
-                      <>
-                        <Save className="mr-2 h-4 w-4" />
-                        Salvar alterações
-                      </>
-                    )}
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardHeader>
-                <CardTitle>Prévia</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div 
-                  className="prose max-w-none"
-                  dangerouslySetInnerHTML={{ __html: policy.content }}
-                />
-              </CardContent>
-            </Card>
+            <div className={`grid ${showPreview ? 'grid-cols-1 lg:grid-cols-2' : 'grid-cols-1'} gap-6`}>
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <FileText className="h-5 w-5 text-eregulariza-primary" />
+                    Editar {policy.title}
+                  </CardTitle>
+                  <div className="flex items-center text-sm text-muted-foreground">
+                    <CalendarIcon className="mr-1 h-4 w-4" />
+                    Última atualização: {format(new Date(policy.lastUpdated), "dd/MM/yyyy")}
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="title">Título</Label>
+                    <Input 
+                      id="title" 
+                      value={policy.title}
+                      onChange={handleTitleChange}
+                      placeholder="Título da política"
+                      className="focus:border-eregulariza-primary focus:ring-eregulariza-primary"
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="description">Meta Descrição (para SEO)</Label>
+                    <Input 
+                      id="description" 
+                      value={policy.description}
+                      onChange={handleDescriptionChange}
+                      placeholder="Breve descrição para SEO (140+ caracteres)"
+                      className="focus:border-eregulariza-primary focus:ring-eregulariza-primary"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      {policy.description.length} caracteres - recomendado mínimo de 140
+                    </p>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="content">Conteúdo HTML</Label>
+                    <Textarea 
+                      id="content" 
+                      value={policy.content}
+                      onChange={handleContentChange}
+                      placeholder="Conteúdo HTML da política"
+                      rows={20}
+                      className="font-mono text-sm focus:border-eregulariza-primary focus:ring-eregulariza-primary"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Este editor aceita tags HTML como &lt;h2&gt;, &lt;h3&gt;, &lt;p&gt;, &lt;ul&gt;, &lt;li&gt;, &lt;a&gt;, &lt;strong&gt;
+                    </p>
+                  </div>
+                  
+                  <div className="flex justify-end">
+                    <Button 
+                      onClick={handleSave} 
+                      disabled={isSaving}
+                      className="bg-eregulariza-primary hover:bg-eregulariza-primary/90 text-white transition-all duration-300"
+                    >
+                      {isSaving ? (
+                        <>
+                          <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2"></div>
+                          Salvando...
+                        </>
+                      ) : (
+                        <>
+                          <Save className="mr-2 h-4 w-4" />
+                          Salvar alterações
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+              
+              {showPreview && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Prévia do Conteúdo</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div 
+                      className="prose max-w-none prose-headings:font-montserrat prose-headings:text-eregulariza-text prose-p:text-gray-700 prose-ul:text-gray-700"
+                      dangerouslySetInnerHTML={{ __html: policy.content }}
+                    />
+                  </CardContent>
+                </Card>
+              )}
+            </div>
           </TabsContent>
         ))}
       </Tabs>

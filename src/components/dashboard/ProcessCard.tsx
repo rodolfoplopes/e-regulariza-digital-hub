@@ -1,24 +1,11 @@
 
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
-import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
-import { 
-  ArrowRight, 
-  Clock, 
-  CheckCircle, 
-  AlertTriangle, 
-  FileText, 
-  Calendar, 
-  File, 
-  MessageSquare, 
-  X, 
-  FileWarning, 
-  CalendarClock,
-  Hourglass
-} from "lucide-react";
+import React, { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
+import { CalendarDays, FileText, Clock, CheckCircle, AlertTriangle, Eye, MessageSquare } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export interface ProcessProps {
   id: string;
@@ -27,167 +14,162 @@ export interface ProcessProps {
   status: "pendente" | "em_andamento" | "concluido" | "rejeitado";
   progress: number;
   lastUpdate: string;
-  nextAction?: string;
-  deadline?: string;
   pendingDocuments?: number;
+  deadline?: string;
+  nextAction?: string;
 }
 
-export default function ProcessCard({ process }: { process: ProcessProps }) {
-  const statusLabels = {
-    pendente: "Pendente",
-    em_andamento: "Em Andamento",
-    concluido: "Concluído",
-    rejeitado: "Rejeitado"
+interface ProcessCardProps {
+  process: ProcessProps;
+}
+
+export default function ProcessCard({ process }: ProcessCardProps) {
+  const navigate = useNavigate();
+  const [isViewLoading, setIsViewLoading] = useState(false);
+  const [isChatLoading, setIsChatLoading] = useState(false);
+
+  const getStatusConfig = (status: ProcessProps["status"]) => {
+    const configs = {
+      pendente: {
+        label: "Pendente",
+        color: "status-badge-pending",
+        icon: AlertTriangle,
+        bgColor: "bg-yellow-50",
+        borderColor: "border-yellow-200"
+      },
+      em_andamento: {
+        label: "Em Andamento",
+        color: "status-badge-in-progress",
+        icon: Clock,
+        bgColor: "bg-blue-50",
+        borderColor: "border-blue-200"
+      },
+      concluido: {
+        label: "Concluído",
+        color: "status-badge-completed",
+        icon: CheckCircle,
+        bgColor: "bg-green-50",
+        borderColor: "border-green-200"
+      },
+      rejeitado: {
+        label: "Rejeitado",
+        color: "status-badge-rejected",
+        icon: AlertTriangle,
+        bgColor: "bg-red-50",
+        borderColor: "border-red-200"
+      }
+    };
+    return configs[status];
   };
 
-  const statusClasses = {
-    pendente: "status-badge-pending",
-    em_andamento: "status-badge-in-progress",
-    concluido: "status-badge-completed",
-    rejeitado: "status-badge-rejected"
+  const statusConfig = getStatusConfig(process.status);
+  const StatusIcon = statusConfig.icon;
+
+  const handleViewProcess = async () => {
+    setIsViewLoading(true);
+    // Simulate loading delay for better UX
+    await new Promise(resolve => setTimeout(resolve, 600));
+    navigate(`/processo/${process.id}`);
   };
 
-  // Status icons mapping
-  const statusIcons = {
-    pendente: <Clock className="h-4 w-4 mr-1 text-yellow-500" />,
-    em_andamento: <Hourglass className="h-4 w-4 mr-1 text-blue-500" />,
-    concluido: <CheckCircle className="h-4 w-4 mr-1 text-green-500" />,
-    rejeitado: <X className="h-4 w-4 mr-1 text-red-500" />
-  };
-
-  // Process type icons mapping
-  const typeIcons = {
-    "Usucapião": <File className="h-4 w-4 mr-1 text-eregulariza-primary" />,
-    "Regularização": <Calendar className="h-4 w-4 mr-1 text-eregulariza-primary" />,
-    "Inventário": <FileText className="h-4 w-4 mr-1 text-eregulariza-primary" />,
-    "Retificação": <MessageSquare className="h-4 w-4 mr-1 text-eregulariza-primary" />
-  };
-
-  // Default icon for process types not in the mapping
-  const defaultTypeIcon = <File className="h-4 w-4 mr-1 text-eregulariza-primary" />;
-
-  // Get process type icon
-  const getTypeIcon = (type: string) => {
-    return typeIcons[type as keyof typeof typeIcons] || defaultTypeIcon;
-  };
-
-  // Get next expected action based on status if not provided
-  const getNextAction = () => {
-    if (process.nextAction) {
-      return process.nextAction;
-    }
-    
-    switch (process.status) {
-      case "pendente":
-        return "Aguardando documentação inicial";
-      case "em_andamento":
-        return "Análise em andamento";
-      case "concluido":
-        return "Processo finalizado";
-      case "rejeitado":
-        return "Revisão necessária";
-      default:
-        return "Verificar status com suporte";
-    }
-  };
-
-  // Get next action icon based on status
-  const getNextActionIcon = () => {
-    if (process.pendingDocuments && process.pendingDocuments > 0) {
-      return <FileWarning className="h-4 w-4 text-yellow-500 mr-2 flex-shrink-0" />;
-    }
-    
-    switch (process.status) {
-      case "pendente":
-        return <FileText className="h-4 w-4 text-yellow-500 mr-2 flex-shrink-0" />;
-      case "em_andamento":
-        return <CalendarClock className="h-4 w-4 text-blue-500 mr-2 flex-shrink-0" />;
-      case "concluido":
-        return <CheckCircle className="h-4 w-4 text-green-500 mr-2 flex-shrink-0" />;
-      case "rejeitado":
-        return <AlertTriangle className="h-4 w-4 text-red-500 mr-2 flex-shrink-0" />;
-      default:
-        return <ArrowRight className="h-4 w-4 text-[#06D7A5] mr-2 flex-shrink-0" />;
-    }
-  };
-
-  // Get progress color based on progress value
-  const getProgressColor = () => {
-    if (process.progress < 25) return "bg-red-500";
-    if (process.progress < 50) return "bg-yellow-500";
-    if (process.progress < 75) return "bg-blue-500";
-    return "bg-green-500";
+  const handleOpenChat = async () => {
+    setIsChatLoading(true);
+    // Simulate loading delay for better UX
+    await new Promise(resolve => setTimeout(resolve, 400));
+    navigate(`/processo/${process.id}?tab=chat`);
   };
 
   return (
-    <Card className="card-hover transition-all hover:border-eregulariza-primary/30">
-      <CardHeader className="pb-2">
-        <div className="flex justify-between items-start">
-          <CardTitle className="text-lg flex items-center">
-            {getTypeIcon(process.type)}
-            <span className="font-bold">{process.title}</span>
+    <Card className={`card-hover border-2 ${statusConfig.bgColor} ${statusConfig.borderColor} transition-all duration-300`}>
+      <CardHeader className="pb-3">
+        <div className="flex items-start justify-between">
+          <CardTitle className="text-lg font-semibold text-eregulariza-text leading-tight">
+            {process.title}
           </CardTitle>
-          <Badge className={cn(
-            "transition-all duration-300 flex items-center",
-            process.status === "pendente" ? "bg-yellow-100 text-yellow-800 hover:bg-yellow-200" :
-            process.status === "em_andamento" ? "bg-blue-100 text-blue-800 hover:bg-blue-200" :
-            process.status === "concluido" ? "bg-green-100 text-green-800 hover:bg-green-200" :
-            "bg-red-100 text-red-800 hover:bg-red-200"
-          )}>
-            {statusIcons[process.status]}
-            {statusLabels[process.status]}
+          <Badge className={`${statusConfig.color} status-badge flex items-center gap-1`}>
+            <StatusIcon className="h-3 w-3" />
+            {statusConfig.label}
           </Badge>
         </div>
-        <p className="text-sm text-gray-500 ml-5">{process.type}</p>
+        <p className="text-sm text-gray-600 font-medium">{process.type}</p>
       </CardHeader>
-      <CardContent className="py-2">
-        <div className="bg-[#fefae0] p-3 rounded-md mb-3 border-l-4 border-[#06D7A5] flex items-center shadow-sm hover:shadow-md transition-all duration-300">
-          {getNextActionIcon()}
-          <span className="text-sm font-medium">📌 Próxima ação: {getNextAction()}</span>
+      
+      <CardContent className="space-y-4">
+        <div className="space-y-2">
+          <div className="flex justify-between items-center">
+            <span className="text-sm font-medium text-gray-700">Progresso</span>
+            <span className="text-sm font-semibold text-eregulariza-primary">{process.progress}%</span>
+          </div>
+          <Progress value={process.progress} className="h-2" />
         </div>
-        
-        {process.pendingDocuments && process.pendingDocuments > 0 && (
-          <div className="bg-yellow-50 p-2 rounded-md mb-3 border-l-4 border-yellow-500 flex items-center">
-            <FileWarning className="h-4 w-4 text-yellow-500 mr-2 flex-shrink-0" />
-            <span className="text-sm text-yellow-800">
-              📄 {process.pendingDocuments} documento{process.pendingDocuments > 1 ? 's' : ''} pendente{process.pendingDocuments > 1 ? 's' : ''}
-            </span>
-          </div>
-        )}
-        
-        {process.deadline && (
-          <div className="flex items-center mb-2 text-sm">
-            <CalendarClock className="h-4 w-4 text-gray-500 mr-1" />
-            <span>🕒 Prazo: <span className="font-semibold">{process.deadline}</span></span>
-          </div>
-        )}
         
         <div className="space-y-2">
-          <div className="flex justify-between text-sm">
-            <span>Progresso</span>
-            <span className="font-medium">{process.progress}%</span>
+          <div className="flex items-center text-sm text-gray-600">
+            <CalendarDays className="h-4 w-4 mr-2 text-gray-400" />
+            <span>Última atualização: {process.lastUpdate}</span>
           </div>
-          <Progress 
-            value={process.progress} 
-            className={cn(
-              "h-2 transition-all duration-300",
-              getProgressColor()
+          
+          {process.pendingDocuments && process.pendingDocuments > 0 && (
+            <div className="flex items-center text-sm text-orange-600">
+              <FileText className="h-4 w-4 mr-2" />
+              <span>{process.pendingDocuments} documento(s) pendente(s)</span>
+            </div>
+          )}
+          
+          {process.deadline && (
+            <div className="flex items-center text-sm text-red-600">
+              <Clock className="h-4 w-4 mr-2" />
+              <span>Prazo: {process.deadline}</span>
+            </div>
+          )}
+          
+          {process.nextAction && (
+            <div className="p-3 bg-blue-50 rounded-lg border border-blue-100">
+              <p className="text-sm text-blue-800 font-medium">Próxima ação:</p>
+              <p className="text-sm text-blue-700">{process.nextAction}</p>
+            </div>
+          )}
+        </div>
+        
+        <div className="flex gap-2 pt-2">
+          <Button 
+            onClick={handleViewProcess}
+            disabled={isViewLoading}
+            className="flex-1 bg-eregulariza-primary hover:bg-eregulariza-primary/90 text-white transition-all duration-300 transform hover:scale-105 focus:scale-95"
+          >
+            {isViewLoading ? (
+              <>
+                <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2"></div>
+                Carregando...
+              </>
+            ) : (
+              <>
+                <Eye className="h-4 w-4 mr-2" />
+                Ver Processo
+              </>
             )}
-          />
-          <p className="text-xs text-gray-500 flex items-center mt-2">
-            <Clock className="h-3 w-3 mr-1 inline text-gray-400" />
-            Última atualização: {process.lastUpdate}
-          </p>
+          </Button>
+          
+          <Button 
+            onClick={handleOpenChat}
+            disabled={isChatLoading}
+            variant="outline"
+            className="flex-1 border-eregulariza-primary text-eregulariza-primary hover:bg-eregulariza-primary hover:text-white transition-all duration-300 transform hover:scale-105 focus:scale-95"
+          >
+            {isChatLoading ? (
+              <>
+                <div className="animate-spin rounded-full h-4 w-4 border-2 border-eregulariza-primary border-t-transparent mr-2"></div>
+                Abrindo...
+              </>
+            ) : (
+              <>
+                <MessageSquare className="h-4 w-4 mr-2" />
+                Chat
+              </>
+            )}
+          </Button>
         </div>
       </CardContent>
-      <CardFooter className="pt-2">
-        <Button asChild variant="outline" className="w-full hover:border-eregulariza-primary hover:text-eregulariza-primary transition-all duration-300 hover:shadow-sm">
-          <Link to={`/processo/${process.id}`} className="flex items-center justify-center gap-2">
-            Ver detalhes
-            <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
-          </Link>
-        </Button>
-      </CardFooter>
     </Card>
   );
 }
