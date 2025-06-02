@@ -51,15 +51,22 @@
     --ring: 167 95% 43%;
   }
 
+  * {
+    font-family: 'Montserrat', sans-serif !important;
+  }
+
   body {
     font-family: 'Montserrat', sans-serif;
     color: #333333;
     line-height: 1.6;
     letter-spacing: 0.01em;
+    background-color: #ffffff;
   }
   
   h1, h2, h3, h4, h5, h6 {
+    font-family: 'Montserrat', sans-serif;
     font-weight: 700;
+    color: #333333;
   }
   
   h1 {
@@ -71,9 +78,26 @@
     font-weight: 600;
   }
   
-  p, span, div {
+  p, span, div, button, input, textarea, select {
+    font-family: 'Montserrat', sans-serif;
     font-size: 16px;
     font-weight: 400;
+  }
+
+  button {
+    font-weight: 500;
+  }
+
+  .font-medium {
+    font-weight: 500;
+  }
+
+  .font-semibold {
+    font-weight: 600;
+  }
+
+  .font-bold {
+    font-weight: 700;
   }
 }
 
@@ -140,26 +164,27 @@
     @apply transition-all duration-300 ease-in-out;
   }
   
-  /* Toast animations */
-  .toast-enter {
-    @apply transform transition-all duration-300 ease-in-out;
+  /* E-regulariza specific styles */
+  .eregulariza-primary {
+    color: #06D7A5;
   }
-  
-  .toast-enter-active {
-    @apply translate-y-0 opacity-100;
+
+  .eregulariza-bg-primary {
+    background-color: #06D7A5;
   }
-  
-  .toast-exit {
-    @apply transform transition-all duration-300 ease-in-out opacity-100;
+
+  .eregulariza-border-primary {
+    border-color: #06D7A5;
   }
-  
-  .toast-exit-active {
-    @apply translate-y-2 opacity-0;
+
+  .eregulariza-hover-primary:hover {
+    background-color: rgba(6, 215, 165, 0.1);
+    color: #06D7A5;
   }
 }
 
 :root {
-  /* Design tokens */
+  /* Design tokens - E-regulariza */
   --eregulariza-primary: #06D7A5;
   --eregulariza-secondary: #06D7A5;
   --eregulariza-darkgray: #373535;
@@ -167,13 +192,6 @@
   
   /* Font */
   --font-main: 'Montserrat', sans-serif;
-}
-
-body {
-  font-family: var(--font-main);
-  color: var(--eregulariza-text);
-  line-height: 1.6;
-  letter-spacing: 0.01em;
 }
 
 /* Button with transparency and transitions */
@@ -263,4 +281,46 @@ button:hover, a:hover, .card:hover, .interactive-element:hover {
 
 button:active, a:active, .interactive-element:active {
   transform: translateY(0);
+}
+
+/* Chat specific styles */
+.chat-message {
+  animation: fadeInUp 0.3s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* File attachment styles */
+.file-attachment {
+  transition: all 0.2s ease-in-out;
+}
+
+.file-attachment:hover {
+  background-color: rgba(6, 215, 165, 0.1);
+  border-color: #06D7A5;
+}
+
+/* Loading states */
+.loading-shimmer {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
 }
