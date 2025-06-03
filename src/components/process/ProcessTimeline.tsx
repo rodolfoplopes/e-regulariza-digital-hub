@@ -78,6 +78,15 @@ export default function ProcessTimeline({
     }
   };
 
+  if (!stages || stages.length === 0) {
+    return (
+      <div className="text-center py-8 text-gray-500">
+        <FileText className="h-12 w-12 mx-auto mb-4 opacity-50" />
+        <p>Nenhuma etapa encontrada para este processo.</p>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-8 relative before:absolute before:inset-0 before:left-4 before:h-full before:w-0.5 before:bg-gray-200">
       {stages.map((stage, index) => {

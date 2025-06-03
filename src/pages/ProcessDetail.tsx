@@ -108,6 +108,16 @@ export default function ProcessDetail() {
     }
   };
 
+  // Convert process steps to timeline format
+  const timelineStages = process.process_steps?.map(step => ({
+    id: step.id,
+    title: step.title,
+    description: step.description || '',
+    status: step.status,
+    date: step.completed_at || step.deadline?.toString(),
+    estimatedDays: step.deadline ? Math.ceil((new Date(step.deadline).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)) : undefined,
+  })) || [];
+
   return (
     <div className="flex h-screen bg-gray-50">
       <DashboardSidebar />
@@ -193,7 +203,7 @@ export default function ProcessDetail() {
             </TabsList>
             
             <TabsContent value="timeline">
-              <ProcessTimeline processId={process.id} />
+              <ProcessTimeline stages={timelineStages} />
             </TabsContent>
             
             <TabsContent value="chat">
@@ -201,7 +211,12 @@ export default function ProcessDetail() {
             </TabsContent>
             
             <TabsContent value="documents">
-              <DocumentManager processId={process.id} />
+              <DocumentManager 
+                processId={process.id}
+                etapaId="current"
+                etapaNome="Documentos do Processo"
+                isAdmin={profile?.role === 'admin'}
+              />
             </TabsContent>
           </Tabs>
         </main>

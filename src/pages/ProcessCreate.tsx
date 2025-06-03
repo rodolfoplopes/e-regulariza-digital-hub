@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -43,7 +42,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { useToast } from "@/hooks/use-toast";
-import { generateProcessNumber } from "@/utils/processUtils";
+import { previewProcessNumber } from "@/utils/processUtils";
 
 // Form schemas
 const clientFormSchema = z.object({
@@ -208,8 +207,24 @@ export default function ProcessCreate() {
     stages: [],
   });
   const [selectedProcessType, setSelectedProcessType] = useState("");
-  const [processNumber, setProcessNumber] = useState(() => generateProcessNumber());
+  const [processNumber, setProcessNumber] = useState("");
   const [isEditingNumber, setIsEditingNumber] = useState(false);
+
+  // Initialize process number on component mount
+  useEffect(() => {
+    const initProcessNumber = async () => {
+      try {
+        const number = await previewProcessNumber();
+        setProcessNumber(number);
+      } catch (error) {
+        console.error('Error generating process number:', error);
+        const currentYM = new Date().toISOString().slice(2, 7).replace('-', '');
+        setProcessNumber(`ER-${currentYM}-00001`);
+      }
+    };
+    
+    initProcessNumber();
+  }, []);
 
   // Client form
   const clientForm = useForm({
@@ -226,7 +241,7 @@ export default function ProcessCreate() {
   const processForm = useForm({
     resolver: zodResolver(processFormSchema),
     defaultValues: {
-      processNumber: processNumber,
+      processNumber: "",
       processName: "",
       processType: "",
       startDate: new Date(),
@@ -236,7 +251,9 @@ export default function ProcessCreate() {
 
   // Update the form when processNumber changes
   useEffect(() => {
-    processForm.setValue("processNumber", processNumber);
+    if (processNumber) {
+      processForm.setValue("processNumber", processNumber);
+    }
   }, [processNumber, processForm]);
 
   // Stages form
@@ -456,7 +473,7 @@ export default function ProcessCreate() {
                     />
                   ) : (
                     <div className="p-2 bg-muted rounded-md font-mono">
-                      {processNumber}
+                      {processNumber || "Carregando..."}
                     </div>
                   )}
                   <FormDescription>
