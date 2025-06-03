@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -214,6 +215,7 @@ const Unauthorized = () => (
 );
 
 const App = () => {
+  const { user } = useAuth();
   const gtmId = localStorage.getItem('gtm_id') || '';
   const gtmEnabled = localStorage.getItem('gtm_enabled') === 'true';
 
