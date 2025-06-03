@@ -108,8 +108,8 @@ export default function ProcessDetail() {
     }
   };
 
-  // Convert process steps to timeline format
-  const timelineStages = process.process_steps?.map(step => ({
+  // Convert process steps to timeline format - using 'steps' instead of 'process_steps'
+  const timelineStages = process.steps?.map(step => ({
     id: step.id,
     title: step.title,
     description: step.description || '',
