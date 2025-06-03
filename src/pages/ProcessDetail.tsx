@@ -108,12 +108,29 @@ export default function ProcessDetail() {
     }
   };
 
+  // Helper function to normalize status to ProcessStage type
+  const normalizeStatus = (status: string): "pendente" | "em_andamento" | "concluido" | "pending" | "in_progress" | "completed" => {
+    switch (status) {
+      case 'pendente':
+      case 'pending':
+        return 'pendente';
+      case 'em_andamento':
+      case 'in_progress':
+        return 'em_andamento';
+      case 'concluido':
+      case 'completed':
+        return 'concluido';
+      default:
+        return 'pendente'; // fallback to pendente
+    }
+  };
+
   // Convert process steps to timeline format - using 'steps' instead of 'process_steps'
   const timelineStages = process.steps?.map(step => ({
     id: step.id,
     title: step.title,
     description: step.description || '',
-    status: step.status,
+    status: normalizeStatus(step.status),
     date: step.completed_at || step.deadline?.toString(),
     estimatedDays: step.deadline ? Math.ceil((new Date(step.deadline).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)) : undefined,
   })) || [];
