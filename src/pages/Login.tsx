@@ -15,7 +15,7 @@ import {
 import { useToast } from "@/components/ui/use-toast";
 import Layout from "@/components/layout/Layout";
 import { AlertCircle } from "lucide-react";
-import { useAuth } from "../App";
+import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -27,11 +27,17 @@ export default function Login() {
   
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { login } = useAuth();
+  const { login, isAuthenticated, role } = useSupabaseAuth();
+
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate(role === 'admin' ? '/admin' : '/dashboard');
+    }
+  }, [isAuthenticated, role, navigate]);
 
   // Handle cooldown timer
   useEffect(() => {
-    // Check for existing cooldown from localStorage
     const storedCooldown = localStorage.getItem('loginCooldown');
     const storedAttempts = localStorage.getItem('loginAttempts');
     
@@ -74,8 +80,7 @@ export default function Login() {
   }, [cooldownActive, cooldownTimer]);
 
   const activateCooldown = () => {
-    // Set a 5-minute cooldown after 3 failed attempts
-    const cooldownDuration = 5 * 60 * 1000; // 5 minutes in milliseconds
+    const cooldownDuration = 5 * 60 * 1000; // 5 minutes
     const expiryTime = Date.now() + cooldownDuration;
     
     localStorage.setItem('loginCooldown', expiryTime.toString());
@@ -83,7 +88,7 @@ export default function Login() {
     setCooldownTimer(5 * 60); // 5 minutes in seconds
   };
 
-  const handleFailedLogin = () => {
+  const handleFailedLogin = (errorMessage: string) => {
     const newAttempts = loginAttempts + 1;
     setLoginAttempts(newAttempts);
     localStorage.setItem('loginAttempts', newAttempts.toString());
@@ -99,7 +104,7 @@ export default function Login() {
       toast({
         variant: "destructive",
         title: "Erro ao fazer login",
-        description: `E-mail ou senha inválidos. Tentativa ${newAttempts} de 3.`,
+        description: `${errorMessage}. Tentativa ${newAttempts} de 3.`,
       });
     }
   };
@@ -112,7 +117,6 @@ export default function Login() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     
-    // Prevent login attempt during cooldown
     if (cooldownActive) {
       toast({
         variant: "destructive",
@@ -125,26 +129,21 @@ export default function Login() {
     setIsLoading(true);
 
     try {
-      // Use the login function from AuthContext instead of the mock implementation
-      const success = await login(email, password);
+      const { success, error } = await login(email, password);
       
       if (success) {
-        // Successful login - reset attempts
         resetLoginAttempts();
         toast({
           title: "Login bem-sucedido",
           description: "Redirecionando para o dashboard...",
         });
-        // Add a small delay to ensure the toast is displayed before redirecting
-        setTimeout(() => {
-          navigate("/dashboard");
-        }, 500);
+        // Navigation will be handled by the useEffect hook
       } else {
-        handleFailedLogin();
+        handleFailedLogin(error || "E-mail ou senha inválidos");
       }
     } catch (error) {
       console.error("Login error:", error);
-      handleFailedLogin();
+      handleFailedLogin("Erro inesperado durante o login");
     } finally {
       setIsLoading(false);
     }

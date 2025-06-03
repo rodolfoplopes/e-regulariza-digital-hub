@@ -1,0 +1,470 @@
+
+import { supabase } from "@/integrations/supabase/client";
+import { Database } from "@/integrations/supabase/types";
+
+type Tables = Database['public']['Tables'];
+type Profile = Tables['profiles']['Row'];
+type Process = Tables['processes']['Row'];
+type ProcessStep = Tables['process_steps']['Row'];
+type ProcessMessage = Tables['process_messages']['Row'];
+type ProcessDocument = Tables['process_documents']['Row'];
+type Notification = Tables['notifications']['Row'];
+type ProcessType = Tables['process_types']['Row'];
+
+export interface ProcessWithDetails extends Process {
+  process_type: ProcessType;
+  client: Profile;
+  steps?: ProcessStep[];
+  documents?: ProcessDocument[];
+}
+
+// Profile Services
+export const profileService = {
+  async getCurrentProfile(): Promise<Profile | null> {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return null;
+
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', user.id)
+      .single();
+
+    if (error) {
+      console.error('Error fetching profile:', error);
+      return null;
+    }
+    return data;
+  },
+
+  async updateProfile(id: string, updates: Partial<Profile>): Promise<Profile | null> {
+    const { data, error } = await supabase
+      .from('profiles')
+      .update(updates)
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error updating profile:', error);
+      return null;
+    }
+    return data;
+  },
+
+  async getClients(): Promise<Profile[]> {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('role', 'cliente');
+
+    if (error) {
+      console.error('Error fetching clients:', error);
+      return [];
+    }
+    return data || [];
+  },
+
+  async createClient(clientData: Omit<Profile, 'id' | 'created_at' | 'updated_at'>): Promise<Profile | null> {
+    const { data, error } = await supabase
+      .from('profiles')
+      .insert(clientData)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error creating client:', error);
+      return null;
+    }
+    return data;
+  }
+};
+
+// Process Services
+export const processService = {
+  async getProcesses(clientId?: string): Promise<ProcessWithDetails[]> {
+    let query = supabase
+      .from('processes')
+      .select(`
+        *,
+        process_type:process_types(*),
+        client:profiles(*)
+      `)
+      .order('created_at', { ascending: false });
+
+    if (clientId) {
+      query = query.eq('client_id', clientId);
+    }
+
+    const { data, error } = await query;
+
+    if (error) {
+      console.error('Error fetching processes:', error);
+      return [];
+    }
+    return data || [];
+  },
+
+  async getProcessById(id: string): Promise<ProcessWithDetails | null> {
+    const { data, error } = await supabase
+      .from('processes')
+      .select(`
+        *,
+        process_type:process_types(*),
+        client:profiles(*),
+        steps:process_steps(*),
+        documents:process_documents(*)
+      `)
+      .eq('id', id)
+      .single();
+
+    if (error) {
+      console.error('Error fetching process:', error);
+      return null;
+    }
+    return data;
+  },
+
+  async createProcess(processData: {
+    title: string;
+    description?: string;
+    client_id: string;
+    process_type_id: string;
+    deadline?: string;
+  }): Promise<Process | null> {
+    const { data, error } = await supabase
+      .from('processes')
+      .insert(processData)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error creating process:', error);
+      return null;
+    }
+    return data;
+  },
+
+  async updateProcess(id: string, updates: Partial<Process>): Promise<Process | null> {
+    const { data, error } = await supabase
+      .from('processes')
+      .update(updates)
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error updating process:', error);
+      return null;
+    }
+    return data;
+  },
+
+  async deleteProcess(id: string): Promise<boolean> {
+    const { error } = await supabase
+      .from('processes')
+      .delete()
+      .eq('id', id);
+
+    if (error) {
+      console.error('Error deleting process:', error);
+      return false;
+    }
+    return true;
+  }
+};
+
+// Process Type Services
+export const processTypeService = {
+  async getProcessTypes(): Promise<ProcessType[]> {
+    const { data, error } = await supabase
+      .from('process_types')
+      .select('*')
+      .order('name');
+
+    if (error) {
+      console.error('Error fetching process types:', error);
+      return [];
+    }
+    return data || [];
+  }
+};
+
+// Process Steps Services
+export const processStepService = {
+  async getStepsByProcessId(processId: string): Promise<ProcessStep[]> {
+    const { data, error } = await supabase
+      .from('process_steps')
+      .select('*')
+      .eq('process_id', processId)
+      .order('order_number');
+
+    if (error) {
+      console.error('Error fetching process steps:', error);
+      return [];
+    }
+    return data || [];
+  },
+
+  async createStep(stepData: Omit<ProcessStep, 'id' | 'created_at' | 'updated_at'>): Promise<ProcessStep | null> {
+    const { data, error } = await supabase
+      .from('process_steps')
+      .insert(stepData)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error creating step:', error);
+      return null;
+    }
+    return data;
+  },
+
+  async updateStep(id: string, updates: Partial<ProcessStep>): Promise<ProcessStep | null> {
+    const { data, error } = await supabase
+      .from('process_steps')
+      .update(updates)
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error updating step:', error);
+      return null;
+    }
+    return data;
+  }
+};
+
+// Message Services
+export const messageService = {
+  async getMessagesByProcessId(processId: string): Promise<ProcessMessage[]> {
+    const { data, error } = await supabase
+      .from('process_messages')
+      .select('*')
+      .eq('process_id', processId)
+      .order('created_at');
+
+    if (error) {
+      console.error('Error fetching messages:', error);
+      return [];
+    }
+    return data || [];
+  },
+
+  async sendMessage(messageData: Omit<ProcessMessage, 'id' | 'created_at'>): Promise<ProcessMessage | null> {
+    const { data, error } = await supabase
+      .from('process_messages')
+      .insert(messageData)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error sending message:', error);
+      return null;
+    }
+    return data;
+  }
+};
+
+// Document Services
+export const documentService = {
+  async getDocumentsByProcessId(processId: string): Promise<ProcessDocument[]> {
+    const { data, error } = await supabase
+      .from('process_documents')
+      .select('*')
+      .eq('process_id', processId)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Error fetching documents:', error);
+      return [];
+    }
+    return data || [];
+  },
+
+  async uploadDocument(documentData: Omit<ProcessDocument, 'id' | 'created_at'>): Promise<ProcessDocument | null> {
+    const { data, error } = await supabase
+      .from('process_documents')
+      .insert(documentData)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error uploading document:', error);
+      return null;
+    }
+    return data;
+  },
+
+  async updateDocumentStatus(id: string, status: string, reviewedBy?: string, reviewNotes?: string): Promise<ProcessDocument | null> {
+    const updates: any = { 
+      status, 
+      reviewed_at: new Date().toISOString() 
+    };
+    
+    if (reviewedBy) updates.reviewed_by = reviewedBy;
+    if (reviewNotes) updates.review_notes = reviewNotes;
+
+    const { data, error } = await supabase
+      .from('process_documents')
+      .update(updates)
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error updating document status:', error);
+      return null;
+    }
+    return data;
+  }
+};
+
+// Notification Services
+export const notificationService = {
+  async getNotifications(userId: string): Promise<Notification[]> {
+    const { data, error } = await supabase
+      .from('notifications')
+      .select('*')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Error fetching notifications:', error);
+      return [];
+    }
+    return data || [];
+  },
+
+  async createNotification(notificationData: Omit<Notification, 'id' | 'created_at'>): Promise<Notification | null> {
+    const { data, error } = await supabase
+      .from('notifications')
+      .insert(notificationData)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error creating notification:', error);
+      return null;
+    }
+    return data;
+  },
+
+  async markAsRead(id: string): Promise<boolean> {
+    const { error } = await supabase
+      .from('notifications')
+      .update({ is_read: true })
+      .eq('id', id);
+
+    if (error) {
+      console.error('Error marking notification as read:', error);
+      return false;
+    }
+    return true;
+  },
+
+  async markAllAsRead(userId: string): Promise<boolean> {
+    const { error } = await supabase
+      .from('notifications')
+      .update({ is_read: true })
+      .eq('user_id', userId)
+      .eq('is_read', false);
+
+    if (error) {
+      console.error('Error marking all notifications as read:', error);
+      return false;
+    }
+    return true;
+  }
+};
+
+// System Settings Services
+export const systemSettingsService = {
+  async getSetting(key: string): Promise<string | null> {
+    const { data, error } = await supabase
+      .from('system_settings')
+      .select('value')
+      .eq('key', key)
+      .single();
+
+    if (error) {
+      console.error('Error fetching setting:', error);
+      return null;
+    }
+    return data?.value || null;
+  },
+
+  async updateSetting(key: string, value: string): Promise<boolean> {
+    const { error } = await supabase
+      .from('system_settings')
+      .upsert({ key, value, updated_at: new Date().toISOString() });
+
+    if (error) {
+      console.error('Error updating setting:', error);
+      return false;
+    }
+    return true;
+  },
+
+  async getMultipleSettings(keys: string[]): Promise<Record<string, string>> {
+    const { data, error } = await supabase
+      .from('system_settings')
+      .select('key, value')
+      .in('key', keys);
+
+    if (error) {
+      console.error('Error fetching settings:', error);
+      return {};
+    }
+
+    const settings: Record<string, string> = {};
+    data?.forEach(setting => {
+      settings[setting.key] = setting.value || '';
+    });
+    return settings;
+  }
+};
+
+// Export Services
+export const exportService = {
+  async exportProcesses(filters?: {
+    clientId?: string;
+    processTypeId?: string;
+    status?: string;
+    startDate?: string;
+    endDate?: string;
+  }): Promise<ProcessWithDetails[]> {
+    let query = supabase
+      .from('processes')
+      .select(`
+        *,
+        process_type:process_types(*),
+        client:profiles(*)
+      `);
+
+    if (filters?.clientId) {
+      query = query.eq('client_id', filters.clientId);
+    }
+    if (filters?.processTypeId) {
+      query = query.eq('process_type_id', filters.processTypeId);
+    }
+    if (filters?.status) {
+      query = query.eq('status', filters.status);
+    }
+    if (filters?.startDate) {
+      query = query.gte('created_at', filters.startDate);
+    }
+    if (filters?.endDate) {
+      query = query.lte('created_at', filters.endDate);
+    }
+
+    const { data, error } = await query.order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Error exporting processes:', error);
+      return [];
+    }
+    return data || [];
+  }
+};
