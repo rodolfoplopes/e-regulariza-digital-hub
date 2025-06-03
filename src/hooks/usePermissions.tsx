@@ -1,5 +1,5 @@
 
-import { useAuth } from "@/App";
+import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 
 export interface PermissionConfig {
   canEditAllUsers: boolean;
@@ -13,7 +13,7 @@ export interface PermissionConfig {
 }
 
 export const usePermissions = (): PermissionConfig => {
-  const { user, role } = useAuth();
+  const { user, role } = useSupabaseAuth();
 
   if (role === "admin") {
     return {

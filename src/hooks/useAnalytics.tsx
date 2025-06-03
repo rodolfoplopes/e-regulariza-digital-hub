@@ -1,10 +1,10 @@
 
 import { useEffect } from 'react';
 import { analytics } from '@/services/analyticsService';
-import { useAuth } from '@/App';
+import { useSupabaseAuth } from '@/hooks/useSupabaseAuth';
 
 export const useAnalytics = () => {
-  const { user } = useAuth();
+  const { user } = useSupabaseAuth();
 
   useEffect(() => {
     if (user?.id) {

@@ -43,7 +43,12 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
         if (session?.user) {
           setUser(session.user);
           const userProfile = await profileService.getCurrentProfile();
-          setProfile(userProfile);
+          if (userProfile) {
+            setProfile({
+              ...userProfile,
+              role: userProfile.role as 'admin' | 'cliente'
+            });
+          }
         }
       } catch (error) {
         console.error('Error loading session:', error);
@@ -61,7 +66,12 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
         
         if (session?.user) {
           const userProfile = await profileService.getCurrentProfile();
-          setProfile(userProfile);
+          if (userProfile) {
+            setProfile({
+              ...userProfile,
+              role: userProfile.role as 'admin' | 'cliente'
+            });
+          }
         } else {
           setProfile(null);
         }
@@ -85,7 +95,12 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
 
       if (data.user) {
         const userProfile = await profileService.getCurrentProfile();
-        setProfile(userProfile);
+        if (userProfile) {
+          setProfile({
+            ...userProfile,
+            role: userProfile.role as 'admin' | 'cliente'
+          });
+        }
       }
 
       return { success: true };
@@ -131,7 +146,12 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
   const refreshProfile = async (): Promise<void> => {
     if (user) {
       const userProfile = await profileService.getCurrentProfile();
-      setProfile(userProfile);
+      if (userProfile) {
+        setProfile({
+          ...userProfile,
+          role: userProfile.role as 'admin' | 'cliente'
+        });
+      }
     }
   };
 

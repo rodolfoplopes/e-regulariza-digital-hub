@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -9,41 +10,42 @@ import SecuritySettings from "@/components/user/SecuritySettings";
 import PreferenciasUsuario from "@/components/user/PreferenciasUsuario";
 import PoliciesLinks from "@/components/user/PoliciesLinks";
 import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/App";
+import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 
 export default function UserSettings() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { toast } = useToast();
-  const { user } = useAuth();
+  const { user, profile } = useSupabaseAuth();
   
   // Mock user data - would be fetched from authentication context
   const [userData, setUserData] = useState({
-    name: user?.name || "João Silva",
-    email: user?.email || "joao.silva@example.com",
-    phone: "(11) 98765-4321",
-    cpf: user?.cpf || "123.456.789-00" // Read-only field
+    name: profile?.name || "João Silva",
+    email: profile?.email || user?.email || "joao.silva@example.com",
+    phone: profile?.phone || "(11) 98765-4321",
+    cpf: profile?.cpf || "123.456.789-00" // Read-only field
   });
 
   // Effect to sync dashboard data with settings
   useEffect(() => {
-    if (user) {
+    if (profile || user) {
       setUserData(prevData => ({
         ...prevData,
-        name: user.name || prevData.name,
-        email: user.email || prevData.email,
-        cpf: user.cpf || prevData.cpf
+        name: profile?.name || prevData.name,
+        email: profile?.email || user?.email || prevData.email,
+        phone: profile?.phone || prevData.phone,
+        cpf: profile?.cpf || prevData.cpf
       }));
     }
-  }, [user]);
+  }, [profile, user]);
 
   const handleUserDataUpdate = (updatedData: typeof userData) => {
     setUserData(updatedData);
     
     // Validate that the data matches what's in the dashboard
     const isDataValid = 
-      (user?.name === updatedData.name || !user?.name) &&
-      (user?.email === updatedData.email || !user?.email) &&
-      (user?.cpf === updatedData.cpf || !user?.cpf);
+      (profile?.name === updatedData.name || !profile?.name) &&
+      (profile?.email === updatedData.email || !profile?.email) &&
+      (profile?.cpf === updatedData.cpf || !profile?.cpf);
 
     // Show appropriate toast notification
     if (isDataValid) {

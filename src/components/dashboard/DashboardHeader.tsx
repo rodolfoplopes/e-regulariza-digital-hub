@@ -14,7 +14,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { useAuth } from "@/App";
+import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 import { useToast } from "@/hooks/use-toast";
 import ProcessNotifications from "../process/ProcessNotifications";
 
@@ -25,7 +25,7 @@ export default function DashboardHeader() {
   const [lastActivity, setLastActivity] = useState<number>(Date.now());
   
   const isMobile = useIsMobile();
-  const { user, logout } = useAuth();
+  const { user, profile, logout } = useSupabaseAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -105,10 +105,10 @@ export default function DashboardHeader() {
     navigate("/login");
   };
 
-  // Mock user data or use actual user data from context
-  const userData = user || {
-    name: "João Silva",
-    initials: "JS",
+  // Use profile data from Supabase auth
+  const userData = profile || {
+    name: user?.email || "Usuário",
+    initials: user?.email?.substring(0, 2).toUpperCase() || "U",
     role: "Cliente",
   };
 
@@ -157,7 +157,7 @@ export default function DashboardHeader() {
               <DropdownMenuLabel>
                 <div className="flex flex-col">
                   <span>{userData.name}</span>
-                  <span className="text-xs text-muted-foreground">{userData.role}</span>
+                  <span className="text-xs text-muted-foreground">{profile?.role === 'admin' ? 'Administrador' : 'Cliente'}</span>
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />

@@ -43,7 +43,7 @@ export async function getCurrentCounter(): Promise<number> {
       .from('process_counter')
       .select('counter')
       .eq('year_month', currentYM)
-      .single();
+      .maybeSingle(); // Use maybeSingle to avoid errors when no data is found
     
     if (error) {
       console.error('Error fetching counter:', error);
@@ -54,5 +54,23 @@ export async function getCurrentCounter(): Promise<number> {
   } catch (error) {
     console.error('Error fetching counter:', error);
     return 0;
+  }
+}
+
+/**
+ * Generates a preview process number for display purposes (synchronous)
+ * @returns Promise that resolves to process number string
+ */
+export async function previewProcessNumber(): Promise<string> {
+  try {
+    const currentCounter = await getCurrentCounter();
+    const currentYM = new Date().toISOString().slice(2, 7).replace('-', ''); // YYMM format
+    const nextCounter = currentCounter + 1;
+    
+    return `ER-${currentYM}-${nextCounter.toString().padStart(5, '0')}`;
+  } catch (error) {
+    console.error('Error generating preview process number:', error);
+    const currentYM = new Date().toISOString().slice(2, 7).replace('-', ''); // YYMM format
+    return `ER-${currentYM}-00001`;
   }
 }
