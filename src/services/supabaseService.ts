@@ -1,87 +1,44 @@
+/**
+ * Serviços principais do Supabase
+ * @fileoverview Exporta todos os serviços e mantém compatibilidade com código existente
+ * @deprecated Arquivo muito longo - considerar refatoração em módulos separados
+ */
 
 import { supabase } from "@/integrations/supabase/client";
 import { Database } from "@/integrations/supabase/types";
 
+// Re-exportar serviços refatorados
+export { profileService } from "./profileService";
+export { cmsService } from "./cmsService";
+
+// Re-exportar tipos
+export type { 
+  Profile, 
+  Process, 
+  ProcessStep, 
+  ProcessMessage, 
+  ProcessDocument, 
+  Notification, 
+  ProcessType,
+  ProcessWithDetails,
+  CreateProcessData,
+  CreateClientData,
+  ExportFilters
+} from "./core/types";
+
 type Tables = Database['public']['Tables'];
-type Profile = Tables['profiles']['Row'];
 type Process = Tables['processes']['Row'];
 type ProcessStep = Tables['process_steps']['Row'];
 type ProcessMessage = Tables['process_messages']['Row'];
 type ProcessDocument = Tables['process_documents']['Row'];
-export type Notification = Tables['notifications']['Row'];
 type ProcessType = Tables['process_types']['Row'];
 
 export interface ProcessWithDetails extends Process {
   process_type: ProcessType;
-  client: Profile;
+  client: any;
   steps?: ProcessStep[];
   documents?: ProcessDocument[];
 }
-
-// Profile Services
-export const profileService = {
-  async getCurrentProfile(): Promise<Profile | null> {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return null;
-
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', user.id)
-      .single();
-
-    if (error) {
-      console.error('Error fetching profile:', error);
-      return null;
-    }
-    return data;
-  },
-
-  async updateProfile(id: string, updates: Partial<Profile>): Promise<Profile | null> {
-    const { data, error } = await supabase
-      .from('profiles')
-      .update(updates)
-      .eq('id', id)
-      .select()
-      .single();
-
-    if (error) {
-      console.error('Error updating profile:', error);
-      return null;
-    }
-    return data;
-  },
-
-  async getClients(): Promise<Profile[]> {
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('role', 'cliente');
-
-    if (error) {
-      console.error('Error fetching clients:', error);
-      return [];
-    }
-    return data || [];
-  },
-
-  async createClient(clientData: { name: string; email: string; role: string; cpf?: string; phone?: string }): Promise<Profile | null> {
-    const { data, error } = await supabase
-      .from('profiles')
-      .insert({
-        ...clientData,
-        id: crypto.randomUUID(), // Generate UUID for the client
-      })
-      .select()
-      .single();
-
-    if (error) {
-      console.error('Error creating client:', error);
-      return null;
-    }
-    return data;
-  }
-};
 
 // Process Services
 export const processService = {
