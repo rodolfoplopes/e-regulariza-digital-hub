@@ -42,9 +42,9 @@ export default function OnboardingTutorial({ isOpen, onComplete }: OnboardingTut
   }, [isOpen]);
 
   const handleJoyrideCallback = (data: CallBackProps) => {
-    const { status, type } = data;
+    const { status } = data;
     
-    if ([STATUS.FINISHED, STATUS.SKIPPED].includes(status)) {
+    if (status === STATUS.FINISHED || status === STATUS.SKIPPED) {
       setRun(false);
       onComplete();
     }

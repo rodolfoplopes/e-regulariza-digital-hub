@@ -6,6 +6,8 @@ import AdminHeader from "@/components/admin/AdminHeader";
 import AdminTabContent from "@/components/admin/AdminTabContent";
 import IntegrationSettings from "@/components/admin/IntegrationSettings";
 import MetricsDashboard from "@/components/admin/MetricsDashboard";
+import ProductionSettings from "@/components/production/ProductionSettings";
+import ProductionChecklist from "@/components/production/ProductionChecklist";
 import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 import { usePermissions } from "@/hooks/usePermissions";
 import { Navigate } from "react-router-dom";
@@ -38,13 +40,15 @@ export default function AdminDashboard() {
       />
       <main className="container mx-auto px-4 py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid grid-cols-2 lg:grid-cols-6 w-full lg:w-auto">
+          <TabsList className="grid grid-cols-2 lg:grid-cols-8 w-full lg:w-auto">
             <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
             <TabsTrigger value="processes">Processos</TabsTrigger>
             <TabsTrigger value="clients">Clientes</TabsTrigger>
             <TabsTrigger value="cms">CMS</TabsTrigger>
             <TabsTrigger value="metrics">Métricas</TabsTrigger>
             <TabsTrigger value="integrations">Integrações</TabsTrigger>
+            <TabsTrigger value="production">Produção</TabsTrigger>
+            <TabsTrigger value="checklist">Go Live</TabsTrigger>
           </TabsList>
 
           <Separator />
@@ -91,6 +95,14 @@ export default function AdminDashboard() {
 
           <TabsContent value="integrations">
             <IntegrationSettings />
+          </TabsContent>
+
+          <TabsContent value="production">
+            <ProductionSettings />
+          </TabsContent>
+
+          <TabsContent value="checklist">
+            <ProductionChecklist />
           </TabsContent>
         </Tabs>
       </main>

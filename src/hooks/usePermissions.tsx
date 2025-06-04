@@ -1,47 +1,34 @@
 
-import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
+import { useSupabaseAuth } from './useSupabaseAuth';
 
 export interface PermissionConfig {
-  canEditAllUsers: boolean;
-  canViewAdmin: boolean;
-  canEditProcesses: boolean;
-  canViewReports: boolean;
-  canEditPolicies: boolean;
-  canManageSystem: boolean;
-  canEditOwnProfile: boolean;
-  canViewOwnProcesses: boolean;
+  canView: boolean;
+  canEdit: boolean;
+  canDelete: boolean;
+  canManageUsers: boolean;
+  isAdmin: boolean;
 }
 
-export const usePermissions = (): PermissionConfig => {
-  const { user, role } = useSupabaseAuth();
+export function usePermissions(): PermissionConfig {
+  const { profile, isAuthenticated } = useSupabaseAuth();
 
-  if (role === "admin") {
+  if (!isAuthenticated || !profile) {
     return {
-      canEditAllUsers: true,
-      canViewAdmin: true,
-      canEditProcesses: true,
-      canViewReports: true,
-      canEditPolicies: true,
-      canManageSystem: true,
-      canEditOwnProfile: true,
-      canViewOwnProcesses: true,
+      canView: false,
+      canEdit: false,
+      canDelete: false,
+      canManageUsers: false,
+      isAdmin: false,
     };
   }
 
-  // Cliente permissions
-  return {
-    canEditAllUsers: false,
-    canViewAdmin: false,
-    canEditProcesses: false,
-    canViewReports: false,
-    canEditPolicies: false,
-    canManageSystem: false,
-    canEditOwnProfile: true,
-    canViewOwnProcesses: true,
-  };
-};
+  const isAdmin = profile.role === 'admin';
 
-export const useCanAccess = (requiredPermission: keyof PermissionConfig): boolean => {
-  const permissions = usePermissions();
-  return permissions[requiredPermission];
-};
+  return {
+    canView: true,
+    canEdit: isAdmin,
+    canDelete: isAdmin,
+    canManageUsers: isAdmin,
+    isAdmin,
+  };
+}

@@ -16,6 +16,7 @@ import { useToast } from "@/components/ui/use-toast";
 import Layout from "@/components/layout/Layout";
 import { AlertCircle } from "lucide-react";
 import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
+import { RecaptchaWrapper } from "@/components/production/RecaptchaWrapper";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -24,10 +25,15 @@ export default function Login() {
   const [loginAttempts, setLoginAttempts] = useState(0);
   const [cooldownActive, setCooldownActive] = useState(false);
   const [cooldownTimer, setCooldownTimer] = useState(0);
+  const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
   
   const navigate = useNavigate();
   const { toast } = useToast();
   const { login, isAuthenticated, role } = useSupabaseAuth();
+
+  // Check if reCAPTCHA is enabled
+  const recaptchaEnabled = localStorage.getItem('recaptcha_site_key') && 
+                          localStorage.getItem('recaptcha_site_key') !== '';
 
   // Redirect if already authenticated
   useEffect(() => {
@@ -114,6 +120,14 @@ export default function Login() {
     localStorage.removeItem('loginAttempts');
   };
 
+  const handleRecaptchaVerify = (token: string) => {
+    setRecaptchaToken(token);
+  };
+
+  const handleRecaptchaExpire = () => {
+    setRecaptchaToken(null);
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     
@@ -122,6 +136,16 @@ export default function Login() {
         variant: "destructive",
         title: "Aguarde para tentar novamente",
         description: `Por segurança, tente novamente em ${cooldownTimer} segundos.`,
+      });
+      return;
+    }
+
+    // Check reCAPTCHA if enabled
+    if (recaptchaEnabled && !recaptchaToken) {
+      toast({
+        variant: "destructive",
+        title: "Verificação necessária",
+        description: "Por favor, complete a verificação reCAPTCHA.",
       });
       return;
     }
@@ -140,10 +164,13 @@ export default function Login() {
         // Navigation will be handled by the useEffect hook
       } else {
         handleFailedLogin(error || "E-mail ou senha inválidos");
+        // Reset reCAPTCHA on failed login
+        setRecaptchaToken(null);
       }
     } catch (error) {
       console.error("Login error:", error);
       handleFailedLogin("Erro inesperado durante o login");
+      setRecaptchaToken(null);
     } finally {
       setIsLoading(false);
     }
@@ -203,12 +230,20 @@ export default function Login() {
                     disabled={cooldownActive || isLoading}
                   />
                 </div>
+
+                {/* reCAPTCHA */}
+                {recaptchaEnabled && (
+                  <RecaptchaWrapper
+                    onVerify={handleRecaptchaVerify}
+                    onExpire={handleRecaptchaExpire}
+                  />
+                )}
               </CardContent>
               <CardFooter className="flex flex-col">
                 <Button
                   type="submit"
                   className="w-full eregulariza-gradient hover:opacity-90"
-                  disabled={cooldownActive || isLoading}
+                  disabled={cooldownActive || isLoading || (recaptchaEnabled && !recaptchaToken)}
                 >
                   {isLoading ? "Entrando..." : "Entrar"}
                 </Button>
