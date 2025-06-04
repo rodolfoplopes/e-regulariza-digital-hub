@@ -12,7 +12,7 @@ import { Navigate } from "react-router-dom";
 
 export default function AdminDashboard() {
   const { profile, isLoading: authLoading } = useSupabaseAuth();
-  const { isAdmin } = usePermissions();
+  const permissions = usePermissions();
   const [activeTab, setActiveTab] = useState("dashboard");
 
   if (authLoading) {
@@ -26,13 +26,16 @@ export default function AdminDashboard() {
     );
   }
 
-  if (!profile || !isAdmin) {
+  if (!profile || !permissions.isAdmin) {
     return <Navigate to="/login" replace />;
   }
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <AdminHeader />
+      <AdminHeader 
+        clients={[]} 
+        serviceTypes={[]} 
+      />
       <main className="container mx-auto px-4 py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList className="grid grid-cols-2 lg:grid-cols-6 w-full lg:w-auto">
@@ -47,19 +50,19 @@ export default function AdminDashboard() {
           <Separator />
 
           <TabsContent value="dashboard">
-            <AdminTabContent activeTab="dashboard" />
+            <AdminTabContent />
           </TabsContent>
 
           <TabsContent value="processes">
-            <AdminTabContent activeTab="processes" />
+            <AdminTabContent />
           </TabsContent>
 
           <TabsContent value="clients">
-            <AdminTabContent activeTab="clients" />
+            <AdminTabContent />
           </TabsContent>
 
           <TabsContent value="cms">
-            <AdminTabContent activeTab="cms" />
+            <AdminTabContent />
           </TabsContent>
 
           <TabsContent value="metrics">

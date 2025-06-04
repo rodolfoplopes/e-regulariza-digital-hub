@@ -23,13 +23,13 @@ class CMSService extends BaseService {
       `getContentByType(${tipo})`,
       async () => {
         const { data, error } = await supabase
-          .from('cms_contents' as any)
+          .from('cms_contents')
           .select('*')
           .eq('tipo', tipo)
           .single();
 
         if (error) throw error;
-        return data as CMSContent;
+        return data;
       }
     );
   }
@@ -43,12 +43,12 @@ class CMSService extends BaseService {
       'getAllContents',
       async () => {
         const { data, error } = await supabase
-          .from('cms_contents' as any)
+          .from('cms_contents')
           .select('*')
           .order('tipo');
 
         if (error) throw error;
-        return data as CMSContent[];
+        return data || [];
       }
     );
   }
@@ -71,18 +71,18 @@ class CMSService extends BaseService {
       `updateContent(${tipo})`,
       async () => {
         const { data, error } = await supabase
-          .from('cms_contents' as any)
+          .from('cms_contents')
           .update({
             titulo,
             conteudo,
             editor: editorId
-          } as any)
+          })
           .eq('tipo', tipo)
           .select()
           .single();
 
         if (error) throw error;
-        return data as CMSContent;
+        return data;
       }
     );
   }
@@ -105,18 +105,18 @@ class CMSService extends BaseService {
       `createContent(${tipo})`,
       async () => {
         const { data, error } = await supabase
-          .from('cms_contents' as any)
+          .from('cms_contents')
           .insert({
             tipo,
             titulo,
             conteudo,
             editor: editorId
-          } as any)
+          })
           .select()
           .single();
 
         if (error) throw error;
-        return data as CMSContent;
+        return data;
       }
     );
   }
@@ -129,13 +129,13 @@ class CMSService extends BaseService {
   async getLastEditorInfo(tipo: CMSContentType): Promise<{ data_ultima_edicao: string; editor: string } | null> {
     try {
       const { data, error } = await supabase
-        .from('cms_contents' as any)
+        .from('cms_contents')
         .select('data_ultima_edicao, editor')
         .eq('tipo', tipo)
         .single();
 
       if (error) throw error;
-      return data as { data_ultima_edicao: string; editor: string };
+      return data;
     } catch (error) {
       this.logError('getLastEditorInfo', error);
       return null;

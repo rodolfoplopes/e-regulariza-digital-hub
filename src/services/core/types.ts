@@ -14,8 +14,10 @@ export type Process = Tables['processes']['Row'];
 export type ProcessStep = Tables['process_steps']['Row'];
 export type ProcessMessage = Tables['process_messages']['Row'];
 export type ProcessDocument = Tables['process_documents']['Row'];
-export type Notification = Tables['notifications']['Row'];
 export type ProcessType = Tables['process_types']['Row'];
+
+// Tipo correto para notificações baseado na tabela Supabase
+export type Notification = Tables['notifications']['Row'];
 
 // Tipo para CMS (usando any por enquanto já que a tabela é nova)
 export interface CMSContent {
@@ -120,4 +122,45 @@ export interface AutomationConfig {
     email: boolean;
     webhook: boolean;
   };
+}
+
+// Tipos para permissões
+export interface PermissionConfig {
+  canView: boolean;
+  canEdit: boolean;
+  canDelete: boolean;
+  canManageUsers: boolean;
+  isAdmin: boolean;
+}
+
+// Tipos para onboarding e tutorial
+export interface TutorialStep {
+  target: string;
+  content: string;
+  title: string;
+  placement?: 'top' | 'bottom' | 'left' | 'right';
+  disableBeacon?: boolean;
+}
+
+export interface OnboardingState {
+  hasCompletedTutorial: boolean;
+  currentStep: number;
+  isActive: boolean;
+}
+
+// Tipos para feedback
+export interface ProcessFeedback {
+  id: string;
+  process_id: string;
+  user_id: string;
+  rating: number;
+  comment?: string;
+  created_at: string;
+}
+
+export interface NPSData {
+  score: number;
+  comment?: string;
+  process_id: string;
+  user_id: string;
 }

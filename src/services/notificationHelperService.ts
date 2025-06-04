@@ -1,6 +1,7 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import { notificationService } from './supabaseService';
+import { CreateNotificationData } from './core/types';
 
 export interface NotificationTemplate {
   title: string;
@@ -60,16 +61,18 @@ export const sendNotification = async (
   actionUrl?: string
 ) => {
   try {
-    await notificationService.createNotification({
+    const notificationData: CreateNotificationData = {
       user_id: userId,
-      process_id: processId,
+      process_id: processId || null,
       title: template.title,
       message: template.message,
       type: template.type,
       priority: template.priority,
-      action_url: actionUrl,
+      action_url: actionUrl || null,
       is_read: false
-    });
+    };
+
+    await notificationService.createNotification(notificationData);
   } catch (error) {
     console.error('Error sending notification:', error);
   }

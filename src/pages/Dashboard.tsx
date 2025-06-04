@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
@@ -12,12 +11,15 @@ import { useToast } from "@/hooks/use-toast";
 import { useProcesses } from "@/hooks/useProcesses";
 import { useNotifications } from "@/hooks/useNotifications";
 import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
+import OnboardingTutorial from "@/components/onboarding/OnboardingTutorial";
+import { useOnboarding } from "@/hooks/useOnboarding";
 
 export default function Dashboard() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const isMobile = useIsMobile();
   const { toast } = useToast();
   const { profile } = useSupabaseAuth();
+  const { showOnboarding, completeOnboarding } = useOnboarding();
   
   // Use real data from Supabase
   const { processes, isLoading: processesLoading } = useProcesses();
@@ -53,7 +55,9 @@ export default function Dashboard() {
 
   return (
     <div className="flex h-screen bg-gray-50">
-      <DashboardSidebar />
+      <div className="sidebar-navigation">
+        <DashboardSidebar />
+      </div>
       <MobileNav 
         isOpen={isMobileMenuOpen} 
         onClose={() => setIsMobileMenuOpen(false)}
@@ -63,7 +67,7 @@ export default function Dashboard() {
         <DashboardHeader />
         
         <main className="flex-1 overflow-y-auto p-4 md:p-6">
-          <div className="mb-6">
+          <div className="mb-6 dashboard-welcome">
             <h1 className="text-2xl font-bold">Olá, {profile?.name}!</h1>
             <p className="text-gray-500">Bem-vindo ao seu painel de regularização imobiliária.</p>
           </div>
@@ -84,7 +88,9 @@ export default function Dashboard() {
             ) : transformedProcesses.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {transformedProcesses.map((process) => (
-                  <ProcessCard key={process.id} process={process} />
+                  <div key={process.id} className="process-card">
+                    <ProcessCard process={process} />
+                  </div>
                 ))}
               </div>
             ) : (
@@ -118,6 +124,12 @@ export default function Dashboard() {
           </div>
         </main>
       </div>
+
+      {/* Onboarding Tutorial */}
+      <OnboardingTutorial
+        isOpen={showOnboarding}
+        onComplete={completeOnboarding}
+      />
     </div>
   );
 }
