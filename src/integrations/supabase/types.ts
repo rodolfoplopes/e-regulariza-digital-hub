@@ -9,6 +9,36 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      cms_contents: {
+        Row: {
+          conteudo: string
+          created_at: string
+          data_ultima_edicao: string
+          editor: string | null
+          id: string
+          tipo: string
+          titulo: string
+        }
+        Insert: {
+          conteudo: string
+          created_at?: string
+          data_ultima_edicao?: string
+          editor?: string | null
+          id?: string
+          tipo: string
+          titulo: string
+        }
+        Update: {
+          conteudo?: string
+          created_at?: string
+          data_ultima_edicao?: string
+          editor?: string | null
+          id?: string
+          tipo?: string
+          titulo?: string
+        }
+        Relationships: []
+      }
       notifications: {
         Row: {
           action_url: string | null
@@ -153,6 +183,33 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      process_feedback: {
+        Row: {
+          comment: string | null
+          created_at: string
+          id: string
+          process_id: string
+          rating: number
+          user_id: string
+        }
+        Insert: {
+          comment?: string | null
+          created_at?: string
+          id?: string
+          process_id: string
+          rating: number
+          user_id: string
+        }
+        Update: {
+          comment?: string | null
+          created_at?: string
+          id?: string
+          process_id?: string
+          rating?: number
+          user_id?: string
+        }
+        Relationships: []
       }
       process_messages: {
         Row: {

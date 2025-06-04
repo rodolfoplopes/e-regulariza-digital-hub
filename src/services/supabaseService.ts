@@ -5,7 +5,8 @@
  */
 
 import { supabase } from "@/integrations/supabase/client";
-import { Profile, Notification, CreateNotificationData } from "./core/types";
+import { Profile, Notification, CreateNotificationData, ProcessWithDetails } from "./core/types";
+import { processService } from "./processService";
 
 // Serviços de perfil - funcionalidades básicas mantidas aqui por compatibilidade
 export const profileService = {
@@ -110,5 +111,6 @@ export const notificationService = {
   }
 };
 
-// Mantendo exports para compatibilidade com código existente
-export { supabase };
+// Exportar tipos e serviços para compatibilidade
+export { supabase, processService };
+export type { ProcessWithDetails };

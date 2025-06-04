@@ -15,11 +15,18 @@ export type ProcessStep = Tables['process_steps']['Row'];
 export type ProcessMessage = Tables['process_messages']['Row'];
 export type ProcessDocument = Tables['process_documents']['Row'];
 export type ProcessType = Tables['process_types']['Row'];
-
-// Tipo correto para notificações baseado na tabela Supabase
 export type Notification = Tables['notifications']['Row'];
 
-// Tipo para CMS (usando any por enquanto já que a tabela é nova)
+// Tipos para as novas tabelas (usando any temporariamente até o types.ts ser atualizado)
+export interface ProcessFeedback {
+  id: string;
+  process_id: string;
+  user_id: string;
+  rating: number;
+  comment?: string;
+  created_at: string;
+}
+
 export interface CMSContent {
   id: string;
   tipo: string;
@@ -149,15 +156,6 @@ export interface OnboardingState {
 }
 
 // Tipos para feedback
-export interface ProcessFeedback {
-  id: string;
-  process_id: string;
-  user_id: string;
-  rating: number;
-  comment?: string;
-  created_at: string;
-}
-
 export interface NPSData {
   score: number;
   comment?: string;

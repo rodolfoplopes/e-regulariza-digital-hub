@@ -26,7 +26,7 @@ export default function AdminDashboard() {
     );
   }
 
-  if (!profile || !permissions.isAdmin) {
+  if (!profile || !permissions.canManageUsers) {
     return <Navigate to="/login" replace />;
   }
 
@@ -50,19 +50,39 @@ export default function AdminDashboard() {
           <Separator />
 
           <TabsContent value="dashboard">
-            <AdminTabContent />
+            <AdminTabContent 
+              activeSection="dashboard"
+              processes={[]}
+              clients={[]}
+              serviceTypes={[]}
+            />
           </TabsContent>
 
           <TabsContent value="processes">
-            <AdminTabContent />
+            <AdminTabContent 
+              activeSection="processes"
+              processes={[]}
+              clients={[]}
+              serviceTypes={[]}
+            />
           </TabsContent>
 
           <TabsContent value="clients">
-            <AdminTabContent />
+            <AdminTabContent 
+              activeSection="clients"
+              processes={[]}
+              clients={[]}
+              serviceTypes={[]}
+            />
           </TabsContent>
 
           <TabsContent value="cms">
-            <AdminTabContent />
+            <AdminTabContent 
+              activeSection="cms"
+              processes={[]}
+              clients={[]}
+              serviceTypes={[]}
+            />
           </TabsContent>
 
           <TabsContent value="metrics">
