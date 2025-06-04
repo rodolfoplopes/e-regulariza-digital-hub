@@ -1,6 +1,6 @@
 
 /**
- * Serviço para gerenciamento de conteúdos do CMS
+ * Serviço para gerenciamento de conteúdos CMS
  * @fileoverview Operações CRUD para conteúdos institucionais
  */
 
@@ -14,50 +14,50 @@ class CMSService extends BaseService {
   }
 
   /**
-   * Obtém conteúdo por tipo
+   * Busca conteúdo por tipo
    * @param tipo Tipo do conteúdo (politica-privacidade, termos-uso, etc.)
    * @returns Conteúdo encontrado ou null
    */
   async getContentByType(tipo: CMSContentType): Promise<CMSContent | null> {
-    return this.executeOperation('getContentByType', async () => {
-      const { data, error } = await supabase
-        .from('cms_contents')
-        .select('*')
-        .eq('tipo', tipo)
-        .single();
+    return this.executeOperation(
+      `getContentByType(${tipo})`,
+      async () => {
+        const { data, error } = await supabase
+          .from('cms_contents' as any)
+          .select('*')
+          .eq('tipo', tipo)
+          .single();
 
-      if (error) {
-        throw error;
+        if (error) throw error;
+        return data as CMSContent;
       }
-
-      return data;
-    });
+    );
   }
 
   /**
-   * Lista todos os conteúdos do CMS
+   * Busca todos os conteúdos CMS
    * @returns Array de conteúdos
    */
   async getAllContents(): Promise<CMSContent[]> {
-    return this.executeArrayOperation('getAllContents', async () => {
-      const { data, error } = await supabase
-        .from('cms_contents')
-        .select('*')
-        .order('tipo');
+    return this.executeArrayOperation(
+      'getAllContents',
+      async () => {
+        const { data, error } = await supabase
+          .from('cms_contents' as any)
+          .select('*')
+          .order('tipo');
 
-      if (error) {
-        throw error;
+        if (error) throw error;
+        return data as CMSContent[];
       }
-
-      return data || [];
-    });
+    );
   }
 
   /**
    * Atualiza conteúdo existente
    * @param tipo Tipo do conteúdo
-   * @param titulo Novo título
-   * @param conteudo Novo conteúdo
+   * @param titulo Título do conteúdo
+   * @param conteudo Conteúdo HTML
    * @param editorId ID do usuário que está editando
    * @returns Conteúdo atualizado ou null
    */
@@ -67,44 +67,31 @@ class CMSService extends BaseService {
     conteudo: string,
     editorId: string
   ): Promise<CMSContent | null> {
-    return this.executeOperation('updateContent', async () => {
-      // Validações
-      if (!titulo.trim()) {
-        throw new Error('Título é obrigatório');
+    return this.executeOperation(
+      `updateContent(${tipo})`,
+      async () => {
+        const { data, error } = await supabase
+          .from('cms_contents' as any)
+          .update({
+            titulo,
+            conteudo,
+            editor: editorId
+          } as any)
+          .eq('tipo', tipo)
+          .select()
+          .single();
+
+        if (error) throw error;
+        return data as CMSContent;
       }
-
-      if (!conteudo.trim()) {
-        throw new Error('Conteúdo é obrigatório');
-      }
-
-      // Sanitizar HTML básico (remover scripts)
-      const sanitizedContent = this.sanitizeHTML(conteudo);
-
-      const { data, error } = await supabase
-        .from('cms_contents')
-        .update({
-          titulo: titulo.trim(),
-          conteudo: sanitizedContent,
-          editor: editorId,
-          data_ultima_edicao: new Date().toISOString()
-        })
-        .eq('tipo', tipo)
-        .select()
-        .single();
-
-      if (error) {
-        throw error;
-      }
-
-      return data;
-    });
+    );
   }
 
   /**
    * Cria novo conteúdo
    * @param tipo Tipo do conteúdo
-   * @param titulo Título
-   * @param conteudo Conteúdo
+   * @param titulo Título do conteúdo
+   * @param conteudo Conteúdo HTML
    * @param editorId ID do usuário que está criando
    * @returns Conteúdo criado ou null
    */
@@ -114,118 +101,96 @@ class CMSService extends BaseService {
     conteudo: string,
     editorId: string
   ): Promise<CMSContent | null> {
-    return this.executeOperation('createContent', async () => {
-      // Verificar se já existe conteúdo deste tipo
-      const existing = await this.getContentByType(tipo);
-      if (existing) {
-        throw new Error('Já existe conteúdo deste tipo. Use a função de atualização.');
+    return this.executeOperation(
+      `createContent(${tipo})`,
+      async () => {
+        const { data, error } = await supabase
+          .from('cms_contents' as any)
+          .insert({
+            tipo,
+            titulo,
+            conteudo,
+            editor: editorId
+          } as any)
+          .select()
+          .single();
+
+        if (error) throw error;
+        return data as CMSContent;
       }
-
-      const sanitizedContent = this.sanitizeHTML(conteudo);
-
-      const { data, error } = await supabase
-        .from('cms_contents')
-        .insert({
-          tipo,
-          titulo: titulo.trim(),
-          conteudo: sanitizedContent,
-          editor: editorId
-        })
-        .select()
-        .single();
-
-      if (error) {
-        throw error;
-      }
-
-      return data;
-    });
+    );
   }
 
   /**
-   * Obtém histórico de edições de um conteúdo
+   * Busca informações do último editor
    * @param tipo Tipo do conteúdo
-   * @returns Dados do histórico
+   * @returns Informações do editor
    */
-  async getContentHistory(tipo: CMSContentType): Promise<{
-    data_ultima_edicao: string;
-    editor: string;
-  } | null> {
-    return this.executeOperation('getContentHistory', async () => {
+  async getLastEditorInfo(tipo: CMSContentType): Promise<{ data_ultima_edicao: string; editor: string } | null> {
+    try {
       const { data, error } = await supabase
-        .from('cms_contents')
+        .from('cms_contents' as any)
         .select('data_ultima_edicao, editor')
         .eq('tipo', tipo)
         .single();
 
-      if (error) {
-        throw error;
-      }
-
-      return data;
-    });
+      if (error) throw error;
+      return data as { data_ultima_edicao: string; editor: string };
+    } catch (error) {
+      this.logError('getLastEditorInfo', error);
+      return null;
+    }
   }
 
   /**
-   * Sanitiza HTML para prevenir XSS
-   * @param html HTML a ser sanitizado
-   * @returns HTML limpo
-   */
-  private sanitizeHTML(html: string): string {
-    // Remove scripts e outros elementos perigosos
-    const sanitized = html
-      .replace(/<script[^>]*>.*?<\/script>/gi, '')
-      .replace(/<iframe[^>]*>.*?<\/iframe>/gi, '')
-      .replace(/on\w+="[^"]*"/gi, '')
-      .replace(/javascript:/gi, '');
-
-    return sanitized;
-  }
-
-  /**
-   * Valida conteúdo HTML
+   * Valida conteúdo HTML básico
    * @param content Conteúdo a ser validado
    * @returns Array de erros encontrados
    */
   validateContent(content: string): string[] {
     const errors: string[] = [];
 
-    // Verificar se contém scripts
-    if (/<script/i.test(content)) {
-      errors.push('Conteúdo não pode conter scripts');
+    if (!content || content.trim().length === 0) {
+      errors.push('Conteúdo não pode estar vazio');
     }
 
-    // Verificar se contém iframes
-    if (/<iframe/i.test(content)) {
-      errors.push('Conteúdo não pode conter iframes');
+    if (content.length > 50000) {
+      errors.push('Conteúdo muito longo (máximo 50.000 caracteres)');
     }
 
-    // Verificar handlers de eventos
-    if (/on\w+=/i.test(content)) {
-      errors.push('Conteúdo não pode conter handlers de eventos JavaScript');
-    }
+    // Validação básica de HTML malicioso
+    const dangerousPatterns = [
+      /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,
+      /<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi,
+      /javascript:/gi,
+      /on\w+\s*=/gi
+    ];
+
+    dangerousPatterns.forEach(pattern => {
+      if (pattern.test(content)) {
+        errors.push('Conteúdo contém código potencialmente perigoso');
+      }
+    });
 
     return errors;
   }
 
   /**
    * Gera preview do conteúdo
-   * @param content Conteúdo HTML
+   * @param content Conteúdo completo
    * @param maxLength Tamanho máximo do preview
-   * @returns Preview em texto plano
+   * @returns Preview do conteúdo
    */
-  generatePreview(content: string, maxLength: number = 150): string {
-    // Remove tags HTML
-    const textContent = content.replace(/<[^>]*>/g, '');
+  generatePreview(content: string, maxLength: number = 200): string {
+    // Remove tags HTML para preview
+    const textOnly = content.replace(/<[^>]*>/g, '');
     
-    // Limita tamanho e adiciona reticências
-    if (textContent.length > maxLength) {
-      return textContent.substring(0, maxLength) + '...';
+    if (textOnly.length <= maxLength) {
+      return textOnly;
     }
 
-    return textContent;
+    return textOnly.substring(0, maxLength).trim() + '...';
   }
 }
 
-// Exporta instância singleton
 export const cmsService = new CMSService();
