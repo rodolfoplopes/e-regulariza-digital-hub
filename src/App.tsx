@@ -18,6 +18,7 @@ import UserSettings from "./pages/UserSettings";
 import PolicyPage from "./pages/PolicyPage";
 import Notifications from "./pages/Notifications";
 import LogoManagementPage from "./pages/LogoManagementPage";
+import AdminUserManagementPage from "./pages/AdminUserManagement";
 import GTMManager from '@/components/tracking/GTMManager';
 import { analytics } from '@/services/analyticsService';
 import { SupabaseAuthProvider, useSupabaseAuth } from '@/hooks/useSupabaseAuth';
@@ -125,6 +126,7 @@ const AppContent = () => {
                 <Route path="/admin-dashboard" element={<Navigate to="/admin" replace />} />
                 <Route path="/admin/novo-processo" element={<ProcessCreate />} />
                 <Route path="/admin/logo" element={<LogoManagementPage />} />
+                <Route path="/admin/usuarios" element={<AdminUserManagementPage />} />
               </Route>
               
               {/* Other routes */}

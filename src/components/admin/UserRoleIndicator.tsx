@@ -13,7 +13,7 @@ export default function UserRoleIndicator({ role, className }: UserRoleIndicator
         return {
           label: 'Super Admin',
           variant: 'destructive' as const,
-          className: 'bg-red-100 text-red-800 border-red-200'
+          className: 'bg-admin-master text-white border-admin-master'
         };
       case 'admin':
         return {
@@ -25,13 +25,13 @@ export default function UserRoleIndicator({ role, className }: UserRoleIndicator
         return {
           label: 'Editor',
           variant: 'secondary' as const,
-          className: 'bg-orange-100 text-orange-800 border-orange-200'
+          className: 'bg-admin-editor text-white border-admin-editor'
         };
       case 'admin_viewer':
         return {
           label: 'Viewer',
           variant: 'outline' as const,
-          className: 'bg-blue-100 text-blue-800 border-blue-200'
+          className: 'bg-admin-viewer text-white border-admin-viewer'
         };
       case 'cliente':
         return {

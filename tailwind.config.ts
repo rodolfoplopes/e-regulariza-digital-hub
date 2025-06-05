@@ -73,7 +73,11 @@ export default {
 					'primary-40': 'rgba(6, 215, 165, 0.4)',
 					'secondary-20': 'rgba(6, 215, 165, 0.2)',
 					'secondary-40': 'rgba(6, 215, 165, 0.4)',
-				}
+				},
+				// Permission-specific colors
+				'admin-master': '#1e3a8a', // blue-800
+				'admin-editor': '#059669', // emerald-600
+				'admin-viewer': '#6b7280', // gray-500
 			},
 			fontFamily: {
 				sans: ['Montserrat', 'sans-serif'], // Changed from Inter to Montserrat
