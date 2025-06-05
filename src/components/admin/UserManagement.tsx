@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import {
   Table,
@@ -17,10 +18,19 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { usePermissions } from "@/hooks/usePermissions";
-import { User, Key, Mail } from "lucide-react";
+import UserRoleIndicator from "./UserRoleIndicator";
+import UserPermissionsGuard from "./UserPermissionsGuard";
+import { User, Key, Mail, Plus, Filter } from "lucide-react";
 
 type UserData = {
   id: string;
@@ -29,7 +39,7 @@ type UserData = {
   phone: string;
   cpf: string;
   createdAt: string;
-  role: "cliente" | "admin";
+  role: "cliente" | "admin" | "admin_master" | "admin_editor" | "admin_viewer";
 };
 
 export default function UserManagement() {
@@ -56,59 +66,100 @@ export default function UserManagement() {
     },
     {
       id: "user-003",
-      name: "Pedro Santos",
-      email: "pedro@example.com",
+      name: "Pedro Editor",
+      email: "pedro@eregulariza.com",
       phone: "(31) 98765-4321",
       cpf: "456.789.123-00",
       createdAt: "20/02/2023",
-      role: "cliente"
+      role: "admin_editor"
     },
     {
       id: "user-004",
-      name: "Ana Oliveira",
-      email: "ana@example.com",
+      name: "Ana Viewer",
+      email: "ana@eregulariza.com",
       phone: "(41) 98765-4321",
       cpf: "789.123.456-00",
       createdAt: "12/03/2023",
-      role: "cliente"
+      role: "admin_viewer"
     },
     {
       id: "admin-001",
-      name: "Administrador",
-      email: "admin@eregulariza.com",
+      name: "Super Admin",
+      email: "lopes.rod@gmail.com",
       phone: "(11) 99999-9999",
       cpf: "111.111.111-11",
       createdAt: "01/01/2023",
-      role: "admin"
+      role: "admin_master"
     }
   ]);
   
   const [searchTerm, setSearchTerm] = useState("");
+  const [roleFilter, setRoleFilter] = useState<string>("all");
   const [editingUser, setEditingUser] = useState<UserData | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isResetPasswordDialogOpen, setIsResetPasswordDialogOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
-  const filteredUsers = users.filter(user => 
-    user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.cpf.includes(searchTerm)
-  );
+  const filteredUsers = users.filter(user => {
+    const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         user.cpf.includes(searchTerm);
+    
+    const matchesRole = roleFilter === "all" || user.role === roleFilter;
+    
+    // Super admins can see all users, others see based on their permissions
+    if (permissions.isSuperAdmin) {
+      return matchesSearch && matchesRole;
+    } else if (permissions.isAdmin) {
+      // Admins can see clients and lower-level admins, but not super admins
+      const canSeeUser = user.role === "cliente" || 
+                        user.role === "admin_editor" || 
+                        user.role === "admin_viewer";
+      return matchesSearch && matchesRole && canSeeUser;
+    } else {
+      // Non-admins can only see clients
+      return matchesSearch && matchesRole && user.role === "cliente";
+    }
+  });
   
   const handleEditUser = (user: UserData) => {
-    // Only allow editing if user has permission or it's their own profile
-    if (!permissions.canEditAllUsers && user.id !== "current-user-id") {
+    // Check if user can edit this specific user
+    if (!permissions.canEditAllUsers) {
       toast({
         variant: "destructive",
         title: "Acesso negado",
-        description: "Você não tem permissão para editar outros usuários."
+        description: "Você não tem permissão para editar usuários."
+      });
+      return;
+    }
+
+    // Super admins cannot be edited by non-super admins
+    if (user.role === "admin_master" && !permissions.isSuperAdmin) {
+      toast({
+        variant: "destructive",
+        title: "Acesso negado",
+        description: "Apenas Super Admins podem editar outros Super Admins."
       });
       return;
     }
     
     setEditingUser({...user});
     setIsEditDialogOpen(true);
+  };
+  
+  const handleCreateUser = () => {
+    setEditingUser({
+      id: "",
+      name: "",
+      email: "",
+      phone: "",
+      cpf: "",
+      createdAt: "",
+      role: "cliente"
+    });
+    setIsCreateDialogOpen(true);
   };
   
   const handleResetPassword = (user: UserData) => {
@@ -122,10 +173,8 @@ export default function UserManagement() {
     setIsLoading(true);
     
     try {
-      // Mock API call to update user
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Update local state
       setUsers(users.map(user => 
         user.id === editingUser.id ? editingUser : user
       ));
@@ -146,6 +195,39 @@ export default function UserManagement() {
       setIsLoading(false);
     }
   };
+
+  const createUser = async () => {
+    if (!editingUser) return;
+    
+    setIsLoading(true);
+    
+    try {
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      const newUser = {
+        ...editingUser,
+        id: `user-${Date.now()}`,
+        createdAt: new Date().toLocaleDateString('pt-BR')
+      };
+      
+      setUsers([...users, newUser]);
+      
+      toast({
+        title: "Usuário criado",
+        description: `O usuário ${editingUser.name} foi criado com sucesso.`,
+      });
+      
+      setIsCreateDialogOpen(false);
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Erro ao criar usuário",
+        description: "Ocorreu um erro ao tentar criar o usuário.",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
   
   const resetUserPassword = async () => {
     if (!editingUser) return;
@@ -153,7 +235,6 @@ export default function UserManagement() {
     setIsLoading(true);
     
     try {
-      // Mock API call to reset password
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       toast({
@@ -180,22 +261,80 @@ export default function UserManagement() {
     setEditingUser({ ...editingUser, [name]: value });
   };
 
-  // Show only clients if not admin
-  const displayUsers = permissions.canEditAllUsers ? filteredUsers : filteredUsers.filter(u => u.role === "cliente");
+  const handleRoleChange = (value: string) => {
+    if (!editingUser) return;
+    
+    setEditingUser({ 
+      ...editingUser, 
+      role: value as UserData['role']
+    });
+  };
+
+  const getAvailableRoles = () => {
+    if (permissions.isSuperAdmin) {
+      return [
+        { value: "cliente", label: "Cliente" },
+        { value: "admin_viewer", label: "Admin Viewer" },
+        { value: "admin_editor", label: "Admin Editor" },
+        { value: "admin", label: "Admin" },
+        { value: "admin_master", label: "Super Admin" }
+      ];
+    } else if (permissions.isAdmin) {
+      return [
+        { value: "cliente", label: "Cliente" },
+        { value: "admin_viewer", label: "Admin Viewer" },
+        { value: "admin_editor", label: "Admin Editor" }
+      ];
+    } else {
+      return [
+        { value: "cliente", label: "Cliente" }
+      ];
+    }
+  };
 
   return (
     <div className="space-y-4">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <h2 className="text-xl font-semibold">
-          {permissions.canEditAllUsers ? "Gerenciar Usuários" : "Usuários do Sistema"}
-        </h2>
-        <div className="relative w-full sm:w-[300px]">
+        <div className="flex items-center gap-2">
+          <h2 className="text-xl font-semibold">Gerenciar Usuários</h2>
+          <UserRoleIndicator role={permissions.role || 'cliente'} />
+        </div>
+        
+        <div className="flex flex-col sm:flex-row gap-2">
+          <UserPermissionsGuard requiredPermission="canCreateUsers">
+            <Button onClick={handleCreateUser} className="eregulariza-gradient hover:opacity-90">
+              <Plus className="h-4 w-4 mr-2" />
+              Novo Usuário
+            </Button>
+          </UserPermissionsGuard>
+        </div>
+      </div>
+
+      <div className="flex flex-col sm:flex-row gap-4">
+        <div className="relative flex-1">
           <Input
             placeholder="Buscar por nome, e-mail ou CPF..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
+        
+        <Select value={roleFilter} onValueChange={setRoleFilter}>
+          <SelectTrigger className="w-full sm:w-[200px]">
+            <Filter className="h-4 w-4 mr-2" />
+            <SelectValue placeholder="Filtrar por perfil" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Todos os perfis</SelectItem>
+            <SelectItem value="cliente">Clientes</SelectItem>
+            <SelectItem value="admin_viewer">Admin Viewer</SelectItem>
+            <SelectItem value="admin_editor">Admin Editor</SelectItem>
+            <SelectItem value="admin">Admin</SelectItem>
+            {permissions.isSuperAdmin && (
+              <SelectItem value="admin_master">Super Admin</SelectItem>
+            )}
+          </SelectContent>
+        </Select>
       </div>
       
       <div className="bg-white rounded-lg shadow overflow-hidden">
@@ -206,60 +345,50 @@ export default function UserManagement() {
               <TableHead>E-mail</TableHead>
               <TableHead>CPF</TableHead>
               <TableHead>Telefone</TableHead>
-              {permissions.canEditAllUsers && <TableHead>Tipo</TableHead>}
+              <TableHead>Perfil</TableHead>
               <TableHead>Cadastrado em</TableHead>
-              {permissions.canEditAllUsers && <TableHead className="text-right">Ações</TableHead>}
+              {permissions.canManageUsers && <TableHead className="text-right">Ações</TableHead>}
             </TableRow>
           </TableHeader>
           <TableBody>
-            {displayUsers.map((user) => (
+            {filteredUsers.map((user) => (
               <TableRow key={user.id}>
                 <TableCell className="font-medium">{user.name}</TableCell>
                 <TableCell>{user.email}</TableCell>
                 <TableCell>{user.cpf}</TableCell>
                 <TableCell>{user.phone}</TableCell>
-                {permissions.canEditAllUsers && (
-                  <TableCell>
-                    <span className={`text-xs font-medium py-1 px-2 rounded-full ${
-                      user.role === "admin" 
-                        ? "bg-purple-100 text-purple-700" 
-                        : "bg-blue-100 text-blue-700"
-                    }`}>
-                      {user.role === "admin" ? "Administrador" : "Cliente"}
-                    </span>
-                  </TableCell>
-                )}
+                <TableCell>
+                  <UserRoleIndicator role={user.role} />
+                </TableCell>
                 <TableCell>{user.createdAt}</TableCell>
-                {permissions.canEditAllUsers && (
+                {permissions.canManageUsers && (
                   <TableCell className="text-right space-x-2">
-                    {user.role !== "admin" && (
-                      <>
-                        <Button 
-                          variant="ghost" 
-                          size="sm"
-                          onClick={() => handleEditUser(user)}
-                        >
-                          <User className="h-4 w-4 mr-1" />
-                          Editar
-                        </Button>
-                        <Button 
-                          variant="ghost" 
-                          size="sm"
-                          onClick={() => handleResetPassword(user)}
-                        >
-                          <Key className="h-4 w-4 mr-1" />
-                          Redefinir Senha
-                        </Button>
-                      </>
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      onClick={() => handleEditUser(user)}
+                    >
+                      <User className="h-4 w-4 mr-1" />
+                      Editar
+                    </Button>
+                    {user.role !== "admin_master" && (
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        onClick={() => handleResetPassword(user)}
+                      >
+                        <Key className="h-4 w-4 mr-1" />
+                        Redefinir Senha
+                      </Button>
                     )}
                   </TableCell>
                 )}
               </TableRow>
             ))}
             
-            {displayUsers.length === 0 && (
+            {filteredUsers.length === 0 && (
               <TableRow>
-                <TableCell colSpan={permissions.canEditAllUsers ? 7 : 6} className="text-center py-8 text-gray-500">
+                <TableCell colSpan={7} className="text-center py-8 text-gray-500">
                   Nenhum usuário encontrado com os filtros selecionados.
                 </TableCell>
               </TableRow>
@@ -268,13 +397,105 @@ export default function UserManagement() {
         </Table>
       </div>
       
+      {/* Create User Dialog */}
+      <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Criar Novo Usuário</DialogTitle>
+            <DialogDescription>
+              Preencha as informações do novo usuário.
+            </DialogDescription>
+          </DialogHeader>
+          
+          {editingUser && (
+            <div className="space-y-4 py-4">
+              <div className="space-y-2">
+                <Label htmlFor="create-name">Nome Completo</Label>
+                <Input
+                  id="create-name"
+                  name="name"
+                  value={editingUser.name}
+                  onChange={handleInputChange}
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="create-email">Email</Label>
+                <Input
+                  id="create-email"
+                  name="email"
+                  type="email"
+                  value={editingUser.email}
+                  onChange={handleInputChange}
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="create-phone">Telefone</Label>
+                <Input
+                  id="create-phone"
+                  name="phone"
+                  value={editingUser.phone}
+                  onChange={handleInputChange}
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="create-cpf">CPF</Label>
+                <Input
+                  id="create-cpf"
+                  name="cpf"
+                  value={editingUser.cpf}
+                  onChange={handleInputChange}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="create-role">Perfil</Label>
+                <Select value={editingUser.role} onValueChange={handleRoleChange}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione o perfil" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {getAvailableRoles().map((role) => (
+                      <SelectItem key={role.value} value={role.value}>
+                        {role.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          )}
+          
+          <DialogFooter>
+            <Button 
+              type="button" 
+              variant="outline" 
+              onClick={() => setIsCreateDialogOpen(false)}
+              disabled={isLoading}
+            >
+              Cancelar
+            </Button>
+            <Button 
+              type="button" 
+              className="eregulariza-gradient hover:opacity-90"
+              onClick={createUser}
+              disabled={isLoading}
+            >
+              {isLoading ? "Criando..." : "Criar usuário"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      
       {/* Edit User Dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
             <DialogTitle>Editar Usuário</DialogTitle>
             <DialogDescription>
-              Atualize as informações do usuário. O CPF não pode ser alterado.
+              Atualize as informações do usuário.
             </DialogDescription>
           </DialogHeader>
           
@@ -324,6 +545,24 @@ export default function UserManagement() {
                   O CPF não pode ser alterado.
                 </p>
               </div>
+
+              {permissions.canManagePermissions && (
+                <div className="space-y-2">
+                  <Label htmlFor="edit-role">Perfil</Label>
+                  <Select value={editingUser.role} onValueChange={handleRoleChange}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione o perfil" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {getAvailableRoles().map((role) => (
+                        <SelectItem key={role.value} value={role.value}>
+                          {role.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
             </div>
           )}
           
@@ -369,6 +608,7 @@ export default function UserManagement() {
                   <p className="text-sm text-muted-foreground">
                     {editingUser.email}
                   </p>
+                  <UserRoleIndicator role={editingUser.role} />
                 </div>
               </div>
               <p className="mt-4 text-sm">

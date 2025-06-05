@@ -8,7 +8,7 @@ interface Profile {
   id: string;
   name: string;
   email: string;
-  role: 'admin' | 'cliente';
+  role: 'admin' | 'cliente' | 'admin_master' | 'admin_editor' | 'admin_viewer';
   cpf?: string;
   phone?: string;
   created_at: string;
@@ -46,7 +46,7 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
           if (userProfile) {
             setProfile({
               ...userProfile,
-              role: userProfile.role as 'admin' | 'cliente'
+              role: userProfile.role as Profile['role']
             });
           }
         }
@@ -69,7 +69,7 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
           if (userProfile) {
             setProfile({
               ...userProfile,
-              role: userProfile.role as 'admin' | 'cliente'
+              role: userProfile.role as Profile['role']
             });
           }
         } else {
@@ -158,7 +158,12 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
   const checkPermission = (requiredRole: "admin" | "cliente" | "any"): boolean => {
     if (!profile) return false;
     if (requiredRole === "any") return true;
-    if (requiredRole === "admin") return profile.role === "admin";
+    if (requiredRole === "admin") {
+      return profile.role === "admin" || 
+             profile.role === "admin_master" || 
+             profile.role === "admin_editor" || 
+             profile.role === "admin_viewer";
+    }
     return true; // For "cliente" role, both admins and clients can access
   };
 
