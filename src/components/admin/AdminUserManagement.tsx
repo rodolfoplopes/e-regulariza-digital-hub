@@ -40,7 +40,8 @@ import { useToast } from "@/hooks/use-toast";
 import UserRoleIndicator from "./UserRoleIndicator";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
-import { edit, filter } from "lucide-react";
+import { Edit, Filter } from "lucide-react";
+import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 
 interface AdminUser {
   id: string;
@@ -64,6 +65,7 @@ export default function AdminUserManagement() {
     newRole: string;
   } | null>(null);
   const { toast } = useToast();
+  const { profile } = useSupabaseAuth();
 
   useEffect(() => {
     fetchAdminUsers();
@@ -80,7 +82,13 @@ export default function AdminUserManagement() {
 
       if (error) throw error;
 
-      setAdminUsers(data || []);
+      // Cast to AdminUser[] with proper typing
+      const typedData = (data || []).map(user => ({
+        ...user,
+        role: user.role as AdminUser['role']
+      }));
+
+      setAdminUsers(typedData);
     } catch (error) {
       console.error('Error fetching admin users:', error);
       toast({
@@ -109,6 +117,16 @@ export default function AdminUserManagement() {
 
   const handleRoleChange = (newRole: string) => {
     if (!editingUser) return;
+
+    // Validation: Prevent self-downgrade from admin_master
+    if (editingUser.id === profile?.id && editingUser.role === 'admin_master' && newRole !== 'admin_master') {
+      toast({
+        variant: "destructive",
+        title: "Ação não permitida",
+        description: "Você não pode alterar suas próprias permissões de Super Admin.",
+      });
+      return;
+    }
     
     setPendingRoleChange({
       user: editingUser,
@@ -117,19 +135,42 @@ export default function AdminUserManagement() {
     setIsConfirmDialogOpen(true);
   };
 
+  const updateAdminRole = async (userId: string, newRole: AdminUser['role']) => {
+    try {
+      // Validate current user is admin_master
+      if (profile?.role !== 'admin_master') {
+        throw new Error('Apenas Super Admins podem alterar permissões');
+      }
+
+      const { error } = await supabase
+        .from('profiles')
+        .update({ 
+          role: newRole,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', userId);
+
+      if (error) throw error;
+
+      return { success: true };
+    } catch (error) {
+      console.error('Error updating role:', error);
+      return { success: false, error };
+    }
+  };
+
   const confirmRoleChange = async () => {
     if (!pendingRoleChange) return;
 
     try {
-      const { error } = await supabase
-        .from('profiles')
-        .update({ 
-          role: pendingRoleChange.newRole,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', pendingRoleChange.user.id);
+      const result = await updateAdminRole(
+        pendingRoleChange.user.id, 
+        pendingRoleChange.newRole as AdminUser['role']
+      );
 
-      if (error) throw error;
+      if (!result.success) {
+        throw result.error;
+      }
 
       // Update local state
       setAdminUsers(users => 
@@ -142,7 +183,7 @@ export default function AdminUserManagement() {
 
       toast({
         title: "Permissão atualizada",
-        description: `As permissões de ${pendingRoleChange.user.name} foram atualizadas para ${pendingRoleChange.newRole}.`,
+        description: `As permissões de ${pendingRoleChange.user.name} foram atualizadas para ${getRoleLabel(pendingRoleChange.newRole)}.`,
       });
 
       setIsEditDialogOpen(false);
@@ -156,6 +197,31 @@ export default function AdminUserManagement() {
         title: "Erro ao atualizar permissão",
         description: "Não foi possível atualizar as permissões do usuário.",
       });
+    }
+  };
+
+  const getRoleLabel = (role: string) => {
+    switch (role) {
+      case 'admin_master': return 'Super Admin';
+      case 'admin': return 'Admin';
+      case 'admin_editor': return 'Editor';
+      case 'admin_viewer': return 'Viewer';
+      default: return role;
+    }
+  };
+
+  const getRolePermissions = (role: string) => {
+    switch (role) {
+      case 'admin_master':
+        return 'Controle total do sistema, gerenciamento de usuários e permissões';
+      case 'admin':
+        return 'Pode editar usuários e gerenciar processos';
+      case 'admin_editor':
+        return 'Pode editar processos e conteúdo';
+      case 'admin_viewer':
+        return 'Visualização apenas, sem permissões de edição';
+      default:
+        return '';
     }
   };
 
@@ -195,7 +261,7 @@ export default function AdminUserManagement() {
         
         <Select value={roleFilter} onValueChange={setRoleFilter}>
           <SelectTrigger className="w-full sm:w-[200px]">
-            <filter className="h-4 w-4 mr-2" />
+            <Filter className="h-4 w-4 mr-2" />
             <SelectValue placeholder="Filtrar por função" />
           </SelectTrigger>
           <SelectContent>
@@ -215,6 +281,7 @@ export default function AdminUserManagement() {
               <TableHead>Nome</TableHead>
               <TableHead>E-mail</TableHead>
               <TableHead>Função</TableHead>
+              <TableHead>Permissões</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Criado em</TableHead>
               <TableHead className="text-right">Ações</TableHead>
@@ -229,6 +296,11 @@ export default function AdminUserManagement() {
                   <UserRoleIndicator role={user.role} />
                 </TableCell>
                 <TableCell>
+                  <span className="text-sm text-gray-600">
+                    {getRolePermissions(user.role)}
+                  </span>
+                </TableCell>
+                <TableCell>
                   {getStatusBadge(user)}
                 </TableCell>
                 <TableCell>
@@ -239,8 +311,9 @@ export default function AdminUserManagement() {
                     variant="ghost" 
                     size="sm"
                     onClick={() => handleEditUser(user)}
+                    disabled={user.id === profile?.id && user.role === 'admin_master'}
                   >
-                    <edit className="h-4 w-4 mr-1" />
+                    <Edit className="h-4 w-4 mr-1" />
                     Editar
                   </Button>
                 </TableCell>
@@ -249,7 +322,7 @@ export default function AdminUserManagement() {
             
             {filteredUsers.length === 0 && (
               <TableRow>
-                <TableCell colSpan={6} className="text-center py-8 text-gray-500">
+                <TableCell colSpan={7} className="text-center py-8 text-gray-500">
                   Nenhum administrador encontrado com os filtros selecionados.
                 </TableCell>
               </TableRow>
@@ -276,6 +349,9 @@ export default function AdminUserManagement() {
                 <div className="mt-2">
                   <UserRoleIndicator role={editingUser.role} />
                 </div>
+                <p className="text-xs text-gray-500 mt-2">
+                  {getRolePermissions(editingUser.role)}
+                </p>
               </div>
 
               <div className="space-y-2">
@@ -315,9 +391,13 @@ export default function AdminUserManagement() {
             <AlertDialogDescription>
               Tem certeza que deseja alterar as permissões de{" "}
               <strong>{pendingRoleChange?.user.name}</strong> para{" "}
-              <strong>{pendingRoleChange?.newRole}</strong>?
+              <strong>{pendingRoleChange?.newRole && getRoleLabel(pendingRoleChange.newRole)}</strong>?
               <br /><br />
               Esta ação irá alterar imediatamente as permissões de acesso do usuário.
+              <br /><br />
+              <span className="text-sm text-gray-600">
+                Nova permissão: {pendingRoleChange?.newRole && getRolePermissions(pendingRoleChange.newRole)}
+              </span>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
