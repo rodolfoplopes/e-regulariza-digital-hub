@@ -10,6 +10,7 @@ interface RecaptchaWrapperProps {
 declare global {
   interface Window {
     grecaptcha: any;
+    onRecaptchaLoad: () => void;
   }
 }
 

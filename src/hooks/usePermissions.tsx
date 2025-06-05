@@ -6,6 +6,7 @@ export interface PermissionConfig {
   canEdit: boolean;
   canDelete: boolean;
   canManageUsers: boolean;
+  canEditAllUsers: boolean;
   isAdmin: boolean;
 }
 
@@ -18,6 +19,7 @@ export function usePermissions(): PermissionConfig {
       canEdit: false,
       canDelete: false,
       canManageUsers: false,
+      canEditAllUsers: false,
       isAdmin: false,
     };
   }
@@ -29,6 +31,7 @@ export function usePermissions(): PermissionConfig {
     canEdit: isAdmin,
     canDelete: isAdmin,
     canManageUsers: isAdmin,
+    canEditAllUsers: isAdmin,
     isAdmin,
   };
 }
