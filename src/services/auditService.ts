@@ -97,7 +97,16 @@ export const auditService = {
       if (error) throw error;
 
       return (data || []).map(log => ({
-        ...log,
+        id: log.id,
+        admin_id: log.admin_id,
+        action: log.action,
+        target_type: log.target_type,
+        target_id: log.target_id || undefined,
+        target_name: log.target_name || undefined,
+        details: log.details,
+        ip_address: log.ip_address ? String(log.ip_address) : undefined,
+        user_agent: log.user_agent || undefined,
+        created_at: log.created_at,
         admin_name: log.admin?.name || 'Usuário Desconhecido'
       }));
     } catch (error) {
