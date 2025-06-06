@@ -46,7 +46,7 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="space-y-4">
             <Link to="/" className="inline-block" aria-label="e-regulariza">
-              <Logo variant="icon-only" className="h-10 w-10" />
+              <Logo variant="without-circle" size="lg" />
             </Link>
             <p className="text-sm text-gray-500">
               {footerContent.about}
@@ -54,7 +54,7 @@ export default function Footer() {
           </div>
 
           <div>
-            <h3 className="font-semibold text-sm uppercase tracking-wider mb-4 text-eregulariza-darkgray">Empresa</h3>
+            <h3 className="font-semibold text-sm uppercase tracking-wider mb-4 text-eregulariza-gray">Empresa</h3>
             <ul className="space-y-2">
               {footerContent.companyLinks.map((link) => (
                 <li key={link.label}>
@@ -67,7 +67,7 @@ export default function Footer() {
           </div>
 
           <div>
-            <h3 className="font-semibold text-sm uppercase tracking-wider mb-4 text-eregulariza-darkgray">Serviços</h3>
+            <h3 className="font-semibold text-sm uppercase tracking-wider mb-4 text-eregulariza-gray">Serviços</h3>
             <ul className="space-y-2">
               {footerContent.serviceLinks.map((link) => (
                 <li key={link.label}>
@@ -80,7 +80,7 @@ export default function Footer() {
           </div>
 
           <div>
-            <h3 className="font-semibold text-sm uppercase tracking-wider mb-4 text-eregulariza-darkgray">Contato</h3>
+            <h3 className="font-semibold text-sm uppercase tracking-wider mb-4 text-eregulariza-gray">Contato</h3>
             <ul className="space-y-2">
               <li className="text-gray-500 text-sm">
                 {footerContent.contactInfo.email}

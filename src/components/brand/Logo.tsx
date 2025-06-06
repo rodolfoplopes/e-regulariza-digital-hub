@@ -2,7 +2,7 @@
 import React from "react";
 
 interface LogoProps {
-  variant?: "default" | "small" | "icon-only" | "without-circle";
+  variant?: "default" | "small" | "icon-only" | "without-circle" | "header";
   className?: string;
   size?: "sm" | "md" | "lg";
   customUrl?: string;
@@ -16,23 +16,33 @@ export function Logo({
 }: LogoProps) {
   // Determine size based on the size prop
   const sizeClasses = {
-    sm: "h-8 w-8",
-    md: "h-10 w-10",
-    lg: "h-12 w-12",
+    sm: "h-6 w-auto",
+    md: "h-8 w-auto", 
+    lg: "h-10 w-auto",
   };
   
   const logoSize = sizeClasses[size];
   
-  // Common base classes for the logo container
-  const baseClasses = "flex items-center justify-center";
-  
   // Use custom URL if provided, otherwise use the default logo
   const logoUrl = customUrl || "/lovable-uploads/3b439cb9-4071-4319-8787-a968cea832a7.png";
+  
+  // For header variant (sem círculo, aplicação limpa da marca)
+  if (variant === "header") {
+    return (
+      <div className={`flex items-center ${className}`}>
+        <img 
+          src={logoUrl}
+          alt="e-regulariza"
+          className="logo-e-regulariza"
+        />
+      </div>
+    );
+  }
   
   // For without-circle variant (just the logo without the circle background)
   if (variant === "without-circle") {
     return (
-      <div className={`${baseClasses} ${className}`}>
+      <div className={`flex items-center justify-center ${className}`}>
         <img 
           src={logoUrl}
           alt="e-regulariza"
@@ -42,29 +52,40 @@ export function Logo({
     );
   }
   
-  // For icon-only variant (just the logo in a circle)
+  // For icon-only variant (logomarca com círculo apenas quando necessário)
   if (variant === "icon-only") {
     return (
-      <div className={`${baseClasses} ${className} rounded-full bg-[#06D7A5] ${logoSize} overflow-hidden flex-shrink-0`}>
+      <div className={`flex items-center justify-center ${className} rounded-full bg-eregulariza-secondary ${logoSize} overflow-hidden flex-shrink-0 p-1.5`}>
         <img 
           src={logoUrl}
           alt="e-regulariza"
-          className={`${logoSize} object-contain p-1.5`}
+          className={`${logoSize} object-contain`}
         />
       </div>
     );
   }
 
-  // For default and small variants
-  return (
-    <div className={`${baseClasses} gap-2 ${className}`}>
-      <div className={`rounded-full bg-[#06D7A5] ${logoSize} flex items-center justify-center overflow-hidden flex-shrink-0`}>
+  // For small variant (sem círculo, tamanho reduzido)
+  if (variant === "small") {
+    return (
+      <div className={`flex items-center ${className}`}>
         <img 
           src={logoUrl}
           alt="e-regulariza"
-          className={`${logoSize} w-auto object-contain p-1.5`}
+          className={`${sizeClasses.sm} object-contain`}
         />
       </div>
+    );
+  }
+
+  // For default variant
+  return (
+    <div className={`flex items-center gap-2 ${className}`}>
+      <img 
+        src={logoUrl}
+        alt="e-regulariza"
+        className={`${logoSize} object-contain`}
+      />
     </div>
   );
 }

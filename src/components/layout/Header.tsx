@@ -26,8 +26,8 @@ export default function Header() {
     <header className="bg-white shadow-sm border-b sticky top-0 z-50">
       <div className="container mx-auto flex justify-between items-center h-16 px-4 sm:px-6 lg:px-8">
         <div className="flex items-center">
-          <Link to="/" className="flex items-center gap-2">
-            <Logo variant="without-circle" size="lg" />
+          <Link to="/" className="flex items-center">
+            <Logo variant="header" />
           </Link>
         </div>
 
@@ -35,25 +35,25 @@ export default function Header() {
         <nav className="hidden md:flex items-center space-x-4">
           <Link 
             to="/" 
-            className={`px-3 py-2 text-sm font-medium ${location.pathname === "/" ? "text-eregulariza-primary" : "text-eregulariza-darkgray hover:text-eregulariza-primary"}`}
+            className={`px-3 py-2 text-sm font-medium transition-colors ${location.pathname === "/" ? "text-eregulariza-primary" : "text-eregulariza-gray hover:text-eregulariza-primary"}`}
           >
             Home
           </Link>
           <Link 
             to="/sobre" 
-            className={`px-3 py-2 text-sm font-medium ${location.pathname === "/sobre" ? "text-eregulariza-primary" : "text-eregulariza-darkgray hover:text-eregulariza-primary"}`}
+            className={`px-3 py-2 text-sm font-medium transition-colors ${location.pathname === "/sobre" ? "text-eregulariza-primary" : "text-eregulariza-gray hover:text-eregulariza-primary"}`}
           >
             Sobre
           </Link>
           <Link 
             to="/servicos" 
-            className={`px-3 py-2 text-sm font-medium ${location.pathname === "/servicos" ? "text-eregulariza-primary" : "text-eregulariza-darkgray hover:text-eregulariza-primary"}`}
+            className={`px-3 py-2 text-sm font-medium transition-colors ${location.pathname === "/servicos" ? "text-eregulariza-primary" : "text-eregulariza-gray hover:text-eregulariza-primary"}`}
           >
             Serviços
           </Link>
           <Link 
             to="/contato" 
-            className={`px-3 py-2 text-sm font-medium ${location.pathname === "/contato" ? "text-eregulariza-primary" : "text-eregulariza-darkgray hover:text-eregulariza-primary"}`}
+            className={`px-3 py-2 text-sm font-medium transition-colors ${location.pathname === "/contato" ? "text-eregulariza-primary" : "text-eregulariza-gray hover:text-eregulariza-primary"}`}
           >
             Contato
           </Link>
@@ -95,10 +95,10 @@ export default function Header() {
             </>
           ) : (
             <div className="flex items-center space-x-2">
-              <Button variant="outline" size="sm" asChild className="hidden sm:flex">
+              <Button variant="outline" size="sm" asChild className="hidden sm:flex border-eregulariza-primary text-eregulariza-primary hover:bg-eregulariza-primary hover:text-white">
                 <Link to="/login">Entrar</Link>
               </Button>
-              <Button size="sm" className="hidden sm:flex bg-eregulariza-primary hover:bg-eregulariza-primary/90">
+              <Button size="sm" className="hidden sm:flex bg-eregulariza-primary hover:bg-eregulariza-primary/90 text-white">
                 <Link to="/register" className="text-white">Cadastrar</Link>
               </Button>
               <Button variant="ghost" size="sm" asChild className="sm:hidden">
@@ -124,12 +124,12 @@ export default function Header() {
 
       {/* Mobile menu */}
       {isMenuOpen && (
-        <div className="md:hidden border-t">
+        <div className="md:hidden border-t bg-white">
           <div className="container px-4 pt-2 pb-3 space-y-1 sm:px-3">
             <Link
               to="/"
-              className={`block px-3 py-2 text-base font-medium rounded-md ${
-                location.pathname === "/" ? "bg-gray-50 text-eregulariza-primary" : "text-eregulariza-darkgray hover:bg-gray-50"
+              className={`block px-3 py-2 text-base font-medium rounded-md transition-colors ${
+                location.pathname === "/" ? "bg-eregulariza-surface text-eregulariza-primary" : "text-eregulariza-gray hover:bg-eregulariza-surface"
               }`}
               onClick={() => setIsMenuOpen(false)}
             >
@@ -137,8 +137,8 @@ export default function Header() {
             </Link>
             <Link
               to="/sobre"
-              className={`block px-3 py-2 text-base font-medium rounded-md ${
-                location.pathname === "/sobre" ? "bg-gray-50 text-eregulariza-primary" : "text-eregulariza-darkgray hover:bg-gray-50"
+              className={`block px-3 py-2 text-base font-medium rounded-md transition-colors ${
+                location.pathname === "/sobre" ? "bg-eregulariza-surface text-eregulariza-primary" : "text-eregulariza-gray hover:bg-eregulariza-surface"
               }`}
               onClick={() => setIsMenuOpen(false)}
             >
@@ -146,8 +146,8 @@ export default function Header() {
             </Link>
             <Link
               to="/servicos"
-              className={`block px-3 py-2 text-base font-medium rounded-md ${
-                location.pathname === "/servicos" ? "bg-gray-50 text-eregulariza-primary" : "text-eregulariza-darkgray hover:bg-gray-50"
+              className={`block px-3 py-2 text-base font-medium rounded-md transition-colors ${
+                location.pathname === "/servicos" ? "bg-eregulariza-surface text-eregulariza-primary" : "text-eregulariza-gray hover:bg-eregulariza-surface"
               }`}
               onClick={() => setIsMenuOpen(false)}
             >
@@ -155,15 +155,15 @@ export default function Header() {
             </Link>
             <Link
               to="/contato"
-              className={`block px-3 py-2 text-base font-medium rounded-md ${
-                location.pathname === "/contato" ? "bg-gray-50 text-eregulariza-primary" : "text-eregulariza-darkgray hover:bg-gray-50"
+              className={`block px-3 py-2 text-base font-medium rounded-md transition-colors ${
+                location.pathname === "/contato" ? "bg-eregulariza-surface text-eregulariza-primary" : "text-eregulariza-gray hover:bg-eregulariza-surface"
               }`}
               onClick={() => setIsMenuOpen(false)}
             >
               Contato
             </Link>
             <div className="pt-4 flex flex-col space-y-2">
-              <Button asChild className="bg-eregulariza-primary hover:bg-eregulariza-primary/90">
+              <Button asChild className="bg-eregulariza-primary hover:bg-eregulariza-primary/90 text-white">
                 <Link to="/login" onClick={() => setIsMenuOpen(false)}>
                   Entrar
                 </Link>

@@ -115,7 +115,7 @@ export default function SystemOverview() {
           title="Total de Usuários"
           value={stats.totalUsers}
           icon={Users}
-          color="text-blue-600"
+          color="text-eregulariza-primary"
           description="Clientes e admins ativos"
         />
         
@@ -123,7 +123,7 @@ export default function SystemOverview() {
           title="Processos Ativos"
           value={stats.activeProcesses}
           icon={FileText}
-          color="text-green-600"
+          color="text-eregulariza-secondary"
           description="Em andamento ou pendentes"
         />
         
@@ -131,7 +131,7 @@ export default function SystemOverview() {
           title="Admins Ativos"
           value={stats.activeAdmins}
           icon={Shield}
-          color="text-purple-600"
+          color="text-eregulariza-primary"
           description="Equipe administrativa"
         />
         
@@ -139,7 +139,7 @@ export default function SystemOverview() {
           title="Logs de Auditoria"
           value={stats.totalLogs}
           icon={Activity}
-          color="text-orange-600"
+          color="text-eregulariza-secondary"
           description="Registro de ações"
         />
       </div>
@@ -149,7 +149,7 @@ export default function SystemOverview() {
         <Card>
           <CardHeader>
             <CardTitle className="section-title flex items-center gap-2">
-              <CheckCircle className="h-5 w-5 text-green-600" />
+              <CheckCircle className="h-5 w-5 text-eregulariza-secondary" />
               Status das Integrações
             </CardTitle>
             <CardDescription>
@@ -157,9 +157,9 @@ export default function SystemOverview() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+            <div className="flex items-center justify-between p-3 bg-eregulariza-surface rounded-lg">
               <div className="flex items-center gap-3">
-                <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                <div className="w-3 h-3 bg-eregulariza-secondary rounded-full"></div>
                 <span className="font-medium">Supabase Database</span>
               </div>
               <div className="text-right">
@@ -172,9 +172,9 @@ export default function SystemOverview() {
               </div>
             </div>
 
-            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+            <div className="flex items-center justify-between p-3 bg-eregulariza-surface rounded-lg">
               <div className="flex items-center gap-3">
-                <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                <div className="w-3 h-3 bg-eregulariza-secondary rounded-full"></div>
                 <span className="font-medium">Twilio SMS</span>
               </div>
               <div className="text-right">
@@ -187,9 +187,9 @@ export default function SystemOverview() {
               </div>
             </div>
 
-            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+            <div className="flex items-center justify-between p-3 bg-eregulariza-surface rounded-lg">
               <div className="flex items-center gap-3">
-                <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                <div className="w-3 h-3 bg-eregulariza-secondary rounded-full"></div>
                 <span className="font-medium">Sistema Principal</span>
               </div>
               <div className="text-right">
@@ -235,7 +235,7 @@ export default function SystemOverview() {
               
               <div className="flex justify-between items-center">
                 <span className="text-sm text-gray-600">Uptime</span>
-                <span className="font-medium text-green-600">99.9%</span>
+                <span className="font-medium text-eregulariza-secondary">99.9%</span>
               </div>
             </div>
 

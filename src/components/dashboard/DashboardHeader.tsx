@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -128,12 +127,11 @@ export default function DashboardHeader() {
 
           <Link to="/dashboard" className="flex items-center gap-2">
             <Logo 
-              variant="icon-only" 
-              size="md"
+              variant="header" 
               customUrl={logoUrl || undefined} 
             />
             {!isMobile && (
-              <span className="font-semibold text-lg text-[#373535]">
+              <span className="font-semibold text-lg text-eregulariza-gray">
                 e-regulariza
               </span>
             )}

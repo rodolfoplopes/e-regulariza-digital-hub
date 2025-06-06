@@ -67,8 +67,11 @@ export default {
         "admin-master": "hsl(var(--admin-master))",
         "admin-editor": "hsl(var(--admin-editor))",
         "admin-viewer": "hsl(var(--admin-viewer))",
-        "eregulariza-primary": "hsl(var(--eregulariza-primary))",
-        "eregulariza-secondary": "hsl(var(--eregulariza-secondary))",
+        // Cores atualizadas da identidade visual e-regulariza
+        "eregulariza-primary": "#3C00F8",
+        "eregulariza-secondary": "#06D7A5", 
+        "eregulariza-gray": "#373535",
+        "eregulariza-surface": "#F5F5F5",
         "eregulariza-accent": "hsl(var(--eregulariza-accent))",
       },
       borderRadius: {

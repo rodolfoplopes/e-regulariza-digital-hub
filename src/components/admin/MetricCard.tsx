@@ -44,7 +44,7 @@ export default function MetricCard({
               <p className="text-xs text-gray-500">{description}</p>
             )}
           </div>
-          <div className={`p-3 rounded-lg bg-gray-50 ${color}`}>
+          <div className={`p-3 rounded-lg bg-eregulariza-surface ${color}`}>
             <Icon className="h-6 w-6" />
           </div>
         </div>

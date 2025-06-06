@@ -37,9 +37,9 @@
     --admin-editor: 220 70% 50%;
     --admin-viewer: 142 76% 36%;
 
-    /* eRegulariza brand colors */
-    --eregulariza-primary: 338 76% 45%;
-    --eregulariza-secondary: 220 70% 50%;
+    /* eRegulariza brand colors - atualizadas conforme identidade visual */
+    --eregulariza-primary: 60 100% 49%; /* #3C00F8 convertido para HSL */
+    --eregulariza-secondary: 171 94% 44%; /* #06D7A5 convertido para HSL */
     --eregulariza-accent: 142 76% 36%;
 
     /* Standard text color */
@@ -99,6 +99,14 @@
     color: #373535;
   }
 
+  /* Classe utilitária para logomarca e-regulariza */
+  .logo-e-regulariza {
+    height: 36px;
+    max-width: 180px;
+    object-fit: contain;
+    padding: 0 8px;
+  }
+
   .eregulariza-gradient {
     @apply bg-gradient-to-r from-eregulariza-primary to-eregulariza-secondary text-white;
   }
@@ -116,7 +124,27 @@
   }
 
   .bg-eregulariza-primary {
-    background-color: hsl(var(--eregulariza-primary));
+    background-color: #3C00F8;
+  }
+
+  .bg-eregulariza-secondary {
+    background-color: #06D7A5;
+  }
+
+  .bg-eregulariza-surface {
+    background-color: #F5F5F5;
+  }
+
+  .text-eregulariza-primary {
+    color: #3C00F8;
+  }
+
+  .text-eregulariza-secondary {
+    color: #06D7A5;
+  }
+
+  .text-eregulariza-gray {
+    color: #373535;
   }
 
   .text-primary-custom {
