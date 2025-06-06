@@ -10,6 +10,7 @@ import ProductionSettings from "@/components/production/ProductionSettings";
 import ProductionChecklist from "@/components/production/ProductionChecklist";
 import AuditLogPanel from "@/components/admin/AuditLogPanel";
 import PermissionMatrixCard from "@/components/admin/PermissionMatrixCard";
+import SystemOverview from "@/components/admin/SystemOverview";
 import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 import { usePermissions } from "@/hooks/usePermissions";
 import { Navigate } from "react-router-dom";
@@ -17,7 +18,7 @@ import { Navigate } from "react-router-dom";
 export default function AdminDashboard() {
   const { profile, isLoading: authLoading } = useSupabaseAuth();
   const permissions = usePermissions();
-  const [activeTab, setActiveTab] = useState("dashboard");
+  const [activeTab, setActiveTab] = useState("overview");
 
   if (authLoading) {
     return (
@@ -42,7 +43,10 @@ export default function AdminDashboard() {
       />
       <main className="container mx-auto px-4 py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid grid-cols-2 lg:grid-cols-10 w-full lg:w-auto">
+          <TabsList className="grid grid-cols-2 lg:grid-cols-11 w-full lg:w-auto">
+            {permissions.isSuperAdmin && (
+              <TabsTrigger value="overview">Resumo</TabsTrigger>
+            )}
             <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
             <TabsTrigger value="processes">Processos</TabsTrigger>
             <TabsTrigger value="clients">Clientes</TabsTrigger>
@@ -60,6 +64,12 @@ export default function AdminDashboard() {
           </TabsList>
 
           <Separator />
+
+          {permissions.isSuperAdmin && (
+            <TabsContent value="overview">
+              <SystemOverview />
+            </TabsContent>
+          )}
 
           <TabsContent value="dashboard">
             <AdminTabContent 

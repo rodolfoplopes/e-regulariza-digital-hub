@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import {
   Table,
@@ -41,7 +40,7 @@ import UserRoleIndicator from "./UserRoleIndicator";
 import BackButton from "./BackButton";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
-import { Edit, Filter, Plus } from "lucide-react";
+import { Edit, Filter, Plus, Power, PowerOff, Search } from "lucide-react";
 import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 import { auditService } from "@/services/auditService";
 
@@ -49,7 +48,8 @@ interface AdminUser {
   id: string;
   name: string;
   email: string;
-  role: "admin" | "admin_master" | "admin_editor" | "admin_viewer";
+  cpf?: string;
+  role: "admin" | "admin_master" | "admin_editor" | "admin_viewer" | "inactive";
   created_at: string;
   updated_at: string;
 }
@@ -57,15 +57,22 @@ interface AdminUser {
 export default function AdminUserManagement() {
   const [adminUsers, setAdminUsers] = useState<AdminUser[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [searchType, setSearchType] = useState<"email" | "cpf">("email");
   const [roleFilter, setRoleFilter] = useState<string>("all");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
   const [isLoading, setIsLoading] = useState(true);
   const [editingUser, setEditingUser] = useState<AdminUser | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
+  const [isStatusDialogOpen, setIsStatusDialogOpen] = useState(false);
   const [pendingRoleChange, setPendingRoleChange] = useState<{
     user: AdminUser;
     newRole: string;
+  } | null>(null);
+  const [pendingStatusChange, setPendingStatusChange] = useState<{
+    user: AdminUser;
+    newStatus: "active" | "inactive";
   } | null>(null);
   const { toast } = useToast();
   const { profile } = useSupabaseAuth();
@@ -80,7 +87,7 @@ export default function AdminUserManagement() {
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
-        .in('role', ['admin', 'admin_master', 'admin_editor', 'admin_viewer'])
+        .in('role', ['admin', 'admin_master', 'admin_editor', 'admin_viewer', 'inactive'])
         .order('name');
 
       if (error) throw error;
@@ -104,12 +111,16 @@ export default function AdminUserManagement() {
   };
 
   const filteredUsers = adminUsers.filter(user => {
-    const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         user.email.toLowerCase().includes(searchTerm.toLowerCase());
+    const searchField = searchType === "email" ? user.email : (user.cpf || "");
+    const matchesSearch = searchField.toLowerCase().includes(searchTerm.toLowerCase());
     
     const matchesRole = roleFilter === "all" || user.role === roleFilter;
     
-    return matchesSearch && matchesRole;
+    const matchesStatus = statusFilter === "all" || 
+      (statusFilter === "active" && user.role !== "inactive") ||
+      (statusFilter === "inactive" && user.role === "inactive");
+    
+    return matchesSearch && matchesRole && matchesStatus;
   });
 
   const handleEditUser = (user: AdminUser) => {
@@ -122,11 +133,85 @@ export default function AdminUserManagement() {
       id: "",
       name: "",
       email: "",
+      cpf: "",
       role: "admin_viewer",
       created_at: "",
       updated_at: ""
     });
     setIsCreateDialogOpen(true);
+  };
+
+  const handleStatusChange = (user: AdminUser) => {
+    if (user.id === profile?.id) {
+      toast({
+        variant: "destructive",
+        title: "Ação não permitida",
+        description: "Você não pode alterar seu próprio status.",
+      });
+      return;
+    }
+
+    setPendingStatusChange({
+      user,
+      newStatus: user.role === "inactive" ? "active" : "inactive"
+    });
+    setIsStatusDialogOpen(true);
+  };
+
+  const confirmStatusChange = async () => {
+    if (!pendingStatusChange) return;
+
+    try {
+      const newRole = pendingStatusChange.newStatus === "inactive" 
+        ? "inactive" 
+        : "admin_viewer"; // Padrão para reativar
+
+      const { error } = await supabase
+        .from('profiles')
+        .update({ 
+          role: newRole,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', pendingStatusChange.user.id);
+
+      if (error) throw error;
+
+      await auditService.createAuditLog({
+        action: `${pendingStatusChange.newStatus === "inactive" ? "Desativação" : "Ativação"} de administrador`,
+        target_type: 'user',
+        target_id: pendingStatusChange.user.id,
+        target_name: pendingStatusChange.user.name,
+        details: {
+          old_status: pendingStatusChange.user.role === "inactive" ? "inactive" : "active",
+          new_status: pendingStatusChange.newStatus,
+          user_email: pendingStatusChange.user.email
+        }
+      });
+
+      setAdminUsers(users => 
+        users.map(user => 
+          user.id === pendingStatusChange.user.id 
+            ? { ...user, role: newRole as AdminUser['role'] }
+            : user
+        )
+      );
+
+      toast({
+        title: `✅ Admin ${pendingStatusChange.newStatus === "inactive" ? "desativado" : "ativado"}`,
+        description: `${pendingStatusChange.user.name} foi ${pendingStatusChange.newStatus === "inactive" ? "desativado" : "ativado"} com sucesso`,
+        duration: 5000,
+      });
+
+      setIsStatusDialogOpen(false);
+      setPendingStatusChange(null);
+    } catch (error) {
+      console.error('Error updating status:', error);
+      toast({
+        variant: "destructive",
+        title: "Erro ao alterar status",
+        description: "Não foi possível alterar o status do usuário.",
+      });
+    }
   };
 
   const handleRoleChange = (newRole: string) => {
@@ -240,6 +325,7 @@ export default function AdminUserManagement() {
         id: "",
         name: "",
         email: "",
+        cpf: "",
         role: "admin_viewer",
         created_at: "",
         updated_at: ""
@@ -262,6 +348,7 @@ export default function AdminUserManagement() {
       case 'admin': return 'Admin';
       case 'admin_editor': return 'Editor';
       case 'admin_viewer': return 'Viewer';
+      case 'inactive': return 'Inativo';
       default: return role;
     }
   };
@@ -276,12 +363,21 @@ export default function AdminUserManagement() {
         return 'Pode editar processos e conteúdo';
       case 'admin_viewer':
         return 'Visualização apenas, sem permissões de edição';
+      case 'inactive':
+        return 'Usuário desativado - sem acesso ao sistema';
       default:
         return '';
     }
   };
 
   const getStatusBadge = (user: AdminUser) => {
+    if (user.role === "inactive") {
+      return (
+        <Badge variant="outline" className="bg-red-100 text-red-800 border-red-200">
+          Inativo
+        </Badge>
+      );
+    }
     return (
       <Badge variant="outline" className="bg-green-100 text-green-800 border-green-200">
         Ativo
@@ -323,17 +419,30 @@ export default function AdminUserManagement() {
         {/* Filters */}
         <div className="bg-white p-4 rounded-lg shadow-sm space-y-4">
           <div className="flex flex-col lg:flex-row gap-4">
-            <div className="flex-1">
-              <Input
-                placeholder="Buscar por nome ou e-mail..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full"
-              />
+            <div className="flex-1 flex gap-2">
+              <Select value={searchType} onValueChange={(value: "email" | "cpf") => setSearchType(value)}>
+                <SelectTrigger className="w-32">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="email">Email</SelectItem>
+                  <SelectItem value="cpf">CPF</SelectItem>
+                </SelectContent>
+              </Select>
+              
+              <div className="flex-1 relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Input
+                  placeholder={`Buscar por ${searchType === "email" ? "e-mail" : "CPF"}...`}
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10 w-full"
+                />
+              </div>
             </div>
             
             <Select value={roleFilter} onValueChange={setRoleFilter}>
-              <SelectTrigger className="w-full lg:w-[220px]">
+              <SelectTrigger className="w-full lg:w-[200px]">
                 <Filter className="h-4 w-4 mr-2" />
                 <SelectValue placeholder="Filtrar por função" />
               </SelectTrigger>
@@ -345,7 +454,24 @@ export default function AdminUserManagement() {
                 <SelectItem value="admin_viewer">Admin Viewer</SelectItem>
               </SelectContent>
             </Select>
+
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="w-full lg:w-[150px]">
+                <SelectValue placeholder="Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todos</SelectItem>
+                <SelectItem value="active">Ativos</SelectItem>
+                <SelectItem value="inactive">Inativos</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
+
+          {searchTerm && (
+            <div className="text-sm text-gray-600">
+              Mostrando {filteredUsers.length} resultado(s) para "{searchTerm}"
+            </div>
+          )}
         </div>
         
         {/* Users Table */}
@@ -356,6 +482,7 @@ export default function AdminUserManagement() {
                 <TableRow className="border-b border-gray-200">
                   <TableHead className="font-medium text-gray-900">Nome</TableHead>
                   <TableHead className="font-medium text-gray-900">E-mail</TableHead>
+                  <TableHead className="font-medium text-gray-900 hidden sm:table-cell">CPF</TableHead>
                   <TableHead className="font-medium text-gray-900">Função</TableHead>
                   <TableHead className="font-medium text-gray-900 hidden lg:table-cell">Permissões</TableHead>
                   <TableHead className="font-medium text-gray-900 hidden md:table-cell">Status</TableHead>
@@ -365,9 +492,20 @@ export default function AdminUserManagement() {
               </TableHeader>
               <TableBody>
                 {filteredUsers.map((user) => (
-                  <TableRow key={user.id} className="hover:bg-gray-50 border-b border-gray-100">
+                  <TableRow 
+                    key={user.id} 
+                    className={`hover:bg-gray-50 border-b border-gray-100 ${
+                      searchTerm && (user.email.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                      (user.cpf && user.cpf.toLowerCase().includes(searchTerm.toLowerCase()))) 
+                        ? 'bg-yellow-50 border-yellow-200' 
+                        : ''
+                    }`}
+                  >
                     <TableCell className="font-medium py-4">{user.name}</TableCell>
                     <TableCell className="py-4">{user.email}</TableCell>
+                    <TableCell className="py-4 hidden sm:table-cell">
+                      {user.cpf || '-'}
+                    </TableCell>
                     <TableCell className="py-4">
                       <UserRoleIndicator role={user.role} />
                     </TableCell>
@@ -383,23 +521,42 @@ export default function AdminUserManagement() {
                       {new Date(user.created_at).toLocaleDateString('pt-BR')}
                     </TableCell>
                     <TableCell className="py-4 text-right">
-                      <Button 
-                        variant="ghost" 
-                        size="sm"
-                        onClick={() => handleEditUser(user)}
-                        disabled={user.id === profile?.id && user.role === 'admin_master'}
-                        className="hover:bg-gray-100"
-                      >
-                        <Edit className="h-4 w-4 mr-1" />
-                        <span className="hidden sm:inline">Editar</span>
-                      </Button>
+                      <div className="flex items-center justify-end gap-2">
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          onClick={() => handleEditUser(user)}
+                          disabled={user.id === profile?.id && user.role === 'admin_master'}
+                          className="hover:bg-gray-100"
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          onClick={() => handleStatusChange(user)}
+                          disabled={user.id === profile?.id}
+                          className={`hover:bg-gray-100 ${
+                            user.role === "inactive" 
+                              ? "text-green-600 hover:text-green-800" 
+                              : "text-red-600 hover:text-red-800"
+                          }`}
+                        >
+                          {user.role === "inactive" ? (
+                            <Power className="h-4 w-4" />
+                          ) : (
+                            <PowerOff className="h-4 w-4" />
+                          )}
+                        </Button>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}
                 
                 {filteredUsers.length === 0 && (
                   <TableRow>
-                    <TableCell colSpan={7} className="text-center py-12 text-gray-500">
+                    <TableCell colSpan={8} className="text-center py-12 text-gray-500">
                       <div className="space-y-2">
                         <p>Nenhum administrador encontrado</p>
                         <p className="text-sm">Ajuste os filtros ou crie um novo administrador</p>
@@ -442,6 +599,17 @@ export default function AdminUserManagement() {
                     value={editingUser.email}
                     onChange={(e) => setEditingUser({ ...editingUser, email: e.target.value })}
                     placeholder="Digite o email"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="create-cpf">CPF</Label>
+                  <Input
+                    id="create-cpf"
+                    type="text"
+                    value={editingUser.cpf}
+                    onChange={(e) => setEditingUser({ ...editingUser, cpf: e.target.value })}
+                    placeholder="Digite o CPF"
                   />
                 </div>
 
@@ -571,6 +739,60 @@ export default function AdminUserManagement() {
                 className="bg-eregulariza-primary hover:bg-eregulariza-primary/90"
               >
                 Confirmar Alteração
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+
+        {/* Status Change Dialog */}
+        <AlertDialog open={isStatusDialogOpen} onOpenChange={setIsStatusDialogOpen}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle className="section-title">
+                {pendingStatusChange?.newStatus === "inactive" ? "Desativar" : "Ativar"} Administrador
+              </AlertDialogTitle>
+              <AlertDialogDescription className="space-y-3">
+                <p>
+                  Tem certeza que deseja {pendingStatusChange?.newStatus === "inactive" ? "desativar" : "ativar"}{" "}
+                  <strong>{pendingStatusChange?.user.name}</strong>?
+                </p>
+                
+                {pendingStatusChange?.newStatus === "inactive" && (
+                  <div className="bg-red-50 p-3 rounded-lg">
+                    <p className="text-sm font-medium text-red-900">
+                      ⚠️ Administrador desativado não poderá:
+                    </p>
+                    <ul className="text-xs text-red-700 mt-1 list-disc list-inside">
+                      <li>Fazer login no sistema</li>
+                      <li>Ser selecionado para novos processos</li>
+                      <li>Receber notificações</li>
+                    </ul>
+                  </div>
+                )}
+                
+                {pendingStatusChange?.newStatus === "active" && (
+                  <div className="bg-green-50 p-3 rounded-lg">
+                    <p className="text-sm font-medium text-green-900">
+                      ✅ Administrador será reativado como Viewer
+                    </p>
+                    <p className="text-xs text-green-700 mt-1">
+                      Você poderá alterar as permissões após a ativação
+                    </p>
+                  </div>
+                )}
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancelar</AlertDialogCancel>
+              <AlertDialogAction 
+                onClick={confirmStatusChange}
+                className={
+                  pendingStatusChange?.newStatus === "inactive" 
+                    ? "bg-red-600 hover:bg-red-700" 
+                    : "bg-green-600 hover:bg-green-700"
+                }
+              >
+                {pendingStatusChange?.newStatus === "inactive" ? "Desativar" : "Ativar"}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>

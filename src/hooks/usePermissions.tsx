@@ -15,6 +15,7 @@ export interface PermissionConfig {
   isSuperAdmin: boolean;
   isEditor: boolean;
   isViewer: boolean;
+  isActive: boolean;
   role: string | null;
 }
 
@@ -36,18 +37,20 @@ export function usePermissions(): PermissionConfig {
       isSuperAdmin: false,
       isEditor: false,
       isViewer: false,
+      isActive: false,
       role: null,
     };
   }
 
   const role = profile.role;
-  const isSuperAdmin = role === 'admin_master';
-  const isAdmin = role === 'admin' || isSuperAdmin;
-  const isEditor = role === 'admin_editor' || isAdmin || isSuperAdmin;
-  const isViewer = role === 'admin_viewer' || isEditor;
+  const isActive = role !== 'inactive';
+  const isSuperAdmin = role === 'admin_master' && isActive;
+  const isAdmin = (role === 'admin' || isSuperAdmin) && isActive;
+  const isEditor = (role === 'admin_editor' || isAdmin || isSuperAdmin) && isActive;
+  const isViewer = (role === 'admin_viewer' || isEditor) && isActive;
 
   return {
-    canView: true,
+    canView: isActive,
     canEdit: isEditor,
     canDelete: isAdmin,
     canManageUsers: isAdmin,
@@ -60,6 +63,7 @@ export function usePermissions(): PermissionConfig {
     isSuperAdmin,
     isEditor,
     isViewer,
+    isActive,
     role,
   };
 }
