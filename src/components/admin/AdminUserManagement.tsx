@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import {
   Table,
@@ -42,6 +41,7 @@ import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { Edit, Filter } from "lucide-react";
 import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
+import { auditService } from "@/services/auditService";
 
 interface AdminUser {
   id: string;
@@ -171,6 +171,19 @@ export default function AdminUserManagement() {
       if (!result.success) {
         throw result.error;
       }
+
+      // Create audit log
+      await auditService.createAuditLog({
+        action: `Alteração de permissão: ${getRoleLabel(pendingRoleChange.user.role)} → ${getRoleLabel(pendingRoleChange.newRole)}`,
+        target_type: 'user',
+        target_id: pendingRoleChange.user.id,
+        target_name: pendingRoleChange.user.name,
+        details: {
+          old_role: pendingRoleChange.user.role,
+          new_role: pendingRoleChange.newRole,
+          user_email: pendingRoleChange.user.email
+        }
+      });
 
       // Update local state
       setAdminUsers(users => 

@@ -8,6 +8,8 @@ import IntegrationSettings from "@/components/admin/IntegrationSettings";
 import MetricsDashboard from "@/components/admin/MetricsDashboard";
 import ProductionSettings from "@/components/production/ProductionSettings";
 import ProductionChecklist from "@/components/production/ProductionChecklist";
+import AuditLogPanel from "@/components/admin/AuditLogPanel";
+import PermissionMatrixCard from "@/components/admin/PermissionMatrixCard";
 import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 import { usePermissions } from "@/hooks/usePermissions";
 import { Navigate } from "react-router-dom";
@@ -40,7 +42,7 @@ export default function AdminDashboard() {
       />
       <main className="container mx-auto px-4 py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid grid-cols-2 lg:grid-cols-8 w-full lg:w-auto">
+          <TabsList className="grid grid-cols-2 lg:grid-cols-10 w-full lg:w-auto">
             <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
             <TabsTrigger value="processes">Processos</TabsTrigger>
             <TabsTrigger value="clients">Clientes</TabsTrigger>
@@ -49,6 +51,12 @@ export default function AdminDashboard() {
             <TabsTrigger value="integrations">Integrações</TabsTrigger>
             <TabsTrigger value="production">Produção</TabsTrigger>
             <TabsTrigger value="checklist">Go Live</TabsTrigger>
+            {permissions.isSuperAdmin && (
+              <>
+                <TabsTrigger value="audit">Logs</TabsTrigger>
+                <TabsTrigger value="permissions">Permissões</TabsTrigger>
+              </>
+            )}
           </TabsList>
 
           <Separator />
@@ -104,6 +112,18 @@ export default function AdminDashboard() {
           <TabsContent value="checklist">
             <ProductionChecklist />
           </TabsContent>
+
+          {permissions.isSuperAdmin && (
+            <>
+              <TabsContent value="audit">
+                <AuditLogPanel />
+              </TabsContent>
+
+              <TabsContent value="permissions">
+                <PermissionMatrixCard />
+              </TabsContent>
+            </>
+          )}
         </Tabs>
       </main>
     </div>
