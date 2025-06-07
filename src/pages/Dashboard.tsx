@@ -5,7 +5,7 @@ import MobileNav from "@/components/dashboard/MobileNav";
 import ProcessCard, { ProcessProps } from "@/components/dashboard/ProcessCard";
 import NotificationCard, { NotificationProps } from "@/components/dashboard/NotificationCard";
 import EnhancedDashboardStats from "@/components/dashboard/EnhancedDashboardStats";
-import { Clock, AlertTriangle } from "lucide-react";
+import { Clock, AlertTriangle, FileText } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useToast } from "@/hooks/use-toast";
 import { useProcesses } from "@/hooks/useProcesses";
@@ -54,7 +54,7 @@ export default function Dashboard() {
   const isLoading = processesLoading || notificationsLoading;
 
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className="flex h-screen bg-white">
       <div className="sidebar-navigation">
         <DashboardSidebar />
       </div>
@@ -68,22 +68,22 @@ export default function Dashboard() {
         
         <main className="flex-1 overflow-y-auto p-4 md:p-6">
           <div className="mb-6 dashboard-welcome">
-            <h1 className="text-2xl font-bold">Olá, {profile?.name}!</h1>
-            <p className="text-gray-500">Bem-vindo ao seu painel de regularização imobiliária.</p>
+            <h1 className="text-2xl font-bold text-eregulariza-gray font-montserrat">Olá, {profile?.name}!</h1>
+            <p className="text-eregulariza-description">Bem-vindo ao seu painel de regularização imobiliária.</p>
           </div>
           
           {/* Enhanced Dashboard Stats */}
           <EnhancedDashboardStats processes={transformedProcesses} isLoading={isLoading} />
           
           <div className="mb-8">
-            <h2 className="text-xl font-semibold mb-4 flex items-center">
-              <Clock className="h-5 w-5 mr-2 text-[#06D7A5]" />
+            <h2 className="text-xl font-semibold mb-4 flex items-center text-eregulariza-gray font-montserrat">
+              <Clock className="h-5 w-5 mr-2 text-eregulariza-primary" />
               Meus Processos
             </h2>
             {isLoading ? (
               <div className="text-center py-8">
-                <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] text-[#06D7A5]"></div>
-                <p className="mt-2 text-gray-500">Carregando processos...</p>
+                <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] text-eregulariza-primary"></div>
+                <p className="mt-2 text-eregulariza-description">Carregando processos...</p>
               </div>
             ) : transformedProcesses.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -95,20 +95,22 @@ export default function Dashboard() {
               </div>
             ) : (
               <div className="text-center py-8">
-                <p className="text-gray-500">Nenhum processo encontrado.</p>
+                <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                <h3 className="text-lg font-medium text-eregulariza-gray mb-2">Nenhum processo encontrado</h3>
+                <p className="text-eregulariza-description">Você ainda não possui processos de regularização.</p>
               </div>
             )}
           </div>
           
           <div>
-            <h2 className="text-xl font-semibold mb-4 flex items-center">
-              <AlertTriangle className="h-5 w-5 mr-2 text-[#06D7A5]" />
+            <h2 className="text-xl font-semibold mb-4 flex items-center text-eregulariza-gray font-montserrat">
+              <AlertTriangle className="h-5 w-5 mr-2 text-eregulariza-primary" />
               Notificações Recentes
             </h2>
             {isLoading ? (
               <div className="text-center py-8">
-                <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] text-[#06D7A5]"></div>
-                <p className="mt-2 text-gray-500">Carregando notificações...</p>
+                <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] text-eregulariza-primary"></div>
+                <p className="mt-2 text-eregulariza-description">Carregando notificações...</p>
               </div>
             ) : transformedNotifications.length > 0 ? (
               <div className="space-y-4">
@@ -118,7 +120,9 @@ export default function Dashboard() {
               </div>
             ) : (
               <div className="text-center py-8">
-                <p className="text-gray-500">Nenhuma notificação encontrada.</p>
+                <AlertTriangle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                <h3 className="text-lg font-medium text-eregulariza-gray mb-2">Nenhuma notificação encontrada</h3>
+                <p className="text-eregulariza-description">Não há notificações no momento.</p>
               </div>
             )}
           </div>

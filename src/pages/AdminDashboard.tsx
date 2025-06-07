@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
@@ -11,6 +10,7 @@ import ProductionChecklist from "@/components/production/ProductionChecklist";
 import AuditLogPanel from "@/components/admin/AuditLogPanel";
 import PermissionMatrixCard from "@/components/admin/PermissionMatrixCard";
 import SystemOverview from "@/components/admin/SystemOverview";
+import ProcessValidationDashboard from "@/components/admin/ProcessValidationDashboard";
 import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 import { usePermissions } from "@/hooks/usePermissions";
 import { Navigate } from "react-router-dom";
@@ -22,10 +22,10 @@ export default function AdminDashboard() {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-white">
         <div className="text-center">
           <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-eregulariza-primary"></div>
-          <p className="mt-4 text-gray-600">Carregando...</p>
+          <p className="mt-4 text-eregulariza-description">Carregando...</p>
         </div>
       </div>
     );
@@ -36,7 +36,7 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <AdminHeader 
         clients={[]} 
         serviceTypes={[]} 
@@ -81,12 +81,7 @@ export default function AdminDashboard() {
           </TabsContent>
 
           <TabsContent value="processes">
-            <AdminTabContent 
-              activeSection="processes"
-              processes={[]}
-              clients={[]}
-              serviceTypes={[]}
-            />
+            <ProcessValidationDashboard />
           </TabsContent>
 
           <TabsContent value="clients">
