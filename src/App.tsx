@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -59,7 +60,14 @@ const PublicRoute = () => {
   const location = useLocation();
 
   if (isAuthenticated && ['/login', '/register'].includes(location.pathname)) {
-    return <Navigate to={role === 'admin' ? '/admin' : '/dashboard'} replace />;
+    // Improved redirection logic based on role
+    if (role === 'admin_master' || role === 'admin' || role === 'admin_editor' || role === 'admin_viewer') {
+      return <Navigate to="/admin" replace />;
+    } else if (role === 'cliente') {
+      return <Navigate to="/dashboard" replace />;
+    } else {
+      return <Navigate to="/dashboard" replace />;
+    }
   }
 
   return <Outlet />;
@@ -111,9 +119,10 @@ const AppContent = () => {
                 <Route path="/:policyType" element={<PolicyPage />} />
               </Route>
 
-              {/* Protected routes for authenticated users */}
+              {/* Protected routes for authenticated users (clients) */}
               <Route element={<ProtectedRoute requiredRole="cliente" />}>
                 <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/dashboard-cliente" element={<Navigate to="/dashboard" replace />} />
                 <Route path="/configuracoes" element={<UserSettings />} />
                 <Route path="/contato" element={<ContactPage />} />
                 <Route path="/processo/:processId" element={<ProcessDetail />} />

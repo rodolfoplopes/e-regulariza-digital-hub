@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -39,13 +40,16 @@ export default function Login() {
   useEffect(() => {
     if (isAuthenticated && role) {
       console.log('User authenticated with role:', role);
-      // Redirect based on role
+      // Redirect based on role - improved logic
       if (role === 'admin_master' || role === 'admin' || role === 'admin_editor' || role === 'admin_viewer') {
         console.log('Redirecting to admin dashboard');
-        navigate('/admin');
+        navigate('/admin', { replace: true });
+      } else if (role === 'cliente') {
+        console.log('Redirecting to client dashboard');
+        navigate('/dashboard', { replace: true });
       } else {
-        console.log('Redirecting to user dashboard');
-        navigate('/dashboard');
+        // Fallback for unknown roles
+        navigate('/dashboard', { replace: true });
       }
     }
   }, [isAuthenticated, role, navigate]);
@@ -191,7 +195,7 @@ export default function Login() {
           <Card className="shadow-lg border-0">
             <CardHeader className="space-y-1 text-center">
               <div className="flex justify-center mb-4">
-                <Logo variant="circular" size="lg" />
+                <Logo variant="circular" size="md" />
               </div>
               <CardTitle className="text-2xl font-bold text-eregulariza-gray">Bem-vindo de volta</CardTitle>
               <CardDescription className="text-eregulariza-description">
@@ -255,11 +259,10 @@ export default function Login() {
                 >
                   {isLoading ? "Entrando..." : "Entrar"}
                 </Button>
+                
+                {/* Removed public registration link as requested */}
                 <p className="text-center text-sm mt-4 text-eregulariza-description">
-                  Não tem uma conta?{" "}
-                  <Link to="/register" className="text-eregulariza-primary hover:underline">
-                    Cadastre-se
-                  </Link>
+                  Não tem acesso? Entre em contato com nossa equipe.
                 </p>
               </CardFooter>
             </form>

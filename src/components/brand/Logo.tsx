@@ -14,11 +14,11 @@ export function Logo({
   size = "md",
   customUrl 
 }: LogoProps) {
-  // Determine size based on the size prop
+  // Determine size based on the size prop - adjusted for better login experience
   const sizeClasses = {
-    sm: "h-8 w-auto", // 30px mobile
-    md: "h-10 w-auto", // 40px desktop  
-    lg: "h-12 w-auto",
+    sm: "h-6 w-auto", // 24px - smaller for mobile
+    md: "h-8 w-auto", // 32px - reduced from 40px for better login layout  
+    lg: "h-10 w-auto", // 40px - reduced from 48px
   };
   
   const logoSize = sizeClasses[size];

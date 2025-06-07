@@ -27,7 +27,7 @@ export default function Header() {
       <div className="container mx-auto flex justify-between items-center h-16 px-4 sm:px-6 lg:px-8">
         <div className="flex items-center">
           <Link to="/" className="flex items-center">
-            <Logo variant="header" />
+            <Logo variant="header" size="sm" />
           </Link>
         </div>
 
@@ -96,10 +96,7 @@ export default function Header() {
           ) : (
             <div className="flex items-center space-x-2">
               <Button variant="outline" size="sm" asChild className="hidden sm:flex border-eregulariza-primary text-eregulariza-primary hover:bg-eregulariza-primary hover:text-white">
-                <Link to="/login">Entrar</Link>
-              </Button>
-              <Button size="sm" className="hidden sm:flex bg-eregulariza-primary hover:bg-eregulariza-primary/90 text-white">
-                <Link to="/register" className="text-white">Cadastrar</Link>
+                <Link to="/login">Área do Cliente</Link>
               </Button>
               <Button variant="ghost" size="sm" asChild className="sm:hidden">
                 <Link to="/login">
@@ -165,12 +162,7 @@ export default function Header() {
             <div className="pt-4 flex flex-col space-y-2">
               <Button asChild className="bg-eregulariza-primary hover:bg-eregulariza-primary/90 text-white">
                 <Link to="/login" onClick={() => setIsMenuOpen(false)}>
-                  Entrar
-                </Link>
-              </Button>
-              <Button asChild variant="outline" className="border-eregulariza-primary text-eregulariza-primary hover:bg-eregulariza-primary/10">
-                <Link to="/register" onClick={() => setIsMenuOpen(false)}>
-                  Cadastrar
+                  Área do Cliente
                 </Link>
               </Button>
             </div>
