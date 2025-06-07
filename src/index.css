@@ -37,13 +37,14 @@
     --admin-editor: 220 70% 50%;
     --admin-viewer: 142 76% 36%;
 
-    /* eRegulariza brand colors - atualizadas conforme identidade visual */
-    --eregulariza-primary: 60 100% 49%; /* #3C00F8 convertido para HSL */
-    --eregulariza-secondary: 171 94% 44%; /* #06D7A5 convertido para HSL */
+    /* eRegulariza brand colors - cores institucionais atualizadas */
+    --eregulariza-primary: 248 100% 49%; /* #3C00F8 */
+    --eregulariza-secondary: 171 94% 44%; /* #06D7A5 */
     --eregulariza-accent: 142 76% 36%;
 
     /* Standard text color */
-    --text-primary: 0 0% 22%;
+    --text-primary: 0 0% 22%; /* #373535 */
+    --text-secondary: 0 0% 42%; /* #6C6C6C */
   }
 
   .dark {
@@ -81,6 +82,8 @@
   body {
     @apply bg-background text-foreground;
     font-family: 'Montserrat', sans-serif;
+    line-height: 1.6;
+    letter-spacing: 0.01em;
   }
 }
 
@@ -90,6 +93,8 @@
     font-weight: 600;
     font-size: 20px;
     color: #373535;
+    line-height: 1.6;
+    letter-spacing: 0.01em;
   }
   
   .section-title {
@@ -97,14 +102,22 @@
     font-weight: 500;
     font-size: 18px;
     color: #373535;
+    line-height: 1.6;
+    letter-spacing: 0.01em;
   }
 
-  /* Classe utilitária para logomarca e-regulariza */
+  /* Classe utilitária para logomarca e-regulariza com tamanhos corretos */
   .logo-e-regulariza {
-    height: 36px;
+    height: 40px; /* Desktop */
     max-width: 180px;
     object-fit: contain;
     padding: 0 8px;
+  }
+
+  @media (max-width: 768px) {
+    .logo-e-regulariza {
+      height: 30px; /* Mobile */
+    }
   }
 
   .eregulariza-gradient {
@@ -132,7 +145,7 @@
   }
 
   .bg-eregulariza-surface {
-    background-color: #F5F5F5;
+    background-color: #F6F6F6; /* Cinza claro atualizado */
   }
 
   .text-eregulariza-primary {
@@ -147,7 +160,26 @@
     color: #373535;
   }
 
+  .text-eregulariza-description {
+    color: #6C6C6C;
+  }
+
   .text-primary-custom {
     color: hsl(var(--text-primary));
+  }
+
+  /* Feedback visual em botões com hover */
+  .btn-eregulariza-hover {
+    transition: all 0.3s ease;
+  }
+
+  .btn-eregulariza-hover:hover {
+    background-color: rgba(60, 0, 248, 0.9);
+    transform: translateY(-1px);
+  }
+
+  .btn-secondary-hover:hover {
+    background-color: rgba(6, 215, 165, 0.9);
+    transform: translateY(-1px);
   }
 }

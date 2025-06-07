@@ -2,7 +2,7 @@
 import React from "react";
 
 interface LogoProps {
-  variant?: "default" | "small" | "icon-only" | "without-circle" | "header";
+  variant?: "default" | "small" | "icon-only" | "without-circle" | "header" | "circular";
   className?: string;
   size?: "sm" | "md" | "lg";
   customUrl?: string;
@@ -16,17 +16,32 @@ export function Logo({
 }: LogoProps) {
   // Determine size based on the size prop
   const sizeClasses = {
-    sm: "h-6 w-auto",
-    md: "h-8 w-auto", 
-    lg: "h-10 w-auto",
+    sm: "h-8 w-auto", // 30px mobile
+    md: "h-10 w-auto", // 40px desktop  
+    lg: "h-12 w-auto",
   };
   
   const logoSize = sizeClasses[size];
   
-  // Use custom URL if provided, otherwise use the default logo
+  // Use the circular logo for icon-only or login contexts
+  const circularLogoUrl = "/lovable-uploads/58cc8e50-0d45-414e-8ce1-33ba4dd6d6e7.png";
+  // Use custom URL if provided, otherwise use the default horizontal logo
   const logoUrl = customUrl || "/lovable-uploads/3b439cb9-4071-4319-8787-a968cea832a7.png";
   
-  // For header variant (sem círculo, aplicação limpa da marca)
+  // For circular variant (usar logo com fundo gradiente azul/verde)
+  if (variant === "circular") {
+    return (
+      <div className={`flex items-center justify-center ${className}`}>
+        <img 
+          src={circularLogoUrl}
+          alt="e-regulariza"
+          className={`${logoSize} object-contain rounded-full`}
+        />
+      </div>
+    );
+  }
+  
+  // For header variant (logotipo horizontal tradicional)
   if (variant === "header") {
     return (
       <div className={`flex items-center ${className}`}>
@@ -52,20 +67,20 @@ export function Logo({
     );
   }
   
-  // For icon-only variant (logomarca com círculo apenas quando necessário)
+  // For icon-only variant (usar logo circular com gradiente)
   if (variant === "icon-only") {
     return (
-      <div className={`flex items-center justify-center ${className} rounded-full bg-eregulariza-secondary ${logoSize} overflow-hidden flex-shrink-0 p-1.5`}>
+      <div className={`flex items-center justify-center ${className}`}>
         <img 
-          src={logoUrl}
+          src={circularLogoUrl}
           alt="e-regulariza"
-          className={`${logoSize} object-contain`}
+          className={`${logoSize} object-contain rounded-full`}
         />
       </div>
     );
   }
 
-  // For small variant (sem círculo, tamanho reduzido)
+  // For small variant (logotipo horizontal em tamanho reduzido)
   if (variant === "small") {
     return (
       <div className={`flex items-center ${className}`}>

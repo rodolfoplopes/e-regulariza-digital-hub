@@ -14,12 +14,12 @@ export default function CTA() {
             Inicie agora mesmo seu processo de forma digital e acompanhe cada etapa com total transparência.
           </p>
           <div className="mt-8 flex justify-center gap-x-4">
-            <Button asChild size="lg" variant="secondary">
+            <Button asChild size="lg" variant="secondary" className="btn-secondary-hover">
               <Link to="/register">
                 Começar agora
               </Link>
             </Button>
-            <Button asChild size="lg" variant="outline" className="bg-transparent text-white border-white hover:bg-white/10">
+            <Button asChild size="lg" variant="outline" className="bg-transparent text-white border-white hover:bg-white/10 transition-all duration-300">
               <Link to="/contato">
                 Falar com especialista
               </Link>

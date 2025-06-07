@@ -18,18 +18,18 @@ export default function MetricCard({
   title, 
   value, 
   icon: Icon, 
-  color = "text-eregulariza-primary",
+  color = "text-white",
   description,
   trend
 }: MetricCardProps) {
   return (
-    <Card className="hover:shadow-md transition-shadow">
+    <Card className="hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
       <CardContent className="p-6">
         <div className="flex items-center justify-between">
           <div className="space-y-2">
-            <p className="text-sm font-medium text-gray-600">{title}</p>
+            <p className="text-sm font-medium text-eregulariza-description">{title}</p>
             <div className="flex items-center space-x-2">
-              <p className="text-2xl font-bold text-gray-900">{value}</p>
+              <p className="text-2xl font-bold text-eregulariza-gray">{value}</p>
               {trend && (
                 <span className={`text-xs px-2 py-1 rounded-full ${
                   trend.isPositive 
@@ -41,11 +41,11 @@ export default function MetricCard({
               )}
             </div>
             {description && (
-              <p className="text-xs text-gray-500">{description}</p>
+              <p className="text-xs text-eregulariza-description">{description}</p>
             )}
           </div>
-          <div className={`p-3 rounded-lg bg-eregulariza-surface ${color}`}>
-            <Icon className="h-6 w-6" />
+          <div className="p-3 rounded-lg eregulariza-gradient">
+            <Icon className={`h-6 w-6 ${color}`} />
           </div>
         </div>
       </CardContent>

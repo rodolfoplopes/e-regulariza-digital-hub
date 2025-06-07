@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -154,8 +155,8 @@ export default function DashboardHeader() {
             <DropdownMenuContent align="end" className="w-56">
               <DropdownMenuLabel>
                 <div className="flex flex-col">
-                  <span>{userData.name}</span>
-                  <span className="text-xs text-muted-foreground">{profile?.role === 'admin' ? 'Administrador' : 'Cliente'}</span>
+                  <span className="text-eregulariza-gray">{userData.name}</span>
+                  <span className="text-xs text-eregulariza-description">{profile?.role === 'admin' ? 'Administrador' : 'Cliente'}</span>
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
