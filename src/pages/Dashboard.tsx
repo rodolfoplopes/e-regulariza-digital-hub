@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
@@ -53,6 +54,13 @@ export default function Dashboard() {
 
   const isLoading = processesLoading || notificationsLoading;
 
+  // Determinar título baseado no perfil do usuário
+  const isAdmin = profile?.role === 'admin' || profile?.role === 'admin_master' || profile?.role === 'admin_editor';
+  const dashboardTitle = isAdmin ? 'Dashboard' : 'Meus Processos';
+  const welcomeMessage = isAdmin 
+    ? `Bem-vindo ao painel administrativo, ${profile?.name}!`
+    : `Olá, ${profile?.name}! Bem-vindo ao seu painel de regularização imobiliária.`;
+
   return (
     <div className="flex h-screen bg-white">
       <div className="sidebar-navigation">
@@ -68,8 +76,8 @@ export default function Dashboard() {
         
         <main className="flex-1 overflow-y-auto p-4 md:p-6">
           <div className="mb-6 dashboard-welcome">
-            <h1 className="text-2xl font-bold text-eregulariza-gray font-montserrat">Olá, {profile?.name}!</h1>
-            <p className="text-eregulariza-description">Bem-vindo ao seu painel de regularização imobiliária.</p>
+            <h1 className="text-2xl font-bold text-eregulariza-gray font-montserrat">{dashboardTitle}</h1>
+            <p className="text-eregulariza-description">{welcomeMessage}</p>
           </div>
           
           {/* Enhanced Dashboard Stats */}
@@ -77,8 +85,8 @@ export default function Dashboard() {
           
           <div className="mb-8">
             <h2 className="text-xl font-semibold mb-4 flex items-center text-eregulariza-gray font-montserrat">
-              <Clock className="h-5 w-5 mr-2 text-eregulariza-primary" />
-              Meus Processos
+              <Clock className="h-5 w-5 mr-2 text-eregulariza-secondary" />
+              {isAdmin ? 'Processos Recentes' : 'Meus Processos'}
             </h2>
             {isLoading ? (
               <div className="text-center py-8">
@@ -96,15 +104,22 @@ export default function Dashboard() {
             ) : (
               <div className="text-center py-8">
                 <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-eregulariza-gray mb-2">Nenhum processo encontrado</h3>
-                <p className="text-eregulariza-description">Você ainda não possui processos de regularização.</p>
+                <h3 className="text-lg font-medium text-eregulariza-gray mb-2">
+                  {isAdmin ? 'Nenhum processo recente' : 'Nenhum processo encontrado'}
+                </h3>
+                <p className="text-eregulariza-description">
+                  {isAdmin 
+                    ? 'Não há processos recentes para exibir.' 
+                    : 'Você ainda não possui processos de regularização.'
+                  }
+                </p>
               </div>
             )}
           </div>
           
           <div>
             <h2 className="text-xl font-semibold mb-4 flex items-center text-eregulariza-gray font-montserrat">
-              <AlertTriangle className="h-5 w-5 mr-2 text-eregulariza-primary" />
+              <AlertTriangle className="h-5 w-5 mr-2 text-eregulariza-secondary" />
               Notificações Recentes
             </h2>
             {isLoading ? (

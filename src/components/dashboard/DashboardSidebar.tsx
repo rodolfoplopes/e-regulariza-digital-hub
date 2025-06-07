@@ -7,7 +7,8 @@ import {
   MessageSquare, 
   Bell, 
   Settings,
-  User
+  User,
+  ExternalLink
 } from "lucide-react";
 
 interface SidebarItemProps {
@@ -15,22 +16,43 @@ interface SidebarItemProps {
   label: string;
   href: string;
   isActive: boolean;
+  isExternal?: boolean;
 }
 
-const SidebarItem = ({ icon, label, href, isActive }: SidebarItemProps) => (
-  <Link
-    to={href}
-    className={cn(
-      "flex items-center py-2 px-3 rounded-md group transition-colors",
-      isActive 
-        ? "bg-eregulariza-primary-20 text-eregulariza-primary" 
-        : "text-eregulariza-darkgray hover:bg-gray-100"
-    )}
-  >
-    <div className="mr-3">{icon}</div>
-    <span>{label}</span>
-  </Link>
-);
+const SidebarItem = ({ icon, label, href, isActive, isExternal }: SidebarItemProps) => {
+  if (isExternal) {
+    return (
+      <a
+        href={href}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={cn(
+          "flex items-center py-2 px-3 rounded-md group transition-colors",
+          "text-eregulariza-darkgray hover:bg-gray-100"
+        )}
+      >
+        <div className="mr-3">{icon}</div>
+        <span className="flex-1">{label}</span>
+        <ExternalLink className="h-4 w-4 ml-2" />
+      </a>
+    );
+  }
+
+  return (
+    <Link
+      to={href}
+      className={cn(
+        "flex items-center py-2 px-3 rounded-md group transition-colors",
+        isActive 
+          ? "bg-eregulariza-primary-20 text-eregulariza-primary" 
+          : "text-eregulariza-darkgray hover:bg-gray-100"
+      )}
+    >
+      <div className="mr-3">{icon}</div>
+      <span>{label}</span>
+    </Link>
+  );
+};
 
 export default function DashboardSidebar() {
   const location = useLocation();
@@ -41,11 +63,6 @@ export default function DashboardSidebar() {
       icon: <LayoutDashboard className="h-5 w-5" />,
       label: "Dashboard",
       href: "/dashboard"
-    },
-    { 
-      icon: <FileText className="h-5 w-5" />,
-      label: "Meus Processos",
-      href: "/processos"
     },
     { 
       icon: <MessageSquare className="h-5 w-5" />,
@@ -82,6 +99,18 @@ export default function DashboardSidebar() {
               isActive={currentPath === item.href}
             />
           ))}
+          
+          {/* Separador */}
+          <div className="border-t border-gray-200 my-4"></div>
+          
+          {/* Link para voltar ao site */}
+          <SidebarItem
+            icon={<ExternalLink className="h-5 w-5" />}
+            label="Voltar ao site e-regulariza"
+            href="https://e-regulariza.com"
+            isActive={false}
+            isExternal={true}
+          />
         </nav>
       </div>
     </aside>

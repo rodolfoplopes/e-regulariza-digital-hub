@@ -3,12 +3,12 @@ import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { 
   LayoutDashboard, 
-  FileText, 
   MessageSquare, 
   Bell, 
   Settings,
   User,
-  X
+  X,
+  ExternalLink
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useEffect } from "react";
@@ -49,11 +49,6 @@ export default function MobileNav({ isOpen, onClose }: { isOpen: boolean, onClos
       icon: <LayoutDashboard className="h-5 w-5" />,
       label: "Dashboard",
       href: "/dashboard"
-    },
-    { 
-      icon: <FileText className="h-5 w-5" />,
-      label: "Meus Processos",
-      href: "/processos"
     },
     { 
       icon: <MessageSquare className="h-5 w-5" />,
@@ -109,6 +104,24 @@ export default function MobileNav({ isOpen, onClose }: { isOpen: boolean, onClos
               <span className="font-medium">{item.label}</span>
             </Link>
           ))}
+          
+          {/* Separador */}
+          <div className="border-t border-gray-200 my-4"></div>
+          
+          {/* Link para voltar ao site */}
+          <a
+            href="https://e-regulariza.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center py-3 px-3 rounded-md group transition-colors text-gray-700 hover:bg-gray-100"
+            onClick={onClose}
+          >
+            <div className="mr-3 flex-shrink-0">
+              <ExternalLink className="h-5 w-5" />
+            </div>
+            <span className="font-medium flex-1">Voltar ao site e-regulariza</span>
+            <ExternalLink className="h-4 w-4 ml-2" />
+          </a>
         </div>
       </nav>
     </div>

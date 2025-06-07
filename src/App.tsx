@@ -124,9 +124,11 @@ const AppContent = () => {
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/dashboard-cliente" element={<Navigate to="/dashboard" replace />} />
                 <Route path="/configuracoes" element={<UserSettings />} />
+                <Route path="/mensagens" element={<Messages />} />
+                <Route path="/notificacoes" element={<Notifications />} />
+                <Route path="/perfil" element={<UserProfile />} />
                 <Route path="/contato" element={<ContactPage />} />
                 <Route path="/processo/:processId" element={<ProcessDetail />} />
-                <Route path="/notificacoes" element={<Notifications />} />
               </Route>
               
               {/* Admin-only routes */}

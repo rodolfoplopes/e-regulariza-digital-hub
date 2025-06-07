@@ -148,6 +148,10 @@
     background-color: #F6F6F6; /* Cinza claro atualizado */
   }
 
+  .bg-eregulariza-primary-20 {
+    background-color: rgba(60, 0, 248, 0.1);
+  }
+
   .text-eregulariza-primary {
     color: #3C00F8;
   }
@@ -162,6 +166,10 @@
 
   .text-eregulariza-description {
     color: #6C6C6C;
+  }
+
+  .text-eregulariza-darkgray {
+    color: #373535;
   }
 
   .text-primary-custom {
@@ -181,5 +189,10 @@
   .btn-secondary-hover:hover {
     background-color: rgba(6, 215, 165, 0.9);
     transform: translateY(-1px);
+  }
+
+  /* Progress bar customization */
+  .progress-bar-eregulariza {
+    background-color: #06D7A5;
   }
 }
