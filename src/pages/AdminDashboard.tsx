@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
@@ -10,7 +11,7 @@ import ProductionChecklist from "@/components/production/ProductionChecklist";
 import AuditLogPanel from "@/components/admin/AuditLogPanel";
 import PermissionMatrixCard from "@/components/admin/PermissionMatrixCard";
 import SystemOverview from "@/components/admin/SystemOverview";
-import ProcessValidationDashboard from "@/components/admin/ProcessValidationDashboard";
+import ProcessValidationDashboard from "@/components/process/ProcessValidationDashboard";
 import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 import { usePermissions } from "@/hooks/usePermissions";
 import { Navigate } from "react-router-dom";

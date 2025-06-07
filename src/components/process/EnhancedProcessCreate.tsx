@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -164,13 +163,12 @@ export default function EnhancedProcessCreate() {
     }
 
     try {
-      // Criar processo
+      // Criar processo (removido 'status' property)
       const process = await processService.createProcess({
         title: formData.title,
         description: formData.description,
         client_id: selectedClient.id,
-        process_type_id: selectedProcessType.id,
-        status: 'pendente'
+        process_type_id: selectedProcessType.id
       });
 
       if (process) {
