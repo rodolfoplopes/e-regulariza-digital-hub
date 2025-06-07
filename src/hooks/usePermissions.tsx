@@ -43,7 +43,7 @@ export function usePermissions(): PermissionConfig {
   }
 
   const role = profile.role;
-  const isActive = profile.status === 'active'; // Corrigido: usar status ao invés de comparar role com 'inactive'
+  const isActive = true; // Since we don't have a status field, assume authenticated users are active
   const isSuperAdmin = role === 'admin_master' && isActive;
   const isAdmin = (role === 'admin' || isSuperAdmin) && isActive;
   const isEditor = (role === 'admin_editor' || isAdmin || isSuperAdmin) && isActive;
