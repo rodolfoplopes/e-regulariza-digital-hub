@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -17,6 +16,7 @@ import Layout from "@/components/layout/Layout";
 import { AlertCircle } from "lucide-react";
 import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 import { RecaptchaWrapper } from "@/components/production/RecaptchaWrapper";
+import { Logo } from "@/components/brand/Logo";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -37,8 +37,16 @@ export default function Login() {
 
   // Redirect if already authenticated
   useEffect(() => {
-    if (isAuthenticated) {
-      navigate(role === 'admin' ? '/admin' : '/dashboard');
+    if (isAuthenticated && role) {
+      console.log('User authenticated with role:', role);
+      // Redirect based on role
+      if (role === 'admin_master' || role === 'admin' || role === 'admin_editor' || role === 'admin_viewer') {
+        console.log('Redirecting to admin dashboard');
+        navigate('/admin');
+      } else {
+        console.log('Redirecting to user dashboard');
+        navigate('/dashboard');
+      }
     }
   }, [isAuthenticated, role, navigate]);
 
@@ -159,7 +167,7 @@ export default function Login() {
         resetLoginAttempts();
         toast({
           title: "Login bem-sucedido",
-          description: "Redirecionando para o dashboard...",
+          description: "Redirecionando para o painel...",
         });
         // Navigation will be handled by the useEffect hook
       } else {
@@ -178,15 +186,15 @@ export default function Login() {
 
   return (
     <Layout hideFooter>
-      <div className="flex items-center justify-center min-h-[calc(100vh-64px)] bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="flex items-center justify-center min-h-[calc(100vh-64px)] bg-white py-12 px-4 sm:px-6 lg:px-8">
         <div className="w-full max-w-md">
           <Card className="shadow-lg border-0">
             <CardHeader className="space-y-1 text-center">
-              <div className="w-16 h-16 rounded-full eregulariza-gradient flex items-center justify-center mx-auto mb-4">
-                <span className="font-bold text-white text-2xl">e</span>
+              <div className="flex justify-center mb-4">
+                <Logo variant="circular" size="lg" />
               </div>
-              <CardTitle className="text-2xl font-bold">Bem-vindo de volta</CardTitle>
-              <CardDescription>
+              <CardTitle className="text-2xl font-bold text-eregulariza-gray">Bem-vindo de volta</CardTitle>
+              <CardDescription className="text-eregulariza-description">
                 Entre com seus dados para acessar sua conta
               </CardDescription>
             </CardHeader>
@@ -242,12 +250,12 @@ export default function Login() {
               <CardFooter className="flex flex-col">
                 <Button
                   type="submit"
-                  className="w-full eregulariza-gradient hover:opacity-90"
+                  className="w-full eregulariza-gradient hover:opacity-90 btn-eregulariza-hover"
                   disabled={cooldownActive || isLoading || (recaptchaEnabled && !recaptchaToken)}
                 >
                   {isLoading ? "Entrando..." : "Entrar"}
                 </Button>
-                <p className="text-center text-sm mt-4">
+                <p className="text-center text-sm mt-4 text-eregulariza-description">
                   Não tem uma conta?{" "}
                   <Link to="/register" className="text-eregulariza-primary hover:underline">
                     Cadastre-se

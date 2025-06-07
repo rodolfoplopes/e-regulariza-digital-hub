@@ -62,11 +62,13 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
+        console.log('Auth state changed:', event, session?.user?.email);
         setUser(session?.user ?? null);
         
         if (session?.user) {
           const userProfile = await profileService.getCurrentProfile();
           if (userProfile) {
+            console.log('User profile loaded:', userProfile);
             setProfile({
               ...userProfile,
               role: userProfile.role as Profile['role']
@@ -84,27 +86,32 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
 
   const login = async (email: string, password: string): Promise<{ success: boolean; error?: string }> => {
     try {
+      console.log('Attempting login for:', email);
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
       if (error) {
+        console.error('Login error:', error);
         return { success: false, error: error.message };
       }
 
       if (data.user) {
+        console.log('Login successful, fetching profile...');
         const userProfile = await profileService.getCurrentProfile();
         if (userProfile) {
+          console.log('Profile fetched:', userProfile);
           setProfile({
             ...userProfile,
-            role: userProfile.role as 'admin' | 'cliente'
+            role: userProfile.role as Profile['role']
           });
         }
       }
 
       return { success: true };
     } catch (error) {
+      console.error('Unexpected login error:', error);
       return { success: false, error: 'Erro inesperado durante o login' };
     }
   };
@@ -149,7 +156,7 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
       if (userProfile) {
         setProfile({
           ...userProfile,
-          role: userProfile.role as 'admin' | 'cliente'
+          role: userProfile.role as Profile['role']
         });
       }
     }
