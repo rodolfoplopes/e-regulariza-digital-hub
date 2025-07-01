@@ -7,7 +7,6 @@ import ProcessCard, { ProcessProps } from "@/components/dashboard/ProcessCard";
 import NotificationCard, { NotificationProps } from "@/components/dashboard/NotificationCard";
 import EnhancedDashboardStats from "@/components/dashboard/EnhancedDashboardStats";
 import { Clock, AlertTriangle, FileText } from "lucide-react";
-import { useIsMobile } from "@/hooks/use-mobile";
 import { useToast } from "@/hooks/use-toast";
 import { useProcesses } from "@/hooks/useProcesses";
 import { useNotifications } from "@/hooks/useNotifications";
@@ -17,7 +16,6 @@ import { useOnboarding } from "@/hooks/useOnboarding";
 
 export default function Dashboard() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const isMobile = useIsMobile();
   const { toast } = useToast();
   const { profile } = useSupabaseAuth();
   const { showOnboarding, completeOnboarding } = useOnboarding();
@@ -55,7 +53,11 @@ export default function Dashboard() {
   const isLoading = processesLoading || notificationsLoading;
 
   // Determine title and welcome message based on user profile
-  const isAdmin = profile?.role === 'admin' || profile?.role === 'admin_master' || profile?.role === 'admin_editor' || profile?.role === 'admin_viewer';
+  const isAdmin = profile?.role === 'admin' || 
+                  profile?.role === 'admin_master' || 
+                  profile?.role === 'admin_editor' || 
+                  profile?.role === 'admin_viewer';
+  
   const dashboardTitle = isAdmin ? 'Dashboard' : 'Meus Processos';
   const welcomeMessage = isAdmin 
     ? `Bem-vindo ao painel administrativo, ${profile?.name}!`

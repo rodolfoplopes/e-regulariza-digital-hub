@@ -2,6 +2,9 @@
 import React, { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
+import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import AdminHeader from "@/components/admin/AdminHeader";
 import AdminTabContent from "@/components/admin/AdminTabContent";
 import IntegrationSettings from "@/components/admin/IntegrationSettings";
@@ -19,7 +22,8 @@ import { Navigate } from "react-router-dom";
 export default function AdminDashboard() {
   const { profile, isLoading: authLoading } = useSupabaseAuth();
   const permissions = usePermissions();
-  const [activeTab, setActiveTab] = useState("overview");
+  const [activeTab, setActiveTab] = useState("dashboard");
+  const navigate = useNavigate();
 
   if (authLoading) {
     return (
@@ -43,6 +47,20 @@ export default function AdminDashboard() {
         serviceTypes={[]} 
       />
       <main className="container mx-auto px-4 py-8">
+        <div className="flex justify-between items-center mb-6">
+          <div>
+            <h1 className="text-3xl font-bold text-eregulariza-gray">Dashboard Administrativo</h1>
+            <p className="text-eregulariza-description mt-1">Gerencie processos, clientes e configurações do sistema</p>
+          </div>
+          <Button 
+            onClick={() => navigate('/admin/novo-processo')}
+            className="bg-eregulariza-primary hover:bg-eregulariza-primary/90 text-white"
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Criar Processo
+          </Button>
+        </div>
+
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList className="grid grid-cols-2 lg:grid-cols-11 w-full lg:w-auto">
             {permissions.isSuperAdmin && (

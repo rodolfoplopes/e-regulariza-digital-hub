@@ -5,154 +5,191 @@
  */
 
 import { supabase } from "@/integrations/supabase/client";
-import { BaseService } from "./core/base";
-import { Process, ProcessWithDetails, CreateProcessData, ProcessStatus } from "./core/types";
 
-class ProcessService extends BaseService {
-  constructor() {
-    super('ProcessService');
-  }
+export interface ProcessType {
+  id: string;
+  name: string;
+  description: string | null;
+  estimated_duration_days: number | null;
+}
 
+export interface Process {
+  id: string;
+  title: string;
+  description: string | null;
+  status: string;
+  progress: number | null;
+  deadline: string | null;
+  created_at: string;
+  updated_at: string;
+  process_number: string;
+  client_id: string;
+  process_type_id: string;
+}
+
+export interface ProcessWithDetails extends Process {
+  process_type?: ProcessType;
+  client?: {
+    id: string;
+    name: string;
+    email: string;
+    cpf: string | null;
+  };
+  steps?: Array<{
+    id: string;
+    title: string;
+    description: string | null;
+    status: string;
+    order_number: number;
+    deadline: string | null;
+    completed_at: string | null;
+  }>;
+  documents?: Array<{
+    id: string;
+    name: string;
+    file_url: string;
+    status: string;
+    uploaded_by: string;
+  }>;
+}
+
+export interface CreateProcessData {
+  title: string;
+  description?: string;
+  client_id: string;
+  process_type_id: string;
+  deadline?: string;
+}
+
+class ProcessService {
   /**
    * Busca todos os processos com filtros opcionais
-   * @param clientId ID do cliente (opcional)
-   * @returns Array de processos
    */
   async getProcesses(clientId?: string): Promise<ProcessWithDetails[]> {
-    return this.executeArrayOperation(
-      `getProcesses${clientId ? `(client: ${clientId})` : ''}`,
-      async () => {
-        let query = supabase
-          .from('processes')
-          .select(`
-            *,
-            process_type:process_types(*),
-            client:profiles(*)
-          `)
-          .order('created_at', { ascending: false });
+    try {
+      let query = supabase
+        .from('processes')
+        .select(`
+          *,
+          process_type:process_types(*),
+          client:profiles(*)
+        `)
+        .order('created_at', { ascending: false });
 
-        if (clientId) {
-          query = query.eq('client_id', clientId);
-        }
-
-        const { data, error } = await query;
-        if (error) throw error;
-        return data || [];
+      if (clientId) {
+        query = query.eq('client_id', clientId);
       }
-    );
+
+      const { data, error } = await query;
+      if (error) throw error;
+      return data || [];
+    } catch (error) {
+      console.error('Error fetching processes:', error);
+      throw error;
+    }
   }
 
   /**
    * Busca processo por ID
-   * @param id ID do processo
-   * @returns Processo com detalhes ou null
    */
   async getProcessById(id: string): Promise<ProcessWithDetails | null> {
-    return this.executeOperation(
-      `getProcessById(${id})`,
-      async () => {
-        const { data, error } = await supabase
-          .from('processes')
-          .select(`
-            *,
-            process_type:process_types(*),
-            client:profiles(*),
-            steps:process_steps(*),
-            documents:process_documents(*)
-          `)
-          .eq('id', id)
-          .single();
+    try {
+      const { data, error } = await supabase
+        .from('processes')
+        .select(`
+          *,
+          process_type:process_types(*),
+          client:profiles(*),
+          steps:process_steps(*),
+          documents:process_documents(*)
+        `)
+        .eq('id', id)
+        .single();
 
-        if (error) throw error;
-        return data;
-      }
-    );
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      console.error('Error fetching process by ID:', error);
+      throw error;
+    }
   }
 
   /**
    * Cria novo processo
-   * @param processData Dados do processo
-   * @returns Processo criado ou null
    */
   async createProcess(processData: CreateProcessData): Promise<Process | null> {
-    return this.executeOperation(
-      'createProcess',
-      async () => {
-        const { data, error } = await supabase
-          .from('processes')
-          .insert({
-            ...processData,
-            process_number: '' // Will be replaced by trigger
-          })
-          .select()
-          .single();
+    try {
+      const { data, error } = await supabase
+        .from('processes')
+        .insert({
+          ...processData,
+          process_number: '' // Will be replaced by trigger
+        })
+        .select()
+        .single();
 
-        if (error) throw error;
-        return data;
-      }
-    );
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      console.error('Error creating process:', error);
+      throw error;
+    }
   }
 
   /**
    * Atualiza processo
-   * @param id ID do processo
-   * @param updates Dados para atualizar
-   * @returns Processo atualizado ou null
    */
   async updateProcess(id: string, updates: Partial<Process>): Promise<Process | null> {
-    return this.executeOperation(
-      `updateProcess(${id})`,
-      async () => {
-        const { data, error } = await supabase
-          .from('processes')
-          .update(updates)
-          .eq('id', id)
-          .select()
-          .single();
+    try {
+      const { data, error } = await supabase
+        .from('processes')
+        .update(updates)
+        .eq('id', id)
+        .select()
+        .single();
 
-        if (error) throw error;
-        return data;
-      }
-    );
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      console.error('Error updating process:', error);
+      throw error;
+    }
   }
 
   /**
-   * Atualiza status do processo
-   * @param id ID do processo
-   * @param status Novo status
-   * @returns Sucesso da operação
+   * Busca tipos de processo
    */
-  async updateProcessStatus(id: string, status: ProcessStatus): Promise<boolean> {
-    return this.executeBooleanOperation(
-      `updateProcessStatus(${id}, ${status})`,
-      async () => {
-        const { error } = await supabase
-          .from('processes')
-          .update({ status })
-          .eq('id', id);
+  async getProcessTypes(): Promise<ProcessType[]> {
+    try {
+      const { data, error } = await supabase
+        .from('process_types')
+        .select('*')
+        .order('name');
 
-        if (error) throw error;
-      }
-    );
+      if (error) throw error;
+      return data || [];
+    } catch (error) {
+      console.error('Error fetching process types:', error);
+      throw error;
+    }
   }
 
   /**
    * Deleta processo
-   * @param id ID do processo
-   * @returns Sucesso da operação
    */
   async deleteProcess(id: string): Promise<boolean> {
-    return this.executeBooleanOperation(
-      `deleteProcess(${id})`,
-      async () => {
-        const { error } = await supabase
-          .from('processes')
-          .delete()
-          .eq('id', id);
+    try {
+      const { error } = await supabase
+        .from('processes')
+        .delete()
+        .eq('id', id);
 
-        if (error) throw error;
-      }
-    );
+      if (error) throw error;
+      return true;
+    } catch (error) {
+      console.error('Error deleting process:', error);
+      throw error;
+    }
   }
 }
 

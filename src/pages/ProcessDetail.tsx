@@ -9,7 +9,7 @@ import ProcessDetailHeader from "@/components/process/ProcessDetailHeader";
 import ProcessInfoCards from "@/components/process/ProcessInfoCards";
 import ProcessDetailContent from "@/components/process/ProcessDetailContent";
 import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
-import { processService, type ProcessWithDetails } from "@/services/supabaseService";
+import { processService, ProcessWithDetails } from "@/services/processService";
 
 export default function ProcessDetail() {
   const { processId } = useParams();
@@ -74,6 +74,11 @@ export default function ProcessDetail() {
     );
   }
 
+  const isAdmin = profile?.role === 'admin' || 
+                  profile?.role === 'admin_master' || 
+                  profile?.role === 'admin_editor' || 
+                  profile?.role === 'admin_viewer';
+
   return (
     <div className="flex h-screen bg-gray-50">
       <DashboardSidebar />
@@ -90,7 +95,7 @@ export default function ProcessDetail() {
           <ProcessInfoCards process={process} />
           <ProcessDetailContent 
             process={process} 
-            isAdmin={profile?.role === 'admin'} 
+            isAdmin={isAdmin} 
           />
         </main>
       </div>

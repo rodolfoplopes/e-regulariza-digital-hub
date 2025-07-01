@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -16,68 +17,36 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { Search, User, Mail, Phone, CreditCard, FileText, Calendar, ArrowRight } from "lucide-react";
 import { clientService } from "@/services/clientService";
-import { processService } from "@/services/processService";
+import { processService, ProcessType } from "@/services/processService";
 import { auditService } from "@/services/auditService";
-import { previewProcessNumber } from "@/utils/processUtils";
+import { supabase } from "@/integrations/supabase/client";
 
-interface ProcessType {
+interface Client {
   id: string;
   name: string;
-  description: string;
-  estimatedDays: number;
-  stages: Array<{
-    name: string;
-    description: string;
-    estimatedDays: number;
-  }>;
+  email: string;
+  cpf: string | null;
+  phone: string | null;
 }
-
-const processTypes: ProcessType[] = [
-  {
-    id: "usucapiao",
-    name: "Usucapião",
-    description: "Processo de regularização por usucapião",
-    estimatedDays: 120,
-    stages: [
-      { name: "Análise Preliminar", description: "Verificação inicial da documentação", estimatedDays: 7 },
-      { name: "Coleta de Documentos", description: "Recebimento e validação de documentação", estimatedDays: 30 },
-      { name: "Elaboração da Petição", description: "Preparação dos documentos legais", estimatedDays: 15 },
-      { name: "Protocolo no Cartório", description: "Entrada do processo no cartório", estimatedDays: 5 },
-      { name: "Acompanhamento", description: "Acompanhamento do andamento", estimatedDays: 60 },
-      { name: "Registro da Matrícula", description: "Finalização com registro", estimatedDays: 10 }
-    ]
-  },
-  {
-    id: "retificacao",
-    name: "Retificação de Área",
-    description: "Correção de medidas e confrontações",
-    estimatedDays: 90,
-    stages: [
-      { name: "Análise Documental", description: "Análise dos documentos existentes", estimatedDays: 7 },
-      { name: "Levantamento Topográfico", description: "Medições técnicas", estimatedDays: 15 },
-      { name: "Notificação de Confrontantes", description: "Comunicação aos vizinhos", estimatedDays: 30 },
-      { name: "Elaboração de Memorial", description: "Preparação do memorial descritivo", estimatedDays: 10 },
-      { name: "Protocolo de Retificação", description: "Entrada do pedido", estimatedDays: 5 },
-      { name: "Averbação na Matrícula", description: "Finalização", estimatedDays: 20 }
-    ]
-  }
-];
 
 export default function EnhancedProcessCreate() {
   const navigate = useNavigate();
   const { toast } = useToast();
   
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedClient, setSelectedClient] = useState<any>(null);
-  const [clients, setClients] = useState<any[]>([]);
+  const [selectedClient, setSelectedClient] = useState<Client | null>(null);
+  const [clients, setClients] = useState<Client[]>([]);
   const [isLoadingClients, setIsLoadingClients] = useState(false);
+  const [processTypes, setProcessTypes] = useState<ProcessType[]>([]);
+  const [isLoadingTypes, setIsLoadingTypes] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
   const [formData, setFormData] = useState({
     processNumber: "",
     title: "",
     description: "",
     processType: "",
-    startDate: new Date().toISOString().split('T')[0]
+    estimatedDays: 0
   });
 
   const [selectedProcessType, setSelectedProcessType] = useState<ProcessType | null>(null);
@@ -86,8 +55,9 @@ export default function EnhancedProcessCreate() {
   useEffect(() => {
     const generateNumber = async () => {
       try {
-        const number = await previewProcessNumber();
-        setFormData(prev => ({ ...prev, processNumber: number }));
+        const { data, error } = await supabase.rpc('generate_process_number');
+        if (error) throw error;
+        setFormData(prev => ({ ...prev, processNumber: data || 'ER-0000-00001' }));
       } catch (error) {
         console.error('Erro ao gerar número:', error);
         const currentYM = new Date().toISOString().slice(2, 7).replace('-', '');
@@ -95,6 +65,27 @@ export default function EnhancedProcessCreate() {
       }
     };
     generateNumber();
+  }, []);
+
+  // Carregar tipos de processo
+  useEffect(() => {
+    const loadProcessTypes = async () => {
+      setIsLoadingTypes(true);
+      try {
+        const types = await processService.getProcessTypes();
+        setProcessTypes(types);
+      } catch (error) {
+        console.error('Erro ao carregar tipos:', error);
+        toast({
+          variant: "destructive",
+          title: "Erro ao carregar tipos de processo",
+          description: "Tente novamente"
+        });
+      } finally {
+        setIsLoadingTypes(false);
+      }
+    };
+    loadProcessTypes();
   }, []);
 
   // Buscar clientes
@@ -138,7 +129,11 @@ export default function EnhancedProcessCreate() {
   const handleProcessTypeChange = (typeId: string) => {
     const type = processTypes.find(t => t.id === typeId);
     setSelectedProcessType(type || null);
-    setFormData(prev => ({ ...prev, processType: typeId }));
+    setFormData(prev => ({ 
+      ...prev, 
+      processType: typeId,
+      estimatedDays: type?.estimated_duration_days || 0
+    }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -162,8 +157,18 @@ export default function EnhancedProcessCreate() {
       return;
     }
 
+    if (!formData.title.trim()) {
+      toast({
+        variant: "destructive",
+        title: "Título obrigatório",
+        description: "Digite um título para o processo"
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
     try {
-      // Criar processo (removido 'status' property)
+      // Criar processo
       const process = await processService.createProcess({
         title: formData.title,
         description: formData.description,
@@ -181,7 +186,7 @@ export default function EnhancedProcessCreate() {
           details: {
             client_name: selectedClient.name,
             process_type: selectedProcessType.name,
-            estimated_days: selectedProcessType.estimatedDays
+            estimated_days: selectedProcessType.estimated_duration_days
           }
         });
 
@@ -199,6 +204,8 @@ export default function EnhancedProcessCreate() {
         title: "Erro ao criar processo",
         description: error instanceof Error ? error.message : "Erro inesperado"
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -251,10 +258,12 @@ export default function EnhancedProcessCreate() {
                               <Mail className="h-3 w-3" />
                               {client.email}
                             </span>
-                            <span className="flex items-center gap-1">
-                              <CreditCard className="h-3 w-3" />
-                              {client.cpf}
-                            </span>
+                            {client.cpf && (
+                              <span className="flex items-center gap-1">
+                                <CreditCard className="h-3 w-3" />
+                                {client.cpf}
+                              </span>
+                            )}
                             {client.phone && (
                               <span className="flex items-center gap-1">
                                 <Phone className="h-3 w-3" />
@@ -281,7 +290,7 @@ export default function EnhancedProcessCreate() {
                         </h4>
                         <div className="flex items-center gap-4 text-sm text-eregulariza-description mt-1">
                           <span>{selectedClient.email}</span>
-                          <span>{selectedClient.cpf}</span>
+                          {selectedClient.cpf && <span>{selectedClient.cpf}</span>}
                           {selectedClient.phone && <span>{selectedClient.phone}</span>}
                         </div>
                       </div>
@@ -337,7 +346,9 @@ export default function EnhancedProcessCreate() {
                     <SelectItem key={type.id} value={type.id}>
                       <div>
                         <div className="font-medium">{type.name}</div>
-                        <div className="text-sm text-gray-500">{type.description}</div>
+                        {type.description && (
+                          <div className="text-sm text-gray-500">{type.description}</div>
+                        )}
                       </div>
                     </SelectItem>
                   ))}
@@ -348,23 +359,24 @@ export default function EnhancedProcessCreate() {
             {selectedProcessType && (
               <Card className="border-l-4 border-l-eregulariza-primary bg-eregulariza-surface">
                 <CardContent className="p-4">
-                  <h4 className="font-medium text-eregulariza-gray mb-2">Etapas do Processo</h4>
+                  <h4 className="font-medium text-eregulariza-gray mb-2">Detalhes do Tipo de Processo</h4>
                   <div className="space-y-2">
-                    {selectedProcessType.stages.map((stage, index) => (
-                      <div key={index} className="flex justify-between items-center text-sm">
-                        <div>
-                          <span className="font-medium">{index + 1}. {stage.name}</span>
-                          <p className="text-eregulariza-description">{stage.description}</p>
-                        </div>
-                        <Badge variant="outline">{stage.estimatedDays} dias</Badge>
-                      </div>
-                    ))}
-                  </div>
-                  <div className="mt-3 pt-3 border-t">
-                    <div className="flex items-center gap-2 text-sm">
-                      <Calendar className="h-4 w-4 text-eregulariza-primary" />
-                      <span className="font-medium">Prazo total estimado: {selectedProcessType.estimatedDays} dias</span>
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="font-medium">Nome:</span>
+                      <span>{selectedProcessType.name}</span>
                     </div>
+                    {selectedProcessType.description && (
+                      <div className="flex justify-between items-center text-sm">
+                        <span className="font-medium">Descrição:</span>
+                        <span>{selectedProcessType.description}</span>
+                      </div>
+                    )}
+                    {selectedProcessType.estimated_duration_days && (
+                      <div className="flex items-center gap-2 text-sm">
+                        <Calendar className="h-4 w-4 text-eregulariza-primary" />
+                        <span className="font-medium">Prazo estimado: {selectedProcessType.estimated_duration_days} dias</span>
+                      </div>
+                    )}
                   </div>
                 </CardContent>
               </Card>
@@ -389,10 +401,10 @@ export default function EnhancedProcessCreate() {
           </Button>
           <Button
             type="submit"
-            disabled={!selectedClient || !selectedProcessType}
+            disabled={!selectedClient || !selectedProcessType || !formData.title.trim() || isSubmitting}
             className="eregulariza-gradient btn-eregulariza-hover text-white"
           >
-            Criar Processo
+            {isSubmitting ? "Criando..." : "Criar Processo"}
           </Button>
         </div>
       </form>
