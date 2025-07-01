@@ -40,7 +40,7 @@ export default function Login() {
   useEffect(() => {
     if (isAuthenticated && role) {
       console.log('User authenticated with role:', role);
-      // Redirect based on role - improved logic
+      // Redirect based on role
       if (role === 'admin_master' || role === 'admin' || role === 'admin_editor' || role === 'admin_viewer') {
         console.log('Redirecting to admin dashboard');
         navigate('/admin', { replace: true });
@@ -260,7 +260,6 @@ export default function Login() {
                   {isLoading ? "Entrando..." : "Entrar"}
                 </Button>
                 
-                {/* Removed public registration link as requested */}
                 <p className="text-center text-sm mt-4 text-eregulariza-description">
                   Não tem acesso? Entre em contato com nossa equipe.
                 </p>

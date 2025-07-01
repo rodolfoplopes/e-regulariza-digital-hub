@@ -15,94 +15,34 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
-import { useToast } from "@/hooks/use-toast";
 import ProcessNotifications from "../process/ProcessNotifications";
 
 export default function DashboardHeader() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
-  const [sessionTimeout, setSessionTimeout] = useState<NodeJS.Timeout | null>(null);
-  const [lastActivity, setLastActivity] = useState<number>(Date.now());
   
   const isMobile = useIsMobile();
   const { user, profile, logout } = useSupabaseAuth();
   const navigate = useNavigate();
-  const { toast } = useToast();
 
   useEffect(() => {
     // In a real app with Supabase, we would fetch the custom logo URL
-    // For now, we'll just use a mock implementation
-    // This would be something like: const { data } = await supabase.from('settings').select('logo_url').single();
-    // setLogoUrl(data?.logo_url || null);
+    // For now, we'll just use a mock implementation  
   }, []);
-
-  // Setup activity monitoring for session security
-  useEffect(() => {
-    const activityEvents = ['mousedown', 'keydown', 'touchstart', 'scroll'];
-    
-    const resetTimer = () => {
-      setLastActivity(Date.now());
-    };
-    
-    // Add event listeners for user activity
-    activityEvents.forEach(event => {
-      window.addEventListener(event, resetTimer);
-    });
-    
-    // Session timeout check (30 minutes of inactivity)
-    const SESSION_TIMEOUT = 30 * 60 * 1000; // 30 minutes in milliseconds
-    
-    const interval = setInterval(() => {
-      const currentTime = Date.now();
-      const inactiveTime = currentTime - lastActivity;
-      
-      if (inactiveTime >= SESSION_TIMEOUT) {
-        // Session expired - log user out
-        handleLogout(true);
-      } else if (inactiveTime >= SESSION_TIMEOUT - (5 * 60 * 1000)) {
-        // Session about to expire in 5 minutes - show warning
-        toast({
-          title: "Sessão prestes a expirar",
-          description: "Sua sessão irá expirar em 5 minutos por inatividade.",
-          duration: 10000,
-        });
-      }
-    }, 60000); // Check every minute
-    
-    setSessionTimeout(interval);
-    
-    return () => {
-      // Clean up event listeners and interval
-      activityEvents.forEach(event => {
-        window.removeEventListener(event, resetTimer);
-      });
-      
-      if (sessionTimeout) {
-        clearInterval(sessionTimeout);
-      }
-    };
-  }, [lastActivity]);
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
 
-  const handleLogout = (isTimeout = false) => {
-    logout();
-    
-    if (isTimeout) {
-      toast({
-        title: "Sessão expirada",
-        description: "Sua sessão expirou por inatividade. Por favor, faça login novamente.",
-      });
-    } else {
-      toast({
-        title: "Logout realizado",
-        description: "Você foi desconectado com sucesso.",
-      });
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate("/login", { replace: true });
+    } catch (error) {
+      console.error('Logout error in header:', error);
+      // Force navigation even if logout fails
+      navigate("/login", { replace: true });
     }
-    
-    navigate("/login");
   };
 
   // Use profile data from Supabase auth
@@ -174,7 +114,7 @@ export default function DashboardHeader() {
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem 
-                onClick={() => handleLogout()}
+                onClick={handleLogout}
                 className="cursor-pointer text-red-600 focus:text-red-600"
               >
                 <LogOut className="mr-2 h-4 w-4" />

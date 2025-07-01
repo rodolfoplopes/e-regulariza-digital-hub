@@ -57,8 +57,13 @@ const ProtectedRoute = ({
 
 // Public routes - accessible to all users
 const PublicRoute = () => {
-  const { isAuthenticated, role } = useSupabaseAuth();
+  const { isAuthenticated, role, isLoading } = useSupabaseAuth();
   const location = useLocation();
+
+  // Don't redirect while loading
+  if (isLoading) {
+    return <Outlet />;
+  }
 
   if (isAuthenticated && ['/login', '/register'].includes(location.pathname)) {
     // Improved redirection logic based on role
