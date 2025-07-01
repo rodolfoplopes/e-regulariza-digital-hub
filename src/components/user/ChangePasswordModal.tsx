@@ -1,6 +1,7 @@
 
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 import {
   Dialog,
   DialogContent,
@@ -20,39 +21,40 @@ interface ChangePasswordModalProps {
 }
 
 export default function ChangePasswordModal({ isOpen, onClose }: ChangePasswordModalProps) {
-  const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [attemptCount, setAttemptCount] = useState(0);
   const { toast } = useToast();
   
   const [errors, setErrors] = useState({
-    currentPassword: "",
     newPassword: "",
     confirmPassword: ""
   });
 
+  const validatePassword = (password: string): boolean => {
+    if (password.length < 8) {
+      return false;
+    }
+    // Check for at least one letter and one number
+    const hasLetter = /[A-Za-z]/.test(password);
+    const hasNumber = /\d/.test(password);
+    return hasLetter && hasNumber;
+  };
+
   const validateForm = () => {
     const newErrors = {
-      currentPassword: "",
       newPassword: "",
       confirmPassword: ""
     };
-    
-    if (!currentPassword) {
-      newErrors.currentPassword = "A senha atual é obrigatória";
-    }
     
     if (!newPassword) {
       newErrors.newPassword = "A nova senha é obrigatória";
     } else if (newPassword.length < 8) {
       newErrors.newPassword = "A senha deve ter pelo menos 8 caracteres";
-    } else if (!/^(?=.*[A-Za-z])(?=.*\d)/.test(newPassword)) {
-      newErrors.newPassword = "A senha deve conter letras e números";
+    } else if (!validatePassword(newPassword)) {
+      newErrors.newPassword = "A senha deve conter pelo menos uma letra e um número";
     }
     
     if (!confirmPassword) {
@@ -76,69 +78,35 @@ export default function ChangePasswordModal({ isOpen, onClose }: ChangePasswordM
     setIsLoading(true);
     
     try {
-      // Check if we have reached the attempt limit
-      if (attemptCount >= 3) {
+      const { error } = await supabase.auth.updateUser({ 
+        password: newPassword 
+      });
+      
+      if (error) {
+        console.error('Password change error:', error);
         toast({
           variant: "destructive",
-          title: "Muitas tentativas",
-          description: "Por favor, aguarde alguns minutos antes de tentar novamente.",
+          title: "Erro ao alterar senha",
+          description: error.message || "Ocorreu um erro ao alterar sua senha. Tente novamente.",
         });
-        setIsLoading(false);
-        return;
-      }
-      
-      // This is where we would integrate with Supabase
-      // In a real implementation, you would use:
-      // 
-      // 1. First authenticate the current password:
-      // const { error: signInError } = await supabase.auth.signInWithPassword({
-      //   email: currentUserEmail, // You would need to get this from your auth context
-      //   password: currentPassword,
-      // });
-      // 
-      // 2. If current password is correct, update to the new password:
-      // if (!signInError) {
-      //   const { error: updateError } = await supabase.auth.updateUser({ 
-      //     password: newPassword 
-      //   });
-      //  
-      //   if (!updateError) {
-      //     // Success
-      //   }
-      // }
-      
-      // For now, we'll simulate the API call with a delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Simulate random success/failure for demonstration
-      const isSuccessful = true; // In real implementation, this would depend on the API response
-      
-      if (isSuccessful) {
+      } else {
         toast({
           title: "Senha alterada com sucesso",
           description: "Sua senha foi atualizada com segurança.",
         });
         
         // Reset form and close modal
-        setCurrentPassword("");
         setNewPassword("");
         setConfirmPassword("");
-        setAttemptCount(0);
+        setErrors({ newPassword: "", confirmPassword: "" });
         onClose();
-      } else {
-        setAttemptCount(prev => prev + 1);
-        toast({
-          variant: "destructive",
-          title: "Erro ao alterar senha",
-          description: "Por favor, verifique se sua senha atual está correta.",
-        });
       }
     } catch (error) {
-      setAttemptCount(prev => prev + 1);
+      console.error('Unexpected error:', error);
       toast({
         variant: "destructive",
-        title: "Erro ao alterar senha",
-        description: "Por favor, verifique se sua senha atual está correta.",
+        title: "Erro inesperado",
+        description: "Ocorreu um erro inesperado. Tente novamente mais tarde.",
       });
     } finally {
       setIsLoading(false);
@@ -146,10 +114,9 @@ export default function ChangePasswordModal({ isOpen, onClose }: ChangePasswordM
   };
 
   const handleClose = () => {
-    setCurrentPassword("");
     setNewPassword("");
     setConfirmPassword("");
-    setErrors({ currentPassword: "", newPassword: "", confirmPassword: "" });
+    setErrors({ newPassword: "", confirmPassword: "" });
     onClose();
   };
 
@@ -159,41 +126,12 @@ export default function ChangePasswordModal({ isOpen, onClose }: ChangePasswordM
         <DialogHeader>
           <DialogTitle>Alterar senha</DialogTitle>
           <DialogDescription>
-            Para sua segurança, informe sua senha atual antes de definir uma nova senha.
+            Digite sua nova senha. Ela deve ter pelo menos 8 caracteres e conter letras e números.
           </DialogDescription>
         </DialogHeader>
         
         <form onSubmit={handleSubmit}>
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label htmlFor="current-password">Senha atual</Label>
-              <div className="relative">
-                <Input
-                  id="current-password"
-                  type={showCurrentPassword ? "text" : "password"}
-                  value={currentPassword}
-                  onChange={(e) => setCurrentPassword(e.target.value)}
-                  className="pr-10"
-                  disabled={isLoading}
-                />
-                <button
-                  type="button"
-                  className="absolute inset-y-0 right-0 flex items-center pr-3"
-                  onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-                  disabled={isLoading}
-                >
-                  {showCurrentPassword ? (
-                    <EyeOff className="h-4 w-4 text-gray-400" />
-                  ) : (
-                    <Eye className="h-4 w-4 text-gray-400" />
-                  )}
-                </button>
-              </div>
-              {errors.currentPassword && (
-                <p className="text-sm text-destructive">{errors.currentPassword}</p>
-              )}
-            </div>
-            
+          <div className="space-y-4 py-4">            
             <div className="space-y-2">
               <Label htmlFor="new-password">Nova senha</Label>
               <div className="relative">
@@ -268,8 +206,8 @@ export default function ChangePasswordModal({ isOpen, onClose }: ChangePasswordM
             </Button>
             <Button 
               type="submit" 
-              className="eregulariza-gradient hover:opacity-90"
-              disabled={isLoading}
+              className="bg-[#3C00F8] hover:bg-[#3C00F8]/90 text-white"
+              disabled={isLoading || !newPassword || !confirmPassword}
             >
               {isLoading ? "Alterando..." : "Alterar senha"}
             </Button>

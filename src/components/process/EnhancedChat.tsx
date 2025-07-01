@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from "react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -22,6 +21,7 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
+import { sanitizeForStorage, sanitizeText } from "@/utils/sanitization";
 import {
   Select,
   SelectContent,
@@ -136,7 +136,10 @@ export default function EnhancedChat({
     setIsSending(true);
     
     try {
-      await onSendMessage(newMessage, attachments.length > 0 ? attachments : undefined, selectedTags.length > 0 ? selectedTags : undefined);
+      // Sanitize message content before sending
+      const sanitizedMessage = sanitizeForStorage(newMessage);
+      
+      await onSendMessage(sanitizedMessage, attachments.length > 0 ? attachments : undefined, selectedTags.length > 0 ? selectedTags : undefined);
       setNewMessage("");
       setAttachments([]);
       setSelectedTags([]);
@@ -230,7 +233,7 @@ export default function EnhancedChat({
       <div className="p-4 border-b bg-gray-50 rounded-t-lg">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-lg font-semibold text-eregulariza-text">
+            <h3 className="text-lg font-semibold text-gray-900">
               Chat do Processo
             </h3>
             <p className="text-sm text-gray-600">
@@ -262,7 +265,7 @@ export default function EnhancedChat({
               <div className="flex max-w-[80%]">
                 {message.sender.type === "admin" && (
                   <Avatar className="h-8 w-8 mr-2 mt-1">
-                    <AvatarFallback className="bg-primary text-white text-xs">
+                    <AvatarFallback className="bg-[#3C00F8] text-white text-xs">
                       {message.sender.initials}
                     </AvatarFallback>
                   </Avatar>
@@ -274,7 +277,7 @@ export default function EnhancedChat({
                       "rounded-lg p-3 shadow-sm",
                       message.sender.type === "admin" 
                         ? "bg-gray-100 text-gray-900" 
-                        : "bg-primary text-white"
+                        : "bg-[#3C00F8] text-white"
                     )}
                   >
                     {message.tags && message.tags.length > 0 && (
@@ -287,7 +290,8 @@ export default function EnhancedChat({
                       </div>
                     )}
                     
-                    <p className="text-sm">{message.content}</p>
+                    {/* Sanitize message content for display */}
+                    <p className="text-sm">{sanitizeText(message.content)}</p>
                     
                     {message.attachments && message.attachments.length > 0 && (
                       <div className="mt-2 space-y-1">
@@ -305,7 +309,7 @@ export default function EnhancedChat({
                             )}
                           >
                             {getFileIcon(attachment.name)}
-                            <span className="ml-2">{attachment.name}</span>
+                            <span className="ml-2">{sanitizeText(attachment.name)}</span>
                             <span className="ml-1 text-xs opacity-75">
                               ({(attachment.size / 1024).toFixed(0)}KB)
                             </span>
@@ -320,13 +324,13 @@ export default function EnhancedChat({
                       message.sender.type === "admin" ? "text-left" : "text-right"
                     }`}
                   >
-                    {message.timestamp} • {message.sender.name}
+                    {message.timestamp} • {sanitizeText(message.sender.name)}
                   </div>
                 </div>
                 
                 {message.sender.type === "client" && (
                   <Avatar className="h-8 w-8 ml-2 mt-1">
-                    <AvatarFallback className="bg-primary text-white text-xs">
+                    <AvatarFallback className="bg-[#3C00F8] text-white text-xs">
                       {message.sender.initials}
                     </AvatarFallback>
                   </Avatar>
@@ -351,7 +355,7 @@ export default function EnhancedChat({
                 className="bg-white rounded px-3 py-2 text-sm flex items-center shadow-sm border"
               >
                 {getFileIcon(file.name)}
-                <span className="ml-2 truncate max-w-[120px]">{file.name}</span>
+                <span className="ml-2 truncate max-w-[120px]">{sanitizeText(file.name)}</span>
                 <span className="ml-1 text-xs text-gray-500">
                   ({(file.size / 1024).toFixed(0)}KB)
                 </span>
@@ -436,14 +440,15 @@ export default function EnhancedChat({
               value={newMessage}
               onChange={(e) => setNewMessage(e.target.value)}
               placeholder="Digite sua mensagem..."
-              className="border-gray-200 focus:border-primary"
+              className="border-gray-200 focus:border-[#3C00F8]"
+              maxLength={1000}
             />
           </div>
           
           <Button
             type="submit"
             disabled={isSending || (!newMessage.trim() && !attachments.length)}
-            className="h-10 bg-primary hover:bg-primary/90 text-white"
+            className="h-10 bg-[#3C00F8] hover:bg-[#3C00F8]/90 text-white"
           >
             {isSending ? (
               "Enviando..."

@@ -1,4 +1,3 @@
-
 /**
  * Serviço para gerenciamento de perfis de usuário
  * @fileoverview Operações CRUD e validações para perfis de usuários
@@ -7,6 +6,7 @@
 import { supabase } from "@/integrations/supabase/client";
 import { BaseService } from "./core/base";
 import { Profile, CreateClientData } from "./core/types";
+import { sanitizeForStorage } from "@/utils/sanitization";
 
 class ProfileService extends BaseService {
   constructor() {
@@ -46,9 +46,18 @@ class ProfileService extends BaseService {
    */
   async updateProfile(id: string, updates: Partial<Profile>): Promise<Profile | null> {
     return this.executeOperation('updateProfile', async () => {
+      // Sanitize all text inputs before updating
+      const sanitizedUpdates = {
+        ...updates,
+        ...(updates.name && { name: sanitizeForStorage(updates.name) }),
+        ...(updates.email && { email: sanitizeForStorage(updates.email) }),
+        ...(updates.phone && { phone: sanitizeForStorage(updates.phone) }),
+        ...(updates.cpf && { cpf: sanitizeForStorage(updates.cpf) })
+      };
+
       const { data, error } = await supabase
         .from('profiles')
-        .update(updates)
+        .update(sanitizedUpdates)
         .eq('id', id)
         .select()
         .single();
@@ -88,8 +97,17 @@ class ProfileService extends BaseService {
    */
   async createClient(clientData: CreateClientData): Promise<Profile | null> {
     return this.executeOperation('createClient', async () => {
+      // Sanitize all text inputs before creating
+      const sanitizedClientData = {
+        ...clientData,
+        name: sanitizeForStorage(clientData.name),
+        email: sanitizeForStorage(clientData.email),
+        ...(clientData.phone && { phone: sanitizeForStorage(clientData.phone) }),
+        ...(clientData.cpf && { cpf: sanitizeForStorage(clientData.cpf) })
+      };
+
       // Validações básicas
-      if (!clientData.email || !clientData.name) {
+      if (!sanitizedClientData.email || !sanitizedClientData.name) {
         throw new Error('Email e nome são obrigatórios');
       }
 
@@ -97,7 +115,7 @@ class ProfileService extends BaseService {
       const { data: existingUser } = await supabase
         .from('profiles')
         .select('id')
-        .eq('email', clientData.email)
+        .eq('email', sanitizedClientData.email)
         .single();
 
       if (existingUser) {
@@ -107,7 +125,7 @@ class ProfileService extends BaseService {
       const { data, error } = await supabase
         .from('profiles')
         .insert({
-          ...clientData,
+          ...sanitizedClientData,
           id: crypto.randomUUID(),
         })
         .select()
