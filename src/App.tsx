@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -20,6 +19,8 @@ import PolicyPage from "./pages/PolicyPage";
 import Notifications from "./pages/Notifications";
 import LogoManagementPage from "./pages/LogoManagementPage";
 import AdminUserManagementPage from "./pages/AdminUserManagement";
+import Messages from "./pages/Messages";
+import UserProfile from "./pages/UserProfile";
 import GTMManager from '@/components/tracking/GTMManager';
 import { analytics } from '@/services/analyticsService';
 import { SupabaseAuthProvider, useSupabaseAuth } from '@/hooks/useSupabaseAuth';
@@ -122,7 +123,6 @@ const AppContent = () => {
               {/* Protected routes for authenticated users (clients) */}
               <Route element={<ProtectedRoute requiredRole="cliente" />}>
                 <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/dashboard-cliente" element={<Navigate to="/dashboard" replace />} />
                 <Route path="/configuracoes" element={<UserSettings />} />
                 <Route path="/mensagens" element={<Messages />} />
                 <Route path="/notificacoes" element={<Notifications />} />
@@ -134,7 +134,6 @@ const AppContent = () => {
               {/* Admin-only routes */}
               <Route element={<ProtectedRoute requiredRole="admin" />}>
                 <Route path="/admin" element={<AdminDashboard />} />
-                <Route path="/admin-dashboard" element={<Navigate to="/admin" replace />} />
                 <Route path="/admin/novo-processo" element={<ProcessCreate />} />
                 <Route path="/admin/logo" element={<LogoManagementPage />} />
                 <Route path="/admin/usuarios" element={<AdminUserManagementPage />} />

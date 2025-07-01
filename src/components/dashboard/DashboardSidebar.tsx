@@ -3,7 +3,6 @@ import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { 
   LayoutDashboard, 
-  FileText, 
   MessageSquare, 
   Bell, 
   Settings,
@@ -44,7 +43,7 @@ const SidebarItem = ({ icon, label, href, isActive, isExternal }: SidebarItemPro
       className={cn(
         "flex items-center py-2 px-3 rounded-md group transition-colors",
         isActive 
-          ? "bg-eregulariza-primary-20 text-eregulariza-primary" 
+          ? "bg-eregulariza-primary text-white" 
           : "text-eregulariza-darkgray hover:bg-gray-100"
       )}
     >
@@ -106,7 +105,7 @@ export default function DashboardSidebar() {
           {/* Link para voltar ao site */}
           <SidebarItem
             icon={<ExternalLink className="h-5 w-5" />}
-            label="Voltar ao site e-regulariza"
+            label="Acessar site institucional"
             href="https://e-regulariza.com"
             isActive={false}
             isExternal={true}

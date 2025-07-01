@@ -95,7 +95,7 @@ export default function MobileNav({ isOpen, onClose }: { isOpen: boolean, onClos
               className={cn(
                 "flex items-center py-3 px-3 rounded-md group transition-colors",
                 currentPath === item.href 
-                  ? "bg-eregulariza-primary/10 text-eregulariza-primary" 
+                  ? "bg-eregulariza-primary text-white" 
                   : "text-gray-700 hover:bg-gray-100"
               )}
               onClick={onClose}
@@ -119,7 +119,7 @@ export default function MobileNav({ isOpen, onClose }: { isOpen: boolean, onClos
             <div className="mr-3 flex-shrink-0">
               <ExternalLink className="h-5 w-5" />
             </div>
-            <span className="font-medium flex-1">Voltar ao site e-regulariza</span>
+            <span className="font-medium flex-1">Acessar site institucional</span>
             <ExternalLink className="h-4 w-4 ml-2" />
           </a>
         </div>

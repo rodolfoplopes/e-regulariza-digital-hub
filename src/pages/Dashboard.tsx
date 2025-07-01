@@ -54,15 +54,15 @@ export default function Dashboard() {
 
   const isLoading = processesLoading || notificationsLoading;
 
-  // Determinar título baseado no perfil do usuário
-  const isAdmin = profile?.role === 'admin' || profile?.role === 'admin_master' || profile?.role === 'admin_editor';
+  // Determine title and welcome message based on user profile
+  const isAdmin = profile?.role === 'admin' || profile?.role === 'admin_master' || profile?.role === 'admin_editor' || profile?.role === 'admin_viewer';
   const dashboardTitle = isAdmin ? 'Dashboard' : 'Meus Processos';
   const welcomeMessage = isAdmin 
     ? `Bem-vindo ao painel administrativo, ${profile?.name}!`
     : `Olá, ${profile?.name}! Bem-vindo ao seu painel de regularização imobiliária.`;
 
   return (
-    <div className="flex h-screen bg-white">
+    <div className="flex h-screen bg-gray-50">
       <div className="sidebar-navigation">
         <DashboardSidebar />
       </div>
@@ -102,17 +102,29 @@ export default function Dashboard() {
                 ))}
               </div>
             ) : (
-              <div className="text-center py-8">
-                <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-eregulariza-gray mb-2">
-                  {isAdmin ? 'Nenhum processo recente' : 'Nenhum processo encontrado'}
-                </h3>
-                <p className="text-eregulariza-description">
-                  {isAdmin 
-                    ? 'Não há processos recentes para exibir.' 
-                    : 'Você ainda não possui processos de regularização.'
-                  }
-                </p>
+              <div className="text-center py-12 px-4">
+                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 max-w-md mx-auto">
+                  <FileText className="h-16 w-16 text-gray-300 mx-auto mb-4" />
+                  <h3 className="text-lg font-medium text-eregulariza-gray mb-2">
+                    {isAdmin ? 'Nenhum processo recente' : 'Nenhum processo encontrado'}
+                  </h3>
+                  <p className="text-eregulariza-description mb-4">
+                    {isAdmin 
+                      ? 'Não há processos recentes para exibir.' 
+                      : 'Você ainda não possui processos de regularização. Aguarde a criação pelo administrador.'
+                    }
+                  </p>
+                  {!isAdmin && (
+                    <a 
+                      href="https://e-regulariza.com" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center px-4 py-2 bg-eregulariza-primary text-white rounded-md hover:bg-opacity-90 transition-colors text-sm"
+                    >
+                      Acessar site institucional
+                    </a>
+                  )}
+                </div>
               </div>
             )}
           </div>
@@ -134,10 +146,12 @@ export default function Dashboard() {
                 ))}
               </div>
             ) : (
-              <div className="text-center py-8">
-                <AlertTriangle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-eregulariza-gray mb-2">Nenhuma notificação encontrada</h3>
-                <p className="text-eregulariza-description">Não há notificações no momento.</p>
+              <div className="text-center py-12 px-4">
+                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 max-w-md mx-auto">
+                  <AlertTriangle className="h-16 w-16 text-gray-300 mx-auto mb-4" />
+                  <h3 className="text-lg font-medium text-eregulariza-gray mb-2">Nenhuma notificação encontrada</h3>
+                  <p className="text-eregulariza-description">Não há notificações no momento. Você será notificado sobre atualizações nos seus processos.</p>
+                </div>
               </div>
             )}
           </div>
