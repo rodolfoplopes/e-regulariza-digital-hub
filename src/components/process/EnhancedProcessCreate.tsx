@@ -17,7 +17,8 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { Search, User, Mail, Phone, CreditCard, FileText, Calendar, ArrowRight } from "lucide-react";
 import { clientService } from "@/services/clientService";
-import { processService, ProcessType } from "@/services/processService";
+import { processService } from "@/services/processService";
+import { ProcessType } from "@/services/core/types";
 import { auditService } from "@/services/auditService";
 import { supabase } from "@/integrations/supabase/client";
 

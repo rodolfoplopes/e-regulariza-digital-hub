@@ -1,10 +1,9 @@
-
 import { MessageSquare, FileText } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ProcessTimeline from "@/components/process/ProcessTimeline";
 import EnhancedChat from "@/components/process/EnhancedChat";
 import DocumentManager from "@/components/process/DocumentManager";
-import { ProcessWithDetails } from "@/services/processService";
+import { ProcessWithDetails } from "@/services/core/types";
 
 interface ProcessDetailContentProps {
   process: ProcessWithDetails;
