@@ -5,61 +5,7 @@
  */
 
 import { supabase } from "@/integrations/supabase/client";
-
-export interface ProcessType {
-  id: string;
-  name: string;
-  description: string | null;
-  estimated_duration_days: number | null;
-}
-
-export interface Process {
-  id: string;
-  title: string;
-  description: string | null;
-  status: string;
-  progress: number | null;
-  deadline: string | null;
-  created_at: string;
-  updated_at: string;
-  process_number: string;
-  client_id: string;
-  process_type_id: string;
-}
-
-export interface ProcessWithDetails extends Process {
-  process_type?: ProcessType;
-  client?: {
-    id: string;
-    name: string;
-    email: string;
-    cpf: string | null;
-  };
-  steps?: Array<{
-    id: string;
-    title: string;
-    description: string | null;
-    status: string;
-    order_number: number;
-    deadline: string | null;
-    completed_at: string | null;
-  }>;
-  documents?: Array<{
-    id: string;
-    name: string;
-    file_url: string;
-    status: string;
-    uploaded_by: string;
-  }>;
-}
-
-export interface CreateProcessData {
-  title: string;
-  description?: string;
-  client_id: string;
-  process_type_id: string;
-  deadline?: string;
-}
+import { ProcessWithDetails, ProcessType, Process, CreateProcessData } from "@/services/core/types";
 
 class ProcessService {
   /**

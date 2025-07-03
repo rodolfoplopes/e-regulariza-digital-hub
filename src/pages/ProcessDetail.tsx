@@ -9,7 +9,8 @@ import ProcessDetailHeader from "@/components/process/ProcessDetailHeader";
 import ProcessInfoCards from "@/components/process/ProcessInfoCards";
 import ProcessDetailContent from "@/components/process/ProcessDetailContent";
 import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
-import { processService, ProcessWithDetails } from "@/services/processService";
+import { processService } from "@/services/processService";
+import { ProcessWithDetails } from "@/services/core/types";
 
 export default function ProcessDetail() {
   const { processId } = useParams();

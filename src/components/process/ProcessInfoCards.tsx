@@ -1,7 +1,7 @@
 
 import { FileText, Clock, User } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ProcessWithDetails } from "@/services/supabaseService";
+import { ProcessWithDetails } from "@/services/core/types";
 
 interface ProcessInfoCardsProps {
   process: ProcessWithDetails;

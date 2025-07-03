@@ -2,7 +2,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { CalendarDays, FileText, User, AlertCircle, CheckCircle, Clock } from "lucide-react";
-import { ProcessWithDetails } from "@/services/supabaseService";
+import { ProcessWithDetails } from "@/services/core/types";
 
 interface ProcessDetailHeaderProps {
   process: ProcessWithDetails;
