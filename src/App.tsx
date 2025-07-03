@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -12,6 +13,7 @@ import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import ContactPage from "./pages/ContactPage";
 import ProcessDetail from "./pages/ProcessDetail";
+import EditProcess from "./pages/EditProcess";
 import AdminDashboard from "./pages/AdminDashboard";
 import ProcessCreate from "./pages/ProcessCreate";
 import UserSettings from "./pages/UserSettings";
@@ -38,8 +40,11 @@ const ProtectedRoute = ({
   
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-eregulariza-primary"></div>
+      <div className="flex items-center justify-center min-h-screen bg-gray-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-eregulariza-primary mx-auto"></div>
+          <p className="mt-4 text-eregulariza-description">Carregando...</p>
+        </div>
       </div>
     );
   }
@@ -82,14 +87,26 @@ const PublicRoute = () => {
 // Unauthorized page component
 const Unauthorized = () => (
   <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 px-4">
-    <h1 className="text-3xl font-bold">Acesso Negado</h1>
-    <p className="text-gray-500 mt-2 mb-6">Você não tem permissão para acessar esta página.</p>
-    <button 
-      onClick={() => window.history.back()} 
-      className="px-4 py-2 bg-eregulariza-primary text-white rounded hover:bg-opacity-90 transition-colors"
-    >
-      Voltar
-    </button>
+    <div className="text-center max-w-md">
+      <h1 className="text-3xl font-bold text-eregulariza-gray mb-4">Acesso Negado</h1>
+      <p className="text-eregulariza-description mb-6">
+        Você não tem permissão para acessar esta página. Entre em contato com o administrador se precisar de acesso.
+      </p>
+      <div className="space-y-3">
+        <button 
+          onClick={() => window.history.back()} 
+          className="block w-full px-4 py-2 bg-eregulariza-primary text-white rounded hover:bg-opacity-90 transition-colors"
+        >
+          Voltar
+        </button>
+        <a 
+          href="/dashboard" 
+          className="block w-full px-4 py-2 border border-eregulariza-primary text-eregulariza-primary rounded hover:bg-eregulariza-primary hover:text-white transition-colors"
+        >
+          Ir para o Dashboard
+        </a>
+      </div>
+    </div>
   </div>
 );
 
@@ -140,6 +157,7 @@ const AppContent = () => {
               <Route element={<ProtectedRoute requiredRole="admin" />}>
                 <Route path="/admin" element={<AdminDashboard />} />
                 <Route path="/admin/novo-processo" element={<ProcessCreate />} />
+                <Route path="/admin/processo/:processId/editar" element={<EditProcess />} />
                 <Route path="/admin/logo" element={<LogoManagementPage />} />
                 <Route path="/admin/usuarios" element={<AdminUserManagementPage />} />
               </Route>

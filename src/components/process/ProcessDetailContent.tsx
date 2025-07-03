@@ -7,6 +7,8 @@ import DocumentManager from "@/components/process/DocumentManager";
 import ManualStepEditor from "@/components/process/ManualStepEditor";
 import { ProcessWithDetails } from "@/services/core/types";
 import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
+import { useSearchParams } from "react-router-dom";
+import { useEffect, useState } from "react";
 
 interface ProcessDetailContentProps {
   process: ProcessWithDetails;
@@ -20,6 +22,24 @@ export default function ProcessDetailContent({
   onProcessUpdate 
 }: ProcessDetailContentProps) {
   const { profile } = useSupabaseAuth();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [activeTab, setActiveTab] = useState("timeline");
+
+  // Handle tab parameter from URL
+  useEffect(() => {
+    const tabParam = searchParams.get('tab');
+    if (tabParam && ['timeline', 'chat', 'documents', 'manage'].includes(tabParam)) {
+      setActiveTab(tabParam);
+    }
+  }, [searchParams]);
+
+  // Update URL when tab changes
+  const handleTabChange = (tab: string) => {
+    setActiveTab(tab);
+    const newSearchParams = new URLSearchParams(searchParams);
+    newSearchParams.set('tab', tab);
+    setSearchParams(newSearchParams);
+  };
 
   // Helper function to normalize status to ProcessStage type
   const normalizeStatus = (status: string): "pendente" | "em_andamento" | "concluido" | "pending" | "in_progress" | "completed" => {
@@ -49,52 +69,65 @@ export default function ProcessDetailContent({
   })) || [];
 
   return (
-    <Tabs defaultValue="timeline" className="space-y-4">
-      <TabsList>
-        <TabsTrigger value="timeline">Timeline</TabsTrigger>
-        <TabsTrigger value="chat">
-          <MessageSquare className="h-4 w-4 mr-2" />
-          Chat
-        </TabsTrigger>
-        <TabsTrigger value="documents">
-          <FileText className="h-4 w-4 mr-2" />
-          Documentos
-        </TabsTrigger>
-        {isAdmin && (
-          <TabsTrigger value="manage">
-            <Settings className="h-4 w-4 mr-2" />
-            Gerenciar
+    <div className="w-full">
+      <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-4">
+        <TabsList className="grid w-full grid-cols-3 md:grid-cols-4">
+          <TabsTrigger value="timeline" className="flex items-center gap-2">
+            <span className="hidden sm:inline">Timeline</span>
+            <span className="sm:hidden">📅</span>
           </TabsTrigger>
-        )}
-      </TabsList>
-      
-      <TabsContent value="timeline">
-        <ProcessTimeline stages={timelineStages} />
-      </TabsContent>
-      
-      <TabsContent value="chat">
-        <EnhancedChat processId={process.id} />
-      </TabsContent>
-      
-      <TabsContent value="documents">
-        <DocumentManager 
-          processId={process.id}
-          etapaId="current"
-          etapaNome="Documentos do Processo"
-          isAdmin={isAdmin}
-        />
-      </TabsContent>
-
-      {isAdmin && (
-        <TabsContent value="manage">
-          <ManualStepEditor
-            processId={process.id}
-            processTitle={process.title}
-            clientId={process.client_id}
-            onStepsChange={onProcessUpdate}
-          />
+          <TabsTrigger value="chat" className="flex items-center gap-2">
+            <MessageSquare className="h-4 w-4" />
+            <span className="hidden sm:inline">Chat</span>
+          </TabsTrigger>
+          <TabsTrigger value="documents" className="flex items-center gap-2">
+            <FileText className="h-4 w-4" />
+            <span className="hidden sm:inline">Documentos</span>
+          </TabsTrigger>
+          {isAdmin && (
+            <TabsTrigger value="manage" className="flex items-center gap-2">
+              <Settings className="h-4 w-4" />
+              <span className="hidden sm:inline">Gerenciar</span>
+            </TabsTrigger>
+          )}
+        </TabsList>
+        
+        <TabsContent value="timeline" className="mt-6">
+          <div className="bg-white rounded-lg border p-6">
+            <ProcessTimeline stages={timelineStages} />
+          </div>
         </TabsContent>
-      )}
-    </Tabs>
+        
+        <TabsContent value="chat" className="mt-6">
+          <div className="bg-white rounded-lg border">
+            <EnhancedChat processId={process.id} />
+          </div>
+        </TabsContent>
+        
+        <TabsContent value="documents" className="mt-6">
+          <div className="bg-white rounded-lg border p-6">
+            <DocumentManager 
+              processId={process.id}
+              etapaId="current"
+              etapaNome="Documentos do Processo"
+              isAdmin={isAdmin}
+            />
+          </div>
+        </TabsContent>
+
+        {isAdmin && (
+          <TabsContent value="manage" className="mt-6">
+            <div className="bg-white rounded-lg border p-6">
+              <ManualStepEditor
+                processId={process.id}
+                processTitle={process.title}
+                clientId={process.client_id}
+                onStepsChange={onProcessUpdate}
+              />
+            </div>
+          </TabsContent>
+        )}
+      </Tabs>
+    </div>
   );
 }
