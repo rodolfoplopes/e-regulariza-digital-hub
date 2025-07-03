@@ -1,16 +1,26 @@
-import { MessageSquare, FileText } from "lucide-react";
+
+import { MessageSquare, FileText, Settings } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ProcessTimeline from "@/components/process/ProcessTimeline";
 import EnhancedChat from "@/components/process/EnhancedChat";
 import DocumentManager from "@/components/process/DocumentManager";
+import ManualStepEditor from "@/components/process/ManualStepEditor";
 import { ProcessWithDetails } from "@/services/core/types";
+import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 
 interface ProcessDetailContentProps {
   process: ProcessWithDetails;
   isAdmin: boolean;
+  onProcessUpdate?: () => void;
 }
 
-export default function ProcessDetailContent({ process, isAdmin }: ProcessDetailContentProps) {
+export default function ProcessDetailContent({ 
+  process, 
+  isAdmin, 
+  onProcessUpdate 
+}: ProcessDetailContentProps) {
+  const { profile } = useSupabaseAuth();
+
   // Helper function to normalize status to ProcessStage type
   const normalizeStatus = (status: string): "pendente" | "em_andamento" | "concluido" | "pending" | "in_progress" | "completed" => {
     switch (status) {
@@ -50,6 +60,12 @@ export default function ProcessDetailContent({ process, isAdmin }: ProcessDetail
           <FileText className="h-4 w-4 mr-2" />
           Documentos
         </TabsTrigger>
+        {isAdmin && (
+          <TabsTrigger value="manage">
+            <Settings className="h-4 w-4 mr-2" />
+            Gerenciar
+          </TabsTrigger>
+        )}
       </TabsList>
       
       <TabsContent value="timeline">
@@ -68,6 +84,17 @@ export default function ProcessDetailContent({ process, isAdmin }: ProcessDetail
           isAdmin={isAdmin}
         />
       </TabsContent>
+
+      {isAdmin && (
+        <TabsContent value="manage">
+          <ManualStepEditor
+            processId={process.id}
+            processTitle={process.title}
+            clientId={process.client_id}
+            onStepsChange={onProcessUpdate}
+          />
+        </TabsContent>
+      )}
     </Tabs>
   );
 }

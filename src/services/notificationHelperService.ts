@@ -25,6 +25,20 @@ export const notificationTemplates = {
     priority: 'medium'
   }),
   
+  stepAdded: (processNumber: string, stepTitle: string): NotificationTemplate => ({
+    title: 'Nova etapa adicionada',
+    message: `Uma nova etapa "${stepTitle}" foi adicionada ao processo ${processNumber}.`,
+    type: 'status',
+    priority: 'medium'
+  }),
+  
+  processUpdated: (processNumber: string): NotificationTemplate => ({
+    title: 'Processo atualizado',
+    message: `O processo ${processNumber} foi atualizado pela equipe administrativa.`,
+    type: 'status',
+    priority: 'medium'
+  }),
+  
   documentRequired: (processNumber: string, documentName: string): NotificationTemplate => ({
     title: 'Documento pendente',
     message: `É necessário enviar o documento "${documentName}" para o processo ${processNumber}.`,
@@ -73,6 +87,7 @@ export const sendNotification = async (
     };
 
     await notificationService.createNotification(notificationData);
+    console.log('Notification sent successfully:', template.title);
   } catch (error) {
     console.error('Error sending notification:', error);
   }

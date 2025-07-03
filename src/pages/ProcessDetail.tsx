@@ -20,23 +20,27 @@ export default function ProcessDetail() {
   const [isLoading, setIsLoading] = useState(true);
   const { profile } = useSupabaseAuth();
 
-  useEffect(() => {
-    const fetchProcess = async () => {
-      if (!processId) return;
-      
-      try {
-        setIsLoading(true);
-        const data = await processService.getProcessById(processId);
-        setProcess(data);
-      } catch (error) {
-        console.error('Error fetching process:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  const fetchProcess = async () => {
+    if (!processId) return;
+    
+    try {
+      setIsLoading(true);
+      const data = await processService.getProcessById(processId);
+      setProcess(data);
+    } catch (error) {
+      console.error('Error fetching process:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchProcess();
   }, [processId]);
+
+  const handleProcessUpdate = () => {
+    fetchProcess();
+  };
 
   if (isLoading) {
     return (
@@ -96,7 +100,8 @@ export default function ProcessDetail() {
           <ProcessInfoCards process={process} />
           <ProcessDetailContent 
             process={process} 
-            isAdmin={isAdmin} 
+            isAdmin={isAdmin}
+            onProcessUpdate={handleProcessUpdate}
           />
         </main>
       </div>
