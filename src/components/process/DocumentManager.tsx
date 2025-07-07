@@ -199,8 +199,8 @@ export default function DocumentManager({
     }
     
     toast({
-      title: "Documento adicionado",
-      description: "Um novo documento foi adicionado à lista.",
+      title: "Documento enviado com sucesso!",
+      description: "O arquivo foi adicionado ao processo",
     });
   };
 

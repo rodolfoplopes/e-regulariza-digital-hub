@@ -195,4 +195,22 @@
   .progress-bar-eregulariza {
     background-color: #06D7A5;
   }
+
+  /* Espaçamento e títulos padronizados */
+  .page-header {
+    @apply mt-6 mb-4;
+  }
+
+  .section-header {
+    @apply mt-4 mb-2;
+  }
+
+  /* Componente de navegação ativa */
+  .nav-item-active {
+    @apply bg-eregulariza-primary text-white;
+  }
+
+  .nav-item-active:hover {
+    @apply bg-eregulariza-primary/90;
+  }
 }

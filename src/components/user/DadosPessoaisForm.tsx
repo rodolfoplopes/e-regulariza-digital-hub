@@ -41,7 +41,10 @@ export default function DadosPessoaisForm({ initialData, onDataUpdate }: DadosPe
         onDataUpdate(userData);
       }
       
-      // Toast is now handled by the parent component
+      toast({
+        title: "Dados atualizados com sucesso!",
+        description: "Suas informações pessoais foram salvas"
+      });
     } catch (error) {
       console.error("Error saving changes:", error);
       toast({

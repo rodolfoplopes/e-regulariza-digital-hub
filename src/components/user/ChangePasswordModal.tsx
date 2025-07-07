@@ -91,8 +91,8 @@ export default function ChangePasswordModal({ isOpen, onClose }: ChangePasswordM
         });
       } else {
         toast({
-          title: "Senha alterada com sucesso",
-          description: "Sua senha foi atualizada com segurança.",
+          title: "Senha alterada com sucesso!",
+          description: "Sua senha foi atualizada com segurança",
         });
         
         // Reset form and close modal

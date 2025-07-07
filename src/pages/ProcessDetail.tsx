@@ -11,6 +11,7 @@ import ProcessDetailContent from "@/components/process/ProcessDetailContent";
 import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 import { processService } from "@/services/processService";
 import { ProcessWithDetails } from "@/services/core/types";
+import LoadingSpinner from "@/components/feedback/LoadingSpinner";
 
 export default function ProcessDetail() {
   const { processId } = useParams();
@@ -49,7 +50,7 @@ export default function ProcessDetail() {
         <div className="flex-1 flex flex-col overflow-hidden">
           <DashboardHeader />
           <main className="flex-1 flex items-center justify-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-eregulariza-primary"></div>
+            <LoadingSpinner size="lg" text="Carregando processo..." />
           </main>
         </div>
       </div>

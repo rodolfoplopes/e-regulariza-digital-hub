@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { Plus, Edit, Save, X, Trash2, Calendar, Clock, CheckCircle } from "lucide-react";
+import LoadingSpinner from "@/components/feedback/LoadingSpinner";
 import { supabase } from "@/integrations/supabase/client";
 import { auditService } from "@/services/auditService";
 import { sendNotification, notificationTemplates } from "@/services/notificationHelperService";
@@ -137,8 +138,8 @@ export default function ManualStepEditor({
       onStepsChange?.();
 
       toast({
-        title: "Etapa adicionada!",
-        description: `A etapa "${newStep.title}" foi criada com sucesso`
+        title: "Etapa criada com sucesso!",
+        description: `A etapa "${newStep.title}" foi adicionada ao processo`
       });
     } catch (error) {
       console.error('Erro ao adicionar etapa:', error);
@@ -191,8 +192,8 @@ export default function ManualStepEditor({
       onStepsChange?.();
 
       toast({
-        title: "Etapa atualizada!",
-        description: "As alterações foram salvas com sucesso"
+        title: "Alterações salvas com sucesso!",
+        description: "A etapa foi atualizada"
       });
     } catch (error) {
       console.error('Erro ao atualizar etapa:', error);
@@ -233,8 +234,8 @@ export default function ManualStepEditor({
       onStepsChange?.();
 
       toast({
-        title: "Etapa excluída!",
-        description: "A etapa foi removida com sucesso"
+        title: "Etapa removida com sucesso!",
+        description: "A etapa foi excluída do processo"
       });
     } catch (error) {
       console.error('Erro ao excluir etapa:', error);
@@ -251,7 +252,7 @@ export default function ManualStepEditor({
       <Card>
         <CardContent className="p-6">
           <div className="flex justify-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-eregulariza-primary"></div>
+            <LoadingSpinner size="md" text="Carregando etapas..." />
           </div>
         </CardContent>
       </Card>

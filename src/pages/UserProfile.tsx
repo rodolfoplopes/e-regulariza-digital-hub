@@ -8,7 +8,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { User, Mail, Phone, CreditCard, Save } from "lucide-react";
+import { User, Mail, Phone, CreditCard, Save, ArrowLeft } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import BackButton from "@/components/admin/BackButton";
 import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 import { useToast } from "@/hooks/use-toast";
 
@@ -16,6 +18,7 @@ export default function UserProfile() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { profile, user } = useSupabaseAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
     name: profile?.name || "",
@@ -29,8 +32,8 @@ export default function UserProfile() {
       // Here would update profile in Supabase
       console.log("Updating profile:", formData);
       toast({
-        title: "Perfil atualizado",
-        description: "Suas informações foram salvas com sucesso.",
+        title: "Perfil atualizado com sucesso!",
+        description: "Suas informações foram salvas",
       });
     } catch (error) {
       toast({
@@ -57,9 +60,12 @@ export default function UserProfile() {
         <DashboardHeader />
         
         <main className="flex-1 overflow-y-auto p-4 md:p-6">
-          <div className="mb-6">
-            <h1 className="text-2xl font-bold text-eregulariza-gray font-montserrat">Meu Perfil</h1>
-            <p className="text-eregulariza-description">Gerencie suas informações pessoais</p>
+          <div className="flex items-center gap-4 mb-6">
+            <BackButton to="/dashboard" label="Voltar ao Dashboard" />
+            <div>
+              <h1 className="page-title page-header">Meu Perfil</h1>
+              <p className="text-eregulariza-description">Gerencie suas informações pessoais</p>
+            </div>
           </div>
 
           <div className="max-w-2xl">

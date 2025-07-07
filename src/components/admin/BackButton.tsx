@@ -28,7 +28,7 @@ export default function BackButton({
     <Button
       variant="ghost"
       onClick={handleBack}
-      className={`flex items-center gap-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 ${className}`}
+      className={`flex items-center gap-2 text-eregulariza-description hover:text-eregulariza-primary btn-eregulariza-hover px-4 py-2 rounded-md ${className}`}
     >
       <ArrowLeft className="h-4 w-4" />
       {label}

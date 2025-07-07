@@ -11,6 +11,7 @@ import PreferenciasUsuario from "@/components/user/PreferenciasUsuario";
 import PoliciesLinks from "@/components/user/PoliciesLinks";
 import { useToast } from "@/hooks/use-toast";
 import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
+import BackButton from "@/components/admin/BackButton";
 
 export default function UserSettings() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -50,8 +51,8 @@ export default function UserSettings() {
     // Show appropriate toast notification
     if (isDataValid) {
       toast({
-        title: "Dados atualizados",
-        description: "Suas informações foram salvas com sucesso.",
+        title: "Dados atualizados com sucesso!",
+        description: "Suas informações foram salvas",
       });
     } else {
       toast({
@@ -81,9 +82,12 @@ export default function UserSettings() {
         <DashboardHeader />
         
         <main className="flex-1 overflow-y-auto p-4 md:p-6">
-          <div className="mb-6">
-            <h1 className="text-2xl font-bold">Configurações da Conta</h1>
-            <p className="text-gray-500">Gerencie suas informações pessoais e preferências</p>
+          <div className="flex items-center gap-4 mb-6">
+            <BackButton to="/dashboard" label="Voltar ao Dashboard" />
+            <div>
+              <h1 className="page-title page-header">Configurações da Conta</h1>
+              <p className="text-eregulariza-description">Gerencie suas informações pessoais e preferências</p>
+            </div>
           </div>
           
           <Tabs defaultValue="personal" className="space-y-4">
@@ -110,7 +114,7 @@ export default function UserSettings() {
           </Tabs>
           
           <div className="mt-8">
-            <h2 className="text-xl font-semibold mb-4">Políticas e Termos</h2>
+            <h2 className="section-title section-header">Políticas e Termos</h2>
             <PoliciesLinks />
           </div>
         </main>

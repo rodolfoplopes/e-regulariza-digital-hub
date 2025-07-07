@@ -38,15 +38,15 @@ const SidebarItem = ({ icon, label, href, isActive, isExternal }: SidebarItemPro
   }
 
   return (
-    <Link
-      to={href}
-      className={cn(
-        "flex items-center py-2 px-3 rounded-md group transition-colors",
-        isActive 
-          ? "bg-eregulariza-primary text-white" 
-          : "text-eregulariza-darkgray hover:bg-gray-100"
-      )}
-    >
+      <Link
+        to={href}
+        className={cn(
+          "flex items-center py-2 px-3 rounded-md group transition-colors",
+          isActive 
+            ? "nav-item-active" 
+            : "text-eregulariza-darkgray hover:bg-gray-100"
+        )}
+      >
       <div className="mr-3">{icon}</div>
       <span>{label}</span>
     </Link>

@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, Save, Calendar, FileText } from "lucide-react";
+import LoadingSpinner from "@/components/feedback/LoadingSpinner";
 import { processService } from "@/services/processService";
 import { auditService } from "@/services/auditService";
 import { ProcessWithDetails, ProcessType } from "@/services/core/types";
@@ -108,8 +109,8 @@ export default function EditProcess() {
       });
 
       toast({
-        title: "Processo atualizado!",
-        description: "As alterações foram salvas com sucesso"
+        title: "Alterações salvas com sucesso!",
+        description: "O processo foi atualizado"
       });
 
       navigate(`/processo/${processId}`);
@@ -132,7 +133,7 @@ export default function EditProcess() {
         <div className="flex-1 flex flex-col overflow-hidden">
           <DashboardHeader />
           <main className="flex-1 flex items-center justify-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-eregulariza-primary"></div>
+            <LoadingSpinner size="lg" text="Carregando processo..." />
           </main>
         </div>
       </div>
@@ -176,7 +177,7 @@ export default function EditProcess() {
                 Voltar
               </Button>
               <div>
-                <h1 className="text-3xl font-bold text-eregulariza-gray">Editar Processo</h1>
+                <h1 className="page-title page-header">Editar Processo</h1>
                 <p className="text-eregulariza-description">
                   {process.process_number} - {process.client?.name}
                 </p>
@@ -261,17 +262,17 @@ export default function EditProcess() {
                 disabled={isSaving || !formData.title.trim()}
                 className="bg-eregulariza-primary hover:bg-eregulariza-primary/90 text-white"
               >
-                {isSaving ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2"></div>
-                    Salvando...
-                  </>
-                ) : (
-                  <>
-                    <Save className="h-4 w-4 mr-2" />
-                    Salvar Alterações
-                  </>
-                )}
+                  {isSaving ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2"></div>
+                      Salvando...
+                    </>
+                  ) : (
+                    <>
+                      <Save className="h-4 w-4 mr-2" />
+                      Salvar Alterações
+                    </>
+                  )}
               </Button>
             </div>
           </div>
