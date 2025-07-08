@@ -91,6 +91,54 @@ export type Database = {
         }
         Relationships: []
       }
+      document_audit_logs: {
+        Row: {
+          action: string
+          created_at: string
+          document_id: string
+          id: string
+          new_status: string
+          observation: string | null
+          previous_status: string | null
+          user_id: string
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          document_id: string
+          id?: string
+          new_status: string
+          observation?: string | null
+          previous_status?: string | null
+          user_id: string
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          document_id?: string
+          id?: string
+          new_status?: string
+          observation?: string | null
+          previous_status?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_document_audit_logs_document_id"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "process_documents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_document_audit_logs_user_id"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notifications: {
         Row: {
           action_url: string | null

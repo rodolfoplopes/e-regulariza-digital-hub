@@ -90,3 +90,39 @@ export function getDeadlineInfo(daysEstimated: number, startDate: Date = new Dat
     status
   };
 }
+
+/**
+ * Formats a date as a relative time string (e.g., "há 2 horas", "ontem", "há 3 dias")
+ * 
+ * @param date The date to format (can be Date object or ISO string)
+ * @returns Formatted relative time string
+ */
+export function formatRelativeTime(date: Date | string): string {
+  const targetDate = typeof date === 'string' ? new Date(date) : date;
+  const now = new Date();
+  const diffMs = now.getTime() - targetDate.getTime();
+  const diffMinutes = Math.floor(diffMs / (1000 * 60));
+  const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+  if (diffMinutes < 1) {
+    return 'agora';
+  } else if (diffMinutes < 60) {
+    return `há ${diffMinutes} minuto${diffMinutes > 1 ? 's' : ''}`;
+  } else if (diffHours < 24) {
+    return `há ${diffHours} hora${diffHours > 1 ? 's' : ''}`;
+  } else if (diffDays === 1) {
+    return 'ontem';
+  } else if (diffDays < 7) {
+    return `há ${diffDays} dia${diffDays > 1 ? 's' : ''}`;
+  } else if (diffDays < 30) {
+    const weeks = Math.floor(diffDays / 7);
+    return `há ${weeks} semana${weeks > 1 ? 's' : ''}`;
+  } else if (diffDays < 365) {
+    const months = Math.floor(diffDays / 30);
+    return `há ${months} mês${months > 1 ? 'es' : ''}`;
+  } else {
+    const years = Math.floor(diffDays / 365);
+    return `há ${years} ano${years > 1 ? 's' : ''}`;
+  }
+}

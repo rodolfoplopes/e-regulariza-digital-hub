@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -20,7 +20,12 @@ import {
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import DocumentUploader, { DocumentType } from "@/components/process/DocumentUploader";
-import { FileText, Download, ThumbsUp, ThumbsDown, AlertTriangle, Upload } from "lucide-react";
+import { FileText, Download, CheckCircle, XCircle, AlertTriangle, Upload, Clock, User } from "lucide-react";
+import { documentValidationService, DocumentWithAudit } from "@/services/documentValidationService";
+import { formatRelativeTime } from "@/utils/dateUtils";
+import DocumentValidationModal from "@/components/admin/DocumentValidationModal";
+import DocumentAuditHistory from "@/components/admin/DocumentAuditHistory";
+import LoadingSpinner from "@/components/feedback/LoadingSpinner";
 
 interface DocumentManagerProps {
   processId: string;
@@ -340,7 +345,7 @@ export default function DocumentManager({
                       className="text-green-600 border-green-200 hover:bg-green-50"
                       onClick={() => handleDocumentStatusChange(doc.id, "approved")}
                     >
-                      <ThumbsUp className="h-4 w-4 mr-1" />
+                      <CheckCircle className="h-4 w-4 mr-1" />
                       Aprovar
                     </Button>
                     
@@ -355,7 +360,7 @@ export default function DocumentManager({
                         }
                       }}
                     >
-                      <ThumbsDown className="h-4 w-4 mr-1" />
+                      <XCircle className="h-4 w-4 mr-1" />
                       Rejeitar
                     </Button>
                   </div>
