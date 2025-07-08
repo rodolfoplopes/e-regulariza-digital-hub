@@ -17,7 +17,7 @@ interface AuditLog {
 
 interface CreateAuditLogData {
   action: string;
-  target_type: 'user' | 'process' | 'client' | 'system';
+  target_type: 'user' | 'process' | 'client' | 'system' | 'document';
   target_id?: string;
   target_name?: string;
   details?: any;
@@ -113,5 +113,59 @@ export const auditService = {
       console.error('Error fetching audit logs:', error);
       return [];
     }
+  },
+
+  // Document-specific audit functions
+  async logDocumentUpload(documentId: string, documentName: string, processId: string): Promise<void> {
+    await this.createAuditLog({
+      action: 'UPLOAD_DOCUMENT',
+      target_type: 'document',
+      target_id: documentId,
+      target_name: documentName,
+      details: {
+        processId,
+        action: 'uploaded'
+      }
+    });
+  },
+
+  async logDocumentApproval(documentId: string, documentName: string, processId: string): Promise<void> {
+    await this.createAuditLog({
+      action: 'APPROVE_DOCUMENT',
+      target_type: 'document',
+      target_id: documentId,
+      target_name: documentName,
+      details: {
+        processId,
+        action: 'approved'
+      }
+    });
+  },
+
+  async logDocumentRejection(documentId: string, documentName: string, processId: string, feedback?: string): Promise<void> {
+    await this.createAuditLog({
+      action: 'REJECT_DOCUMENT',
+      target_type: 'document',
+      target_id: documentId,
+      target_name: documentName,
+      details: {
+        processId,
+        action: 'rejected',
+        feedback
+      }
+    });
+  },
+
+  async logDocumentDeletion(documentId: string, documentName: string, processId: string): Promise<void> {
+    await this.createAuditLog({
+      action: 'DELETE_DOCUMENT',
+      target_type: 'document',
+      target_id: documentId,
+      target_name: documentName,
+      details: {
+        processId,
+        action: 'deleted'
+      }
+    });
   }
 };

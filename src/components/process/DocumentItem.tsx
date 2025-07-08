@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { FileText, Download, CheckCircle, XCircle, AlertTriangle } from "lucide-react";
 import { DocumentType } from "./DocumentUploader";
 import DocumentUploader from "./DocumentUploader";
+import DocumentAuditHistory from "@/components/admin/DocumentAuditHistory";
 
 interface DocumentItemProps {
   document: DocumentType;
@@ -11,6 +12,7 @@ interface DocumentItemProps {
   onUpload: (documentId: string, file: File) => Promise<void>;
   onRemove?: (documentId: string) => Promise<void>;
   onStatusChange: (documentId: string, status: "approved" | "rejected", feedback?: string) => void;
+  showAuditHistory?: boolean;
 }
 
 export default function DocumentItem({
@@ -19,6 +21,7 @@ export default function DocumentItem({
   onUpload,
   onRemove,
   onStatusChange,
+  showAuditHistory = true,
 }: DocumentItemProps) {
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -110,6 +113,15 @@ export default function DocumentItem({
           onUpload={onUpload}
           onRemove={document.status === "uploaded" ? onRemove : undefined}
         />
+      )}
+
+      {showAuditHistory && (
+        <div className="mt-4">
+          <DocumentAuditHistory
+            documentId={document.id}
+            documentName={document.name}
+          />
+        </div>
       )}
     </div>
   );
