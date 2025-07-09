@@ -11,9 +11,10 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { DocumentType } from "@/components/process/DocumentUploader";
-import { Upload } from "lucide-react";
+import { Upload, History } from "lucide-react";
 import DocumentStatsCards from "./DocumentStatsCards";
 import DocumentList from "./DocumentList";
+import AuditHistoryPanel from "./AuditHistoryPanel";
 import { auditService } from "@/services/auditService";
 import { useNotifications } from "@/hooks/useNotifications";
 import { sendNotification, notificationTemplates } from "@/services/notificationHelperService";
@@ -338,10 +339,13 @@ export default function DocumentManager({
             <CardDescription>Gerenciamento de documentos necessários para esta etapa</CardDescription>
           </div>
           {isAdmin && (
-            <Button onClick={handleAddDocument}>
-              <Upload className="h-4 w-4 mr-2" />
-              Adicionar Documento
-            </Button>
+            <div className="flex gap-2">
+              <AuditHistoryPanel processId={processId} />
+              <Button onClick={handleAddDocument}>
+                <Upload className="h-4 w-4 mr-2" />
+                Adicionar Documento
+              </Button>
+            </div>
           )}
         </div>
       </CardHeader>

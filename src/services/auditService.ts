@@ -167,5 +167,72 @@ export const auditService = {
         action: 'deleted'
       }
     });
+  },
+
+  // Get audit logs for a specific process
+  async getProcessAuditLogs(processId: string, filters?: {
+    action?: string;
+    from_date?: string;
+    to_date?: string;
+  }): Promise<AuditLog[]> {
+    try {
+      let query = supabase
+        .from('audit_logs')
+        .select(`
+          *,
+          admin:profiles!audit_logs_admin_id_fkey(name)
+        `)
+        .order('created_at', { ascending: false });
+
+      // Apply filters
+      if (filters?.action) {
+        query = query.ilike('action', `%${filters.action}%`);
+      }
+
+      if (filters?.from_date) {
+        query = query.gte('created_at', filters.from_date);
+      }
+
+      if (filters?.to_date) {
+        query = query.lte('created_at', filters.to_date);
+      }
+
+      const { data, error } = await query;
+      if (error) throw error;
+
+      // Filter logs related to the process
+      const processLogs = (data || []).filter(log => {
+        // Check if log is related to the process
+        if (log.target_type === 'process' && log.target_id === processId) {
+          return true;
+        }
+        
+        // Check if log is for a document related to the process
+        if (log.target_type === 'document' && log.details && 
+            typeof log.details === 'object' && 
+            (log.details as any).processId === processId) {
+          return true;
+        }
+        
+        return false;
+      });
+
+      return processLogs.map(log => ({
+        id: log.id,
+        admin_id: log.admin_id,
+        action: log.action,
+        target_type: log.target_type,
+        target_id: log.target_id || undefined,
+        target_name: log.target_name || undefined,
+        details: log.details,
+        ip_address: log.ip_address ? String(log.ip_address) : undefined,
+        user_agent: log.user_agent || undefined,
+        created_at: log.created_at,
+        admin_name: log.admin?.name || 'Usuário Desconhecido'
+      }));
+    } catch (error) {
+      console.error('Error fetching process audit logs:', error);
+      return [];
+    }
   }
 };
