@@ -25,15 +25,11 @@ interface FAQSearchProps {
 
 const categories = [
   'Todos',
-  'Usucapião',
-  'Regularização',
-  'Documentação',
-  'Condomínio',
-  'Inventário',
-  'Adjudicação',
-  'Desmembramento',
-  'Compra e Venda',
-  'Comparação'
+  'Processo',
+  'Documentos',
+  'Pagamento',
+  'Prazos',
+  'Plataforma'
 ];
 
 export default function FAQSearch({ faqs }: FAQSearchProps) {

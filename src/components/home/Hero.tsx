@@ -14,9 +14,9 @@ export default function Hero() {
               <div className="mt-5 sm:mt-8 sm:flex sm:justify-center lg:justify-start">
                 <div className="rounded-md shadow">
                   <Button asChild size="lg" className="eregulariza-gradient hover:opacity-90 w-full">
-                    <a href="https://wa.me/5521999011999" target="_blank" rel="noopener noreferrer">
-                      Falar com especialista
-                    </a>
+                    <Link to="/register">
+                      Iniciar agora
+                    </Link>
                   </Button>
                 </div>
                 <div className="mt-3 sm:mt-0 sm:ml-3">
