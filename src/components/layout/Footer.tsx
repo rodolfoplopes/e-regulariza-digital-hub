@@ -14,20 +14,20 @@ const footerContent = {
     { label: "Carreiras", url: "/carreiras" }
   ],
   serviceLinks: [
-    { label: "Usucapião", url: "/servicos/usucapiao" },
-    { label: "Inventário Extrajudicial", url: "/servicos/inventario" },
-    { label: "Retificação de Área", url: "/servicos/retificacao" },
-    { label: "Demarcação de Imóvel", url: "/servicos/demarcacao" }
+    { label: "Usucapião Extrajudicial", url: "/servicos/usucapiao-extrajudicial" },
+    { label: "Incorporação Imobiliária", url: "/servicos/incorporacao-imobiliaria" },
+    { label: "Due Diligence", url: "/servicos/due-diligence" },
+    { label: "Reurb", url: "/servicos/reurb" }
   ],
   contactInfo: {
-    email: "contato@eregulariza.com.br",
-    phone: "+55 (11) 9999-9999",
-    location: "São Paulo, SP"
+    email: "sac@e-regulariza.com",
+    phone: "+55 (21) 99901-1999",
+    location: "Itaguaí, RJ"
   },
   socialLinks: [
-    { platform: "Facebook", url: "https://facebook.com/eregulariza", icon: <Facebook className="h-5 w-5" /> },
-    { platform: "Instagram", url: "https://instagram.com/eregulariza", icon: <Instagram className="h-5 w-5" /> },
-    { platform: "LinkedIn", url: "https://linkedin.com/company/eregulariza", icon: <Linkedin className="h-5 w-5" /> }
+    { platform: "Facebook", url: "https://www.facebook.com/eregulariza", icon: <Facebook className="h-5 w-5" /> },
+    { platform: "Instagram", url: "https://www.instagram.com/e_regulariza/#", icon: <Instagram className="h-5 w-5" /> },
+    { platform: "LinkedIn", url: "https://www.linkedin.com/company/e-regulariza/", icon: <Linkedin className="h-5 w-5" /> }
   ],
   legalLinks: [
     { label: "Política de Privacidade", url: "/politica-de-privacidade" },
