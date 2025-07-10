@@ -23,6 +23,7 @@ import LogoManagementPage from "./pages/LogoManagementPage";
 import AdminUserManagementPage from "./pages/AdminUserManagement";
 import Messages from "./pages/Messages";
 import UserProfile from "./pages/UserProfile";
+import ServicesPage from "./pages/ServicesPage";
 import GTMManager from '@/components/tracking/GTMManager';
 import { analytics } from '@/services/analyticsService';
 import { SupabaseAuthProvider, useSupabaseAuth } from '@/hooks/useSupabaseAuth';
@@ -136,6 +137,7 @@ const AppContent = () => {
                 <Route path="/" element={<Index />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
+                <Route path="/servicos" element={<ServicesPage />} />
                 <Route path="/politica-de-privacidade" element={<PolicyPage />} />
                 <Route path="/termos-de-uso" element={<PolicyPage />} />
                 <Route path="/politica-de-cookies" element={<PolicyPage />} />
