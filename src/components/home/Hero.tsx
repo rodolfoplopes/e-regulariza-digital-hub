@@ -10,8 +10,7 @@ export default function Hero() {
                 <span className="block">Regularização imobiliária</span>{" "}
                 <span className="block text-eregulariza-primary">simplificada e transparente</span>
               </h1>
-              <p className="mt-3 text-base text-gray-500 sm:mx-auto sm:mt-5 sm:max-w-xl sm:text-lg md:mt-5 md:text-xl lg:mx-0">A e-regulariza simplifica todo o processo para você, desde a análise até a entrega da documentação.
-Vem para a e-regulariza! É mais simples do que você imagina</p>
+              <p className="mt-3 text-base text-gray-500 sm:mx-auto sm:mt-5 sm:max-w-xl sm:text-lg md:mt-5 md:text-xl lg:mx-0">A e-regulariza simplifica todo o processo para você, desde a análise até a entrega da documentação. Vem para a e-regulariza! É mais simples do que você imagina.</p>
               <div className="mt-5 sm:mt-8 sm:flex sm:justify-center lg:justify-start">
                 <div className="rounded-md shadow">
                   <Button asChild size="lg" className="eregulariza-gradient hover:opacity-90 w-full">
