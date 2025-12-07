@@ -1,0 +1,57 @@
+Aqui está **o prompt perfeito**, claro e direto, para você colar no Replit Agent e fazer a importação do projeto Lovable → GitHub → Replit funcionar sem dor de cabeça.
+
+Ele NÃO vai quebrar seu projeto e orienta o agente exatamente no que fazer:
+
+---
+
+# ✅ **PROMPT PARA O REPLIT – Importar Projeto do GitHub e Preparar Ambiente**
+
+**Prompt:**
+
+> Quero importar para o Replit um projeto que foi originalmente criado no Lovable e exportado para um repositório no GitHub.
+> Aqui está o que preciso que você faça, passo a passo, sem alterar nenhum arquivo além do necessário:
+>
+> **1. Importar o repositório**
+>
+> * Acesse “Import from GitHub”.
+> * Conecte minha conta GitHub (se ainda não estiver conectada).
+> * Selecione o repositório que informarei a seguir.
+> * Clone-o para dentro do workspace atual do Replit.
+>
+> **2. Preparar o ambiente Node/React/Next**
+>
+> * Executar `npm install` na raiz do projeto (ou `pnpm install` se o `package.json` indicar pnpm).
+> * Após instalar, abrir o arquivo `package.json` e identificar qual é o comando de desenvolvimento — normalmente `"dev": "next dev"`, `"dev": "vite dev"` ou similar.
+>
+> **3. Configurar o run do Replit**
+>
+> * Setar o comando padrão do Replit para:
+>   `npm run dev`
+> * Certificar-se de que o preview abre corretamente na porta configurada pelo framework.
+>
+> **4. Testar**
+>
+> * Rodar o projeto localmente e confirmar que o site abre.
+> * Não modificar nenhum arquivo de layout, estilos ou componentes. Apenas garantir o funcionamento do ambiente.
+>
+> **5. Importante:**
+>
+> * NÃO criar pastas ou arquivos extras.
+> * NÃO refatorar código.
+> * Apenas montar o ambiente funcional para que eu possa continuar o desenvolvimento no Replit normalmente.
+>
+> Depois de concluir, me informe:
+>
+> * se o projeto rodou,
+> * qual framework ele utiliza (Next.js, React + Vite, etc.),
+> * e qual comando final de execução ficou configurado.
+
+---
+
+## Caso queira, posso gerar também:
+
+* Um prompt para **organizar o projeto** pós-importação
+* Um prompt para **limpar código Lovable**
+* Um prompt para **configurar deploy automático no GitHub Pages, Vercel ou Replit Deploy**
+
+Quer algum desses?
