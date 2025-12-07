@@ -1,13 +1,23 @@
 {
-  "files": [],
+  "include": ["client/src", "shared", "server"],
   "references": [
-    { "path": "./tsconfig.app.json" },
     { "path": "./tsconfig.node.json" }
   ],
   "compilerOptions": {
+    "target": "ES2020",
+    "useDefineForClassFields": true,
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react-jsx",
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./client/src/*"],
+      "@shared/*": ["./shared/*"]
     },
     "noImplicitAny": false,
     "noUnusedParameters": false,
