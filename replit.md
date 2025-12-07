@@ -78,6 +78,40 @@ Esta aplicação foi migrada do Lovable para Replit. Algumas considerações:
 3. O schema Drizzle foi criado baseado na estrutura do Supabase original
 4. O cliente Supabase foi modificado para lidar graciosamente quando não configurado
 
+## Correções Técnicas Aplicadas (Dezembro 2024)
+
+### Segurança
+- Removido JWT hardcoded do IntegrationSettings.tsx - agora usa API local
+
+### Schema e Tipos
+- Corrigidos tipos de exportação no shared/schema.ts usando $inferInsert
+- Criado arquivo types.ts com interface Database correta para process_counter (year_month, counter)
+
+### Backend
+- Adicionada validação Zod manual nos endpoints POST (processes, messages, documents)
+- Implementado endpoint /api/integrations/sheets/export funcional
+
+### Limpeza
+- Removida dependência wouter (conflito com react-router-dom)
+- Removido arquivo duplicado AdminUserManagementPage.tsx
+- Atualizado components.json com path CSS correto
+
+## Tabelas do Banco de Dados
+
+- `profiles` - Perfis de usuário
+- `process_types` - Tipos de processo
+- `processes` - Processos de regularização
+- `process_steps` - Etapas dos processos
+- `process_documents` - Documentos dos processos
+- `process_messages` - Mensagens dos processos
+- `notifications` - Notificações do sistema
+- `audit_logs` - Logs de auditoria
+- `document_audit_logs` - Logs de auditoria de documentos
+- `process_feedback` - Feedback dos processos
+- `process_counter` - Contador de processos (year_month, counter)
+- `cms_contents` - Conteúdos CMS
+- `system_settings` - Configurações do sistema
+
 ## Data de Migração
 
 Dezembro 2024

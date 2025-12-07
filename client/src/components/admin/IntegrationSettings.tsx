@@ -124,12 +124,10 @@ export default function IntegrationSettings() {
     setIsLoading(true);
     
     try {
-      // Trigger the automated export function manually
-      const response = await fetch(`https://ntnqgfrspuafnlctkrfk.supabase.co/functions/v1/automated-export`, {
+      const response = await fetch('/api/integrations/sheets/export', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${process.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im50bnFnZnJzcHVhZm5sY3RrcmZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg5NTkxMzUsImV4cCI6MjA2NDUzNTEzNX0.FWoQYCVUu1isxEyDtFPYrpKfSbajPp0G-R73aCJesIY'}`
         },
         body: JSON.stringify({ manual: true })
       });
@@ -138,17 +136,18 @@ export default function IntegrationSettings() {
         const result = await response.json();
         toast({
           title: "Exportação concluída",
-          description: `${result.exported} processos exportados com sucesso!`
+          description: `${result.exported || 0} processos exportados com sucesso!`
         });
       } else {
-        throw new Error('Export failed');
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Export failed');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Manual export error:', error);
       toast({
         variant: "destructive",
         title: "Erro na exportação",
-        description: "Erro ao executar exportação manual."
+        description: error?.message || "Ocorreu um erro ao exportar os dados."
       });
     } finally {
       setIsLoading(false);

@@ -1,7 +1,6 @@
 import { pgTable, uuid, text, timestamp, integer, boolean, json } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import { createInsertSchema } from "drizzle-zod";
-import { z } from "zod";
 
 export const profiles = pgTable("profiles", {
   id: uuid("id").primaryKey(),
@@ -269,42 +268,42 @@ export const insertProcessCounterSchema = createInsertSchema(processCounter).omi
 export const insertCmsContentSchema = createInsertSchema(cmsContents).omit({ id: true, createdAt: true, dataUltimaEdicao: true });
 export const insertSystemSettingSchema = createInsertSchema(systemSettings).omit({ id: true, createdAt: true, updatedAt: true });
 
-// Types
+// Types - using Drizzle's $inferSelect and $inferInsert for better compatibility
 export type Profile = typeof profiles.$inferSelect;
-export type InsertProfile = z.infer<typeof insertProfileSchema>;
+export type InsertProfile = typeof profiles.$inferInsert;
 
 export type ProcessType = typeof processTypes.$inferSelect;
-export type InsertProcessType = z.infer<typeof insertProcessTypeSchema>;
+export type InsertProcessType = typeof processTypes.$inferInsert;
 
 export type Process = typeof processes.$inferSelect;
-export type InsertProcess = z.infer<typeof insertProcessSchema>;
+export type InsertProcess = typeof processes.$inferInsert;
 
 export type ProcessStep = typeof processSteps.$inferSelect;
-export type InsertProcessStep = z.infer<typeof insertProcessStepSchema>;
+export type InsertProcessStep = typeof processSteps.$inferInsert;
 
 export type ProcessDocument = typeof processDocuments.$inferSelect;
-export type InsertProcessDocument = z.infer<typeof insertProcessDocumentSchema>;
+export type InsertProcessDocument = typeof processDocuments.$inferInsert;
 
 export type ProcessMessage = typeof processMessages.$inferSelect;
-export type InsertProcessMessage = z.infer<typeof insertProcessMessageSchema>;
+export type InsertProcessMessage = typeof processMessages.$inferInsert;
 
 export type Notification = typeof notifications.$inferSelect;
-export type InsertNotification = z.infer<typeof insertNotificationSchema>;
+export type InsertNotification = typeof notifications.$inferInsert;
 
 export type AuditLog = typeof auditLogs.$inferSelect;
-export type InsertAuditLog = z.infer<typeof insertAuditLogSchema>;
+export type InsertAuditLog = typeof auditLogs.$inferInsert;
 
 export type DocumentAuditLog = typeof documentAuditLogs.$inferSelect;
-export type InsertDocumentAuditLog = z.infer<typeof insertDocumentAuditLogSchema>;
+export type InsertDocumentAuditLog = typeof documentAuditLogs.$inferInsert;
 
 export type ProcessFeedback = typeof processFeedback.$inferSelect;
-export type InsertProcessFeedback = z.infer<typeof insertProcessFeedbackSchema>;
+export type InsertProcessFeedback = typeof processFeedback.$inferInsert;
 
 export type ProcessCounter = typeof processCounter.$inferSelect;
-export type InsertProcessCounter = z.infer<typeof insertProcessCounterSchema>;
+export type InsertProcessCounter = typeof processCounter.$inferInsert;
 
 export type CmsContent = typeof cmsContents.$inferSelect;
-export type InsertCmsContent = z.infer<typeof insertCmsContentSchema>;
+export type InsertCmsContent = typeof cmsContents.$inferInsert;
 
 export type SystemSetting = typeof systemSettings.$inferSelect;
-export type InsertSystemSetting = z.infer<typeof insertSystemSettingSchema>;
+export type InsertSystemSetting = typeof systemSettings.$inferInsert;
