@@ -25,8 +25,8 @@ export default function Features() {
   return <section className="py-16 bg-eregulariza-surface">
       <div className="container px-4 sm:px-6 lg:px-8 mx-auto">
         <div className="max-w-3xl mx-auto text-center mb-12">
-          <h2 className="text-3xl font-bold tracking-tight text-eregulariza-gray sm:text-4xl">Porque escolher a e-regulariza?</h2>
-          <p className="mt-4 text-lg text-eregulariza-description">Nossa plataforma foi projetada para tornar seu processo de regularização imobiliária mais tranquila e eficiente.</p>
+          <h2 className="text-3xl font-bold tracking-tight text-eregulariza-gray sm:text-4xl">Experiência de regularização reimaginada</h2>
+          <p className="mt-4 text-lg text-eregulariza-description">Nossa plataforma digital foi projetada para tornar seu processo de regularização imobiliária o mais transparente e eficiente possível.</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
