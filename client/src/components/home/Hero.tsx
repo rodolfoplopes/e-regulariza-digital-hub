@@ -3,15 +3,15 @@ import { Button } from "@/components/ui/button";
 
 export function Hero() {
   return (
-    <section className="relative min-h-[85vh] flex items-center">
+    <section className="relative min-h-[85vh] flex items-center" data-testid="section-hero">
       <div className="container mx-auto px-4 lg:px-8">
         <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
           <div className="space-y-6">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight" data-testid="text-hero-title">
               Regularização imobiliária{" "}
               <span className="text-primary">simplificada e transparente</span>
             </h1>
-            <p className="text-lg md:text-xl text-muted-foreground max-w-lg">
+            <p className="text-lg md:text-xl text-muted-foreground max-w-lg" data-testid="text-hero-description">
               Acompanhe seu processo de regularização em tempo real, com total 
               transparência e previsibilidade. Transformamos processos 
               burocráticos em experiências digitais.

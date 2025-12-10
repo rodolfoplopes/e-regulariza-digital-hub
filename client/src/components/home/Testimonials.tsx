@@ -24,13 +24,13 @@ const testimonials = [
 
 export function Testimonials() {
   return (
-    <section className="py-16 md:py-24 bg-muted/30">
+    <section className="py-16 md:py-24 bg-muted/30" data-testid="section-testimonials">
       <div className="container mx-auto px-4 lg:px-8">
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">
+          <h2 className="text-3xl md:text-4xl font-bold mb-4" data-testid="text-testimonials-title">
             O que nossos clientes dizem
           </h2>
-          <p className="text-muted-foreground">
+          <p className="text-muted-foreground" data-testid="text-testimonials-subtitle">
             Depoimentos de clientes que regularizaram seus imóveis com nossa ajuda
           </p>
         </div>
@@ -38,17 +38,17 @@ export function Testimonials() {
           {testimonials.map((testimonial, index) => (
             <Card key={index} className="border-0 shadow-sm" data-testid={`card-testimonial-${index}`}>
               <CardContent className="p-6">
-                <p className="text-muted-foreground mb-6 italic">
+                <p className="text-muted-foreground mb-6 italic" data-testid={`text-testimonial-quote-${index}`}>
                   "{testimonial.quote}"
                 </p>
                 <div className="flex items-center gap-3">
-                  <Avatar>
+                  <Avatar data-testid={`avatar-testimonial-${index}`}>
                     <AvatarImage src={testimonial.avatar} alt={testimonial.name} />
                     <AvatarFallback>{testimonial.name.charAt(0)}</AvatarFallback>
                   </Avatar>
                   <div>
-                    <p className="font-semibold text-sm">{testimonial.name}</p>
-                    <p className="text-xs text-muted-foreground">{testimonial.role}</p>
+                    <p className="font-semibold text-sm" data-testid={`text-testimonial-name-${index}`}>{testimonial.name}</p>
+                    <p className="text-xs text-muted-foreground" data-testid={`text-testimonial-role-${index}`}>{testimonial.role}</p>
                   </div>
                 </div>
               </CardContent>
