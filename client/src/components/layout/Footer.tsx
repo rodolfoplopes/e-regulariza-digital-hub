@@ -11,10 +11,10 @@ const footerContent = {
     { label: "Carreiras", url: "/carreiras" }
   ],
   serviceLinks: [
-    { label: "Usucapião Extrajudicial", url: "/servicos" },
-    { label: "Incorporação Imobiliária", url: "/servicos" },
-    { label: "Due Diligence", url: "/servicos" },
-    { label: "Reurb", url: "/servicos" }
+    { label: "Usucapião Extrajudicial", url: "/servicos#usucapiao" },
+    { label: "Incorporação Imobiliária", url: "/servicos#incorporacao" },
+    { label: "Due Diligence", url: "/servicos#duediligence" },
+    { label: "Reurb", url: "/servicos#reurb" }
   ],
   contactInfo: {
     email: "sac@e-regulariza.com",

@@ -1,8 +1,8 @@
-import logoAzulBranco from "@/assets/logo-azul-branco.png";
-import logoGradiente from "@/assets/logo-gradiente.png";
+import logoAzulMenu from "@/assets/logo-azul-menu.png";
+import logoVerdeFooter from "@/assets/logo-verde-footer.png";
 
 interface LogoProps {
-  variant?: "default" | "small" | "icon-only" | "without-circle" | "header" | "circular" | "gradient";
+  variant?: "default" | "small" | "icon-only" | "without-circle" | "header" | "circular" | "gradient" | "footer";
   className?: string;
   size?: "sm" | "md" | "lg";
   customUrl?: string;
@@ -21,19 +21,20 @@ export function Logo({
   };
   
   const logoSize = sizeClasses[size];
-  const logoUrl = customUrl || logoAzulBranco;
   
-  if (variant === "circular" || variant === "icon-only" || variant === "gradient") {
+  if (variant === "footer" || variant === "gradient" || variant === "circular" || variant === "icon-only") {
     return (
       <div className={`flex items-center justify-center ${className}`}>
         <img 
-          src={logoGradiente}
+          src={logoVerdeFooter}
           alt="e-regulariza"
           className={`${logoSize} object-contain`}
         />
       </div>
     );
   }
+  
+  const logoUrl = customUrl || logoAzulMenu;
   
   return (
     <div className={`flex items-center ${className}`}>
