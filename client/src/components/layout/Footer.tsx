@@ -31,6 +31,7 @@ const footerContent = {
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
+  const whatsappLink = "https://wa.me/5521999011999";
 
   return (
     <footer className="bg-gradient-to-r from-[#4318FF] to-[#00D9A5]">
@@ -74,16 +75,20 @@ export default function Footer() {
           <div>
             <h3 className="font-semibold text-sm uppercase tracking-wider mb-4 text-white">Contato</h3>
             <ul className="space-y-2">
-              <li className="text-white/70 text-sm">
-                {footerContent.contactInfo.email}
+              <li>
+                <a href={`mailto:${footerContent.contactInfo.email}`} className="text-white/70 hover:text-white text-sm transition-colors">
+                  {footerContent.contactInfo.email}
+                </a>
               </li>
-              <li className="text-white/70 text-sm">
-                {footerContent.contactInfo.phone}
+              <li>
+                <a href={whatsappLink} target="_blank" rel="noopener noreferrer" className="text-white/70 hover:text-white text-sm transition-colors">
+                  {footerContent.contactInfo.phone}
+                </a>
               </li>
               <li className="text-white/70 text-sm">
                 {footerContent.contactInfo.location}
               </li>
-              <li className="flex space-x-3 mt-4">
+              <li className="flex gap-3 mt-4">
                 <a 
                   href="https://www.facebook.com/eregulariza" 
                   className="text-white/70 hover:text-white transition-colors"
@@ -115,11 +120,11 @@ export default function Footer() {
             </ul>
           </div>
         </div>
-        <div className="border-t border-white/20 pt-8 mt-12 flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+        <div className="border-t border-white/20 pt-8 mt-12 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-xs text-white/70">
             {footerContent.copyright.replace("2025", currentYear.toString())}
           </p>
-          <div className="flex space-x-4">
+          <div className="flex gap-4 flex-wrap justify-center">
             {footerContent.legalLinks.map((link) => (
               <Link key={link.label} to={link.url} className="text-xs text-white/70 hover:text-white transition-colors">
                 {link.label}

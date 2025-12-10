@@ -1,25 +1,21 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Quote } from "lucide-react";
 
 const testimonials = [
   {
-    quote: "O processo de regularização do meu imóvel foi surpreendentemente fácil com a e-regulariza. Consegui acompanhar cada etapa do processo e me senti confiante o tempo todo.",
-    name: "Maria Silva",
-    role: "Proprietária em São Paulo",
-    avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
+    quote: "Finalmente consegui a regularização do meu imóvel! O processo foi muito mais rápido do que eu esperava e a equipe da e-regulariza me manteve informado em cada passo.",
+    name: "Alexandre M.",
+    role: "Proprietário no Rio de Janeiro",
   },
   {
-    quote: "A transparência da plataforma é impressionante. Recebi notificações em cada etapa e pude enviar todos os documentos de forma digital, sem sair de casa.",
-    name: "Carlos Mendes",
-    role: "Proprietário em Campinas",
-    avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
+    quote: "Eu estava há anos tentando resolver a documentação da minha propriedade, mas só a e-regulariza fez acontecer. O atendimento é excelente. Muito obrigado!",
+    name: "Joana V.",
+    role: "Proprietária em Duque de Caxias",
   },
   {
-    quote: "Minha usucapião foi resolvida em tempo recorde. A plataforma digital realmente faz diferença, poupando tempo e evitando burocracia desnecessária.",
-    name: "Ana Pereira",
-    role: "Proprietária em Ribeirão Preto",
-    avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
+    quote: "Nosso empreendimento imobiliário exigia uma regularização complexa, e a e-regulariza foi parceira essencial em todo o processo.",
+    name: "José P.",
+    role: "Proprietário em Itaguaí",
   },
 ];
 
@@ -43,15 +39,9 @@ export function Testimonials() {
                 <p className="text-muted-foreground mb-6" data-testid={`text-testimonial-quote-${index}`}>
                   "{testimonial.quote}"
                 </p>
-                <div className="flex items-center gap-3">
-                  <Avatar data-testid={`avatar-testimonial-${index}`}>
-                    <AvatarImage src={testimonial.avatar} alt={testimonial.name} />
-                    <AvatarFallback>{testimonial.name.charAt(0)}</AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <p className="font-semibold text-sm" data-testid={`text-testimonial-name-${index}`}>{testimonial.name}</p>
-                    <p className="text-xs text-muted-foreground" data-testid={`text-testimonial-role-${index}`}>{testimonial.role}</p>
-                  </div>
+                <div>
+                  <p className="font-semibold" data-testid={`text-testimonial-name-${index}`}>{testimonial.name}</p>
+                  <p className="text-sm text-muted-foreground" data-testid={`text-testimonial-role-${index}`}>{testimonial.role}</p>
                 </div>
               </CardContent>
             </Card>
