@@ -34,7 +34,9 @@ if (process.env.NODE_ENV === "production") {
   const indexPath = path.join(distPath, "index.html");
 
   app.use(express.static(distPath));
-  app.get("/{*splat}", (_req, res) => {
+  
+  // Catch-all for SPA routing - use middleware instead of wildcard route
+  app.use((_req, res) => {
     res.sendFile(indexPath);
   });
 } else {
