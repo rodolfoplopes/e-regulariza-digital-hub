@@ -1,8 +1,8 @@
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { Hero } from "@/components/home/Hero";
-import { Features } from "@/components/home/Features";
 import { HowItWorks } from "@/components/home/HowItWorks";
+import { Services } from "@/components/home/Services";
 import { Testimonials } from "@/components/home/Testimonials";
 import { Platform } from "@/components/home/Platform";
 import { FAQ } from "@/components/home/FAQ";
@@ -14,8 +14,8 @@ export default function Index() {
       <Header />
       <main className="flex-1">
         <Hero />
-        <Features />
         <HowItWorks />
+        <Services />
         <Testimonials />
         <Platform />
         <FAQ />

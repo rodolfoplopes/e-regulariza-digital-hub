@@ -41,7 +41,7 @@ export function Logo({
       <img 
         src={logoUrl}
         alt="e-regulariza"
-        className={`${variant === "header" ? "h-10 w-auto" : logoSize} object-contain`}
+        className={`${variant === "header" ? "h-14 w-auto" : logoSize} object-contain`}
       />
     </div>
   );
