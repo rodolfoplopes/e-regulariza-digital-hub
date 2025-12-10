@@ -38,9 +38,13 @@
     --admin-viewer: 142 76% 36%;
 
     /* eRegulariza brand colors - cores institucionais atualizadas */
-    --eregulariza-primary: 248 100% 49%; /* #3C00F8 */
-    --eregulariza-secondary: 171 94% 44%; /* #06D7A5 */
-    --eregulariza-accent: 142 76% 36%;
+    --eregulariza-primary: 248 100% 55%; /* #4318FF - Azul */
+    --eregulariza-secondary: 160 100% 43%; /* #00D9A5 - Verde */
+    --eregulariza-accent: 160 100% 43%;
+    
+    /* Gradiente azul para verde */
+    --gradient-start: 248 100% 55%;
+    --gradient-end: 160 100% 43%;
 
     /* Standard text color */
     --text-primary: 0 0% 22%; /* #373535 */

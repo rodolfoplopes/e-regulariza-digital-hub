@@ -1,5 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Quote } from "lucide-react";
 
 const testimonials = [
   {
@@ -24,7 +25,7 @@ const testimonials = [
 
 export function Testimonials() {
   return (
-    <section className="py-16 md:py-24 bg-muted/30" data-testid="section-testimonials">
+    <section className="py-16 md:py-24 bg-gradient-to-b from-[#4318FF]/5 to-transparent" data-testid="section-testimonials">
       <div className="container mx-auto px-4 lg:px-8">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold mb-4" data-testid="text-testimonials-title">
@@ -36,9 +37,10 @@ export function Testimonials() {
         </div>
         <div className="grid md:grid-cols-3 gap-6">
           {testimonials.map((testimonial, index) => (
-            <Card key={index} className="border-0 shadow-sm" data-testid={`card-testimonial-${index}`}>
+            <Card key={index} className="border shadow-sm" data-testid={`card-testimonial-${index}`}>
               <CardContent className="p-6">
-                <p className="text-muted-foreground mb-6 italic" data-testid={`text-testimonial-quote-${index}`}>
+                <Quote className="w-10 h-10 text-[#4318FF] mb-4" />
+                <p className="text-muted-foreground mb-6" data-testid={`text-testimonial-quote-${index}`}>
                   "{testimonial.quote}"
                 </p>
                 <div className="flex items-center gap-3">

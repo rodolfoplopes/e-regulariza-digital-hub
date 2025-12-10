@@ -9,17 +9,15 @@ export function Hero() {
           <div className="space-y-6">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight" data-testid="text-hero-title">
               Regularização imobiliária{" "}
-              <span className="text-primary">simplificada e transparente</span>
+              <span className="text-[#4318FF]">simplificada e transparente</span>
             </h1>
             <p className="text-lg md:text-xl text-muted-foreground max-w-lg" data-testid="text-hero-description">
-              Acompanhe seu processo de regularização em tempo real, com total 
-              transparência e previsibilidade. Transformamos processos 
-              burocráticos em experiências digitais.
+              A e-regulariza simplifica todo o processo para você, desde a análise até a entrega da documentação. Vem para a e-regulariza! É mais simples do que você imagina.
             </p>
             <div className="flex flex-wrap gap-4">
-              <Button asChild size="lg">
-                <Link to="/register" data-testid="link-hero-register">
-                  Iniciar agora
+              <Button asChild size="lg" className="bg-[#00D9A5] hover:bg-[#00C495] text-white">
+                <Link to="/contato" data-testid="link-hero-contact">
+                  Falar com especialista
                 </Link>
               </Button>
               <Button asChild variant="outline" size="lg">
