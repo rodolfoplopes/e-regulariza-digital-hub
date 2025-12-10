@@ -24,10 +24,10 @@ export default function Header() {
 
   return (
     <header className="bg-white shadow-sm border-b sticky top-0 z-50">
-      <div className="container mx-auto flex justify-between items-center h-16 px-4 sm:px-6 lg:px-8">
+      <div className="container mx-auto flex justify-between items-center h-20 px-4 sm:px-6 lg:px-8">
         <div className="flex items-center">
           <Link to="/" className="flex items-center">
-            <Logo variant="header" size="sm" />
+            <Logo variant="header" size="lg" />
           </Link>
         </div>
 
@@ -95,7 +95,7 @@ export default function Header() {
             </>
           ) : (
             <div className="flex items-center space-x-2">
-              <Button variant="outline" size="sm" asChild className="hidden sm:flex border-eregulariza-primary text-eregulariza-primary hover:bg-eregulariza-primary hover:text-white">
+              <Button variant="outline" size="lg" asChild className="hidden sm:flex border-eregulariza-primary text-eregulariza-primary hover:bg-eregulariza-primary hover:text-white">
                 <Link to="/login">Área do Cliente</Link>
               </Button>
               <Button variant="ghost" size="sm" asChild className="sm:hidden">

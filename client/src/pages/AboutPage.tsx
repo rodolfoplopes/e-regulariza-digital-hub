@@ -8,10 +8,10 @@ import teamRodolfo from "@/assets/team-rodolfo.jpg";
 import teamFabio from "@/assets/team-fabio.png";
 
 const stats = [
-  { icon: Users, label: "Clientes atendidos", value: "500+" },
-  { icon: Target, label: "Processos concluídos", value: "1.200+" },
+  { icon: Users, label: "Clientes atendidos", value: "400+" },
+  { icon: Target, label: "Processos concluídos", value: "700+" },
   { icon: Award, label: "Anos de experiência", value: "10+" },
-  { icon: Clock, label: "Tempo médio de resposta", value: "24h" },
+  { icon: Clock, label: "Tempo médio de resposta", value: "12h" },
 ];
 
 const teamMembers = [

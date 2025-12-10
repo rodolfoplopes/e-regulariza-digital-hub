@@ -1,9 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { MessageCircle } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export function Hero() {
-  const whatsappLink = "https://wa.me/5521999011999?text=Olá! Gostaria de saber mais sobre os serviços de regularização imobiliária.";
-  
   return (
     <section className="relative min-h-[85vh] flex items-center" data-testid="section-hero">
       <div className="container mx-auto px-4 lg:px-8">
@@ -18,10 +17,10 @@ export function Hero() {
             </p>
             <div className="flex flex-wrap gap-4">
               <Button asChild size="lg" className="bg-[#00D9A5] hover:bg-[#00C495] text-white">
-                <a href={whatsappLink} target="_blank" rel="noopener noreferrer" data-testid="link-hero-whatsapp">
+                <Link to="/contato" data-testid="link-hero-contact">
                   <MessageCircle className="w-5 h-5 mr-2" />
                   Fale Conosco
-                </a>
+                </Link>
               </Button>
             </div>
           </div>

@@ -4,6 +4,7 @@ import { Hero } from "@/components/home/Hero";
 import { Features } from "@/components/home/Features";
 import { HowItWorks } from "@/components/home/HowItWorks";
 import { Testimonials } from "@/components/home/Testimonials";
+import { Platform } from "@/components/home/Platform";
 import { FAQ } from "@/components/home/FAQ";
 import { CTA } from "@/components/home/CTA";
 
@@ -16,6 +17,7 @@ export default function Index() {
         <Features />
         <HowItWorks />
         <Testimonials />
+        <Platform />
         <FAQ />
         <CTA />
       </main>
