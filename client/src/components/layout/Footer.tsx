@@ -5,10 +5,7 @@ import { Facebook, Instagram, Linkedin } from "lucide-react";
 const footerContent = {
   about: "Transformando a experiência de regularização imobiliária em algo simples, transparente e confiável.",
   companyLinks: [
-    { label: "Sobre nós", url: "/sobre" },
-    { label: "Casos de sucesso", url: "/cases" },
-    { label: "Blog", url: "/blog" },
-    { label: "Carreiras", url: "/carreiras" }
+    { label: "Sobre nós", url: "/sobre" }
   ],
   serviceLinks: [
     { label: "Usucapião Extrajudicial", url: "/servicos#usucapiao" },
