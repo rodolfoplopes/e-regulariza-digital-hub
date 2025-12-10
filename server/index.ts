@@ -40,7 +40,11 @@ if (process.env.NODE_ENV === "production") {
 } else {
   // Development mode with Vite dev server
   const vite = await createViteServer({
-    server: { middlewareMode: true },
+    server: { 
+      middlewareMode: true,
+      hmr: true,
+      allowedHosts: true,
+    },
     appType: "spa",
   });
 
