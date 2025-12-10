@@ -22,9 +22,9 @@ const footerContent = {
     location: "Itaguaí, RJ"
   },
   legalLinks: [
-    { label: "Política de Privacidade", url: "/politica-de-privacidade" },
-    { label: "Termos de Uso", url: "/termos-de-uso" },
-    { label: "Política de Cookies", url: "/politica-de-cookies" }
+    { label: "Política de Privacidade", url: "/politicas#privacy" },
+    { label: "Termos de Uso", url: "/politicas#terms" },
+    { label: "Política de Cookies", url: "/politicas#cookies" }
   ],
   copyright: "© 2025 e-regulariza. Todos os direitos reservados."
 };

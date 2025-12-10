@@ -1,219 +1,300 @@
-
-import { useState, useEffect } from "react";
-import { useParams, Link } from "react-router-dom";
-import { Helmet } from "react-helmet-async";
-import Layout from "@/components/layout/Layout";
-import { Card } from "@/components/ui/card";
-import { ChevronLeft } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
+import Header from "@/components/layout/Header";
+import Footer from "@/components/layout/Footer";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { ChevronDown, ChevronUp, Shield, FileText, Cookie } from "lucide-react";
 
-type PolicyContent = {
+interface PolicySectionProps {
+  id: string;
   title: string;
-  content: string;
-  description: string;
-  lastUpdated: string;
-};
+  icon: typeof Shield;
+  summary: string;
+  content: React.ReactNode;
+  isOpen: boolean;
+  onToggle: () => void;
+}
 
-const policyTypes: Record<string, PolicyContent> = {
-  "politica-de-privacidade": {
-    title: "Política de Privacidade",
-    content: `
-      <h2>Política de Privacidade da e-regulariza</h2>
-      <p class="mb-4">Última atualização: 01 de Maio de 2025</p>
-      
-      <h3>1. Introdução</h3>
-      <p>A e-regulariza está comprometida em proteger sua privacidade. Esta Política de Privacidade explica como coletamos, usamos, divulgamos e protegemos suas informações pessoais quando você utiliza nossa plataforma de regularização imobiliária.</p>
-      
-      <h3>2. Informações que Coletamos</h3>
-      <p>Podemos coletar os seguintes tipos de informações pessoais:</p>
-      <ul>
-        <li>Informações de identificação (nome, CPF, RG)</li>
-        <li>Informações de contato (e-mail, telefone, endereço)</li>
-        <li>Documentos imobiliários relacionados ao seu processo</li>
-        <li>Informações de pagamento</li>
-        <li>Dados de uso da plataforma</li>
+function PolicySection({ id, title, icon: Icon, summary, content, isOpen, onToggle }: PolicySectionProps) {
+  return (
+    <Card id={id} className="border-0 shadow-sm scroll-mt-24" data-testid={`card-${id}`}>
+      <CardHeader className="pb-4">
+        <div className="flex items-start gap-4">
+          <div className="w-12 h-12 rounded-lg bg-[#4318FF]/10 flex items-center justify-center flex-shrink-0">
+            <Icon className="w-6 h-6 text-[#4318FF]" />
+          </div>
+          <div className="flex-1">
+            <CardTitle className="text-xl mb-2">{title}</CardTitle>
+            <p className="text-muted-foreground text-sm">{summary}</p>
+          </div>
+        </div>
+      </CardHeader>
+      <CardContent>
+        <Button
+          variant="outline"
+          onClick={onToggle}
+          className="mb-4 border-[#4318FF] text-[#4318FF] hover:bg-[#4318FF] hover:text-white"
+          data-testid={`button-toggle-${id}`}
+        >
+          {isOpen ? (
+            <>
+              <ChevronUp className="w-4 h-4 mr-2" />
+              Fechar
+            </>
+          ) : (
+            <>
+              <ChevronDown className="w-4 h-4 mr-2" />
+              Leia mais
+            </>
+          )}
+        </Button>
+        {isOpen && (
+          <div className="prose prose-sm max-w-none text-muted-foreground" data-testid={`content-${id}`}>
+            {content}
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+const currentDate = new Date().toLocaleDateString('pt-BR', { 
+  day: '2-digit', 
+  month: 'long', 
+  year: 'numeric' 
+});
+
+const privacyContent = (
+  <div className="space-y-6">
+    <p>
+      A e-regulariza valoriza a sua privacidade e se compromete com a proteção dos seus dados pessoais. 
+      Esta Política explica como coletamos, utilizamos, armazenamos e compartilhamos seus dados em 
+      conformidade com a Lei Geral de Proteção de Dados Pessoais (Lei n 13.709/2018 - LGPD).
+    </p>
+    
+    <div>
+      <h4 className="font-semibold text-foreground mb-2">1. Quais dados coletamos?</h4>
+      <p className="mb-2">Coletamos apenas os dados necessários para oferecer nossos serviços de regularização imobiliária, tais como:</p>
+      <ul className="list-disc pl-5 space-y-1">
+        <li>Nome completo, CPF/CNPJ;</li>
+        <li>Endereço do imóvel e documentos correlatos;</li>
+        <li>E-mail, telefone e informações de contato;</li>
+        <li>Informações de navegação (cookies, IP, geolocalização).</li>
       </ul>
-      
-      <h3>3. Como Utilizamos suas Informações</h3>
-      <p>Utilizamos suas informações para:</p>
-      <ul>
-        <li>Fornecer e gerenciar nossos serviços de regularização imobiliária</li>
-        <li>Processar transações e pagamentos</li>
-        <li>Comunicar atualizações sobre seu processo</li>
-        <li>Melhorar nossos serviços</li>
-        <li>Cumprir obrigações legais</li>
+    </div>
+
+    <div>
+      <h4 className="font-semibold text-foreground mb-2">2. Para que usamos seus dados?</h4>
+      <p className="mb-2">Utilizamos seus dados para:</p>
+      <ul className="list-disc pl-5 space-y-1">
+        <li>Analisar e processar serviços solicitados (ex: usucapião, Reurb, retificações);</li>
+        <li>Elaborar documentos jurídicos;</li>
+        <li>Cumprir obrigações legais e regulatórias;</li>
+        <li>Aperfeiçoar nossa plataforma e atendimento.</li>
       </ul>
-      
-      <h3>4. Compartilhamento de Informações</h3>
-      <p>Podemos compartilhar suas informações com:</p>
-      <ul>
-        <li>Órgãos públicos necessários para seu processo de regularização</li>
-        <li>Prestadores de serviços que nos auxiliam</li>
-        <li>Quando exigido por lei ou ordem judicial</li>
+    </div>
+
+    <div>
+      <h4 className="font-semibold text-foreground mb-2">3. Com quem compartilhamos?</h4>
+      <p className="mb-2">Compartilhamos dados apenas quando necessário:</p>
+      <ul className="list-disc pl-5 space-y-1">
+        <li>Com cartórios, prefeituras, INCRA e demais órgãos públicos;</li>
+        <li>Com parceiros técnicos envolvidos em processos de regularização;</li>
+        <li>Com prestadores de serviço que apoiam nossa operação, sob contrato de confidencialidade.</li>
       </ul>
-      
-      <h3>5. Segurança dos Dados</h3>
-      <p>Implementamos medidas técnicas e organizacionais para proteger suas informações contra acesso não autorizado, alteração, divulgação ou destruição.</p>
-      
-      <h3>6. Seus Direitos</h3>
-      <p>Você tem direito a:</p>
-      <ul>
-        <li>Acessar seus dados pessoais</li>
-        <li>Solicitar correções de informações imprecisas</li>
-        <li>Solicitar exclusão de seus dados (quando aplicável)</li>
-        <li>Revogar consentimento para uso de seus dados</li>
+    </div>
+
+    <div>
+      <h4 className="font-semibold text-foreground mb-2">4. Seus direitos como titular:</h4>
+      <p className="mb-2">Você pode, a qualquer momento:</p>
+      <ul className="list-disc pl-5 space-y-1">
+        <li>Acessar, corrigir ou excluir seus dados;</li>
+        <li>Solicitar portabilidade ou anonimização;</li>
+        <li>Revogar consentimentos;</li>
+        <li>Saber com quem seus dados foram compartilhados.</li>
       </ul>
-      
-      <h3>7. Contato</h3>
-      <p>Para questões sobre privacidade, entre em contato pelo e-mail: privacidade@eregulariza.com.br</p>
-    `,
-    description: "Informações sobre como a e-regulariza coleta, usa e protege seus dados pessoais, bem como seus direitos em relação a essas informações.",
-    lastUpdated: "2025-05-01"
-  },
-  "politica-de-cookies": {
-    title: "Política de Cookies",
-    content: `
-      <h2>Política de Cookies da e-regulariza</h2>
-      <p class="mb-4">Última atualização: 01 de Maio de 2025</p>
-      
-      <h3>1. O que são Cookies</h3>
-      <p>Cookies são pequenos arquivos de texto que são armazenados no seu dispositivo quando você visita nosso site. Eles são amplamente utilizados para fazer os sites funcionarem de maneira mais eficiente e fornecer informações aos proprietários do site.</p>
-      
-      <h3>2. Como Utilizamos Cookies</h3>
-      <p>Utilizamos cookies para:</p>
-      <ul>
-        <li>Garantir o funcionamento adequado da plataforma</li>
-        <li>Lembrar suas preferências e configurações</li>
-        <li>Manter sua sessão ativa enquanto navega pelo site</li>
-        <li>Coletar dados analíticos para melhorar nossa plataforma</li>
-        <li>Personalizar sua experiência</li>
+      <p className="mt-2">
+        Para exercer seus direitos, entre em contato: <strong>sac@e-regulariza.com</strong>
+      </p>
+    </div>
+
+    <div>
+      <h4 className="font-semibold text-foreground mb-2">5. Segurança das informações</h4>
+      <p>
+        Adotamos medidas técnicas e organizacionais para proteger seus dados contra acessos 
+        não autorizados, perda ou uso indevido.
+      </p>
+    </div>
+  </div>
+);
+
+const termsContent = (
+  <div className="space-y-6">
+    <p>
+      Bem-vindo à e-regulariza! Ao acessar nosso site e utilizar nossos serviços, você concorda 
+      com os presentes Termos de Uso. Leia com atenção.
+    </p>
+
+    <div>
+      <h4 className="font-semibold text-foreground mb-2">1. Sobre a e-regulariza</h4>
+      <p>
+        Somos uma plataforma jurídica especializada em regularização de imóveis, com foco em 
+        soluções extrajudiciais, como usucapião, Reurb, retificações e registros.
+      </p>
+    </div>
+
+    <div>
+      <h4 className="font-semibold text-foreground mb-2">2. Utilização dos serviços</h4>
+      <p className="mb-2">Você se compromete a:</p>
+      <ul className="list-disc pl-5 space-y-1">
+        <li>Fornecer informações verdadeiras e completas;</li>
+        <li>Utilizar nossos serviços apenas para fins legais;</li>
+        <li>Não compartilhar acesso não autorizado à plataforma.</li>
       </ul>
-      
-      <h3>3. Tipos de Cookies que Utilizamos</h3>
-      <p><strong>Cookies essenciais:</strong> Necessários para o funcionamento básico do site</p>
-      <p><strong>Cookies funcionais:</strong> Permitem lembrar suas preferências</p>
-      <p><strong>Cookies analíticos:</strong> Nos ajudam a entender como você interage com o site</p>
-      <p><strong>Cookies de terceiros:</strong> Fornecidos por serviços externos que usamos</p>
-      
-      <h3>4. Controle de Cookies</h3>
-      <p>Você pode controlar e gerenciar cookies nas configurações do seu navegador. Observe que desativar certos cookies pode afetar a funcionalidade do site.</p>
-      
-      <h3>5. Alterações na Política de Cookies</h3>
-      <p>Esta política pode ser atualizada periodicamente. Recomendamos que você revise esta página regularmente para estar ciente de quaisquer alterações.</p>
-      
-      <h3>6. Contato</h3>
-      <p>Para dúvidas sobre nossa política de cookies, entre em contato pelo e-mail: privacidade@eregulariza.com.br</p>
-    `,
-    description: "Saiba como a e-regulariza utiliza cookies e outras tecnologias de rastreamento para melhorar sua experiência em nossa plataforma.",
-    lastUpdated: "2025-05-01"
-  },
-  "termos-de-uso": {
-    title: "Termos de Uso",
-    content: `
-      <h2>Termos de Uso da e-regulariza</h2>
-      <p class="mb-4">Última atualização: 01 de Maio de 2025</p>
-      
-      <h3>1. Aceitação dos Termos</h3>
-      <p>Ao acessar ou usar a plataforma e-regulariza, você concorda com estes Termos de Uso. Se você não concordar com qualquer parte destes termos, não poderá usar nossos serviços.</p>
-      
-      <h3>2. Descrição dos Serviços</h3>
-      <p>A e-regulariza oferece uma plataforma para gerenciamento e acompanhamento de processos de regularização imobiliária. Nossos serviços incluem, mas não se limitam a:</p>
-      <ul>
-        <li>Gestão de processos de regularização</li>
-        <li>Upload e armazenamento de documentos</li>
-        <li>Comunicação entre clientes e equipe técnica</li>
-        <li>Acompanhamento de status e prazos</li>
+    </div>
+
+    <div>
+      <h4 className="font-semibold text-foreground mb-2">3. Propriedade intelectual</h4>
+      <p>
+        Todo o conteúdo do site (textos, logotipos, documentos, imagens e códigos) pertence à 
+        e-regulariza e não pode ser copiado ou reproduzido sem autorização.
+      </p>
+    </div>
+
+    <div>
+      <h4 className="font-semibold text-foreground mb-2">4. Responsabilidade</h4>
+      <p className="mb-2">Prestamos serviços com diligência e respaldo jurídico. No entanto:</p>
+      <ul className="list-disc pl-5 space-y-1">
+        <li>Não garantimos prazos ou resultados definitivos dependentes de terceiros (ex: cartórios, prefeituras);</li>
+        <li>Não nos responsabilizamos por dados incorretos enviados pelos usuários.</li>
       </ul>
-      
-      <h3>3. Cadastro e Conta</h3>
-      <p>Para utilizar nossos serviços, você deve criar uma conta com informações precisas e completas. Você é responsável por manter a confidencialidade de sua senha e por todas as atividades que ocorrerem em sua conta.</p>
-      
-      <h3>4. Responsabilidades do Usuário</h3>
-      <p>Ao usar nossa plataforma, você concorda em:</p>
-      <ul>
-        <li>Fornecer informações verdadeiras e documentos autênticos</li>
-        <li>Não violar leis ou regulamentos</li>
-        <li>Não infringir direitos de propriedade intelectual</li>
-        <li>Não interferir no funcionamento normal da plataforma</li>
+    </div>
+
+    <div>
+      <h4 className="font-semibold text-foreground mb-2">5. Alterações e atualizações</h4>
+      <p>
+        Podemos atualizar estes termos periodicamente. Recomendamos revisá-los regularmente.
+      </p>
+    </div>
+  </div>
+);
+
+const cookiesContent = (
+  <div className="space-y-6">
+    <p>
+      Usamos cookies para melhorar sua experiência em nosso site.
+    </p>
+
+    <div>
+      <h4 className="font-semibold text-foreground mb-2">O que são cookies?</h4>
+      <p>
+        Cookies são pequenos arquivos de texto armazenados no seu navegador para lembrar 
+        preferências, analisar tráfego e personalizar conteúdo.
+      </p>
+    </div>
+
+    <div>
+      <h4 className="font-semibold text-foreground mb-2">Tipos de cookies que usamos:</h4>
+      <ul className="list-disc pl-5 space-y-1">
+        <li><strong>Essenciais:</strong> Necessários para o funcionamento básico do site;</li>
+        <li><strong>De desempenho:</strong> Coletam dados para melhorar funcionalidades;</li>
+        <li><strong>De marketing:</strong> Usados para exibir anúncios relevantes.</li>
       </ul>
-      
-      <h3>5. Limitação de Responsabilidade</h3>
-      <p>A e-regulariza não garante que os serviços serão ininterruptos ou isentos de erros. Não somos responsáveis por atrasos causados por terceiros ou órgãos públicos no processo de regularização.</p>
-      
-      <h3>6. Alterações nos Termos</h3>
-      <p>Reservamo-nos o direito de modificar estes termos a qualquer momento. Alterações significativas serão notificadas aos usuários.</p>
-      
-      <h3>7. Lei Aplicável</h3>
-      <p>Estes termos são regidos pelas leis do Brasil.</p>
-      
-      <h3>8. Contato</h3>
-      <p>Para questões sobre estes termos, entre em contato pelo e-mail: contato@eregulariza.com.br</p>
-    `,
-    description: "Os termos e condições que regem o uso da plataforma e-regulariza, incluindo os direitos e responsabilidades dos usuários e da empresa.",
-    lastUpdated: "2025-05-01"
-  }
-};
+    </div>
+
+    <div>
+      <h4 className="font-semibold text-foreground mb-2">Como gerenciar cookies?</h4>
+      <p>
+        Você pode ajustar as preferências de cookies diretamente em seu navegador, ou configurar 
+        diretamente no aviso de cookies ao acessar o site.
+      </p>
+      <p className="mt-2">
+        Ao continuar navegando, você concorda com o uso de cookies conforme esta política.
+      </p>
+    </div>
+  </div>
+);
 
 export default function PolicyPage() {
-  const { policyType } = useParams<{ policyType: string }>();
-  const [policy, setPolicy] = useState<PolicyContent | null>(null);
-  
+  const location = useLocation();
+  const [openSections, setOpenSections] = useState<Record<string, boolean>>({
+    privacy: false,
+    terms: false,
+    cookies: false,
+  });
+
   useEffect(() => {
-    if (policyType && policyTypes[policyType]) {
-      // In a real app, this would fetch from an API or CMS
-      // For demo purposes, we're using the static content
-      setPolicy(policyTypes[policyType]);
+    const hash = location.hash.replace('#', '');
+    if (hash && ['privacy', 'terms', 'cookies'].includes(hash)) {
+      setOpenSections(prev => ({ ...prev, [hash]: true }));
+      setTimeout(() => {
+        const element = document.getElementById(hash);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 100);
     }
-  }, [policyType]);
-  
-  if (!policy) {
-    return (
-      <Layout>
-        <Helmet>
-          <title>Página não encontrada | e-regulariza</title>
-          <meta name="description" content="A página solicitada não está disponível." />
-          <meta name="robots" content="noindex, nofollow" />
-        </Helmet>
-        <div className="container mx-auto py-12 px-4">
-          <Card className="p-6">
-            <h1 className="text-2xl font-bold mb-4">Política não encontrada</h1>
-            <p>A política solicitada não está disponível.</p>
-            <Button asChild className="mt-4">
-              <Link to="/">
-                <ChevronLeft className="mr-2 h-4 w-4" />
-                Voltar para o início
-              </Link>
-            </Button>
-          </Card>
-        </div>
-      </Layout>
-    );
-  }
+  }, [location.hash]);
+
+  const toggleSection = (section: string) => {
+    setOpenSections(prev => ({ ...prev, [section]: !prev[section] }));
+  };
+
+  const policies = [
+    {
+      id: "privacy",
+      title: "Política de Privacidade",
+      icon: Shield,
+      summary: `Última atualização: ${currentDate}. Saiba como coletamos, utilizamos e protegemos seus dados pessoais em conformidade com a LGPD.`,
+      content: privacyContent,
+    },
+    {
+      id: "terms",
+      title: "Termos de Uso",
+      icon: FileText,
+      summary: "Conheça as regras e condições para utilização dos nossos serviços e plataforma.",
+      content: termsContent,
+    },
+    {
+      id: "cookies",
+      title: "Política de Cookies",
+      icon: Cookie,
+      summary: "Entenda como utilizamos cookies para melhorar sua experiência de navegação.",
+      content: cookiesContent,
+    },
+  ];
 
   return (
-    <Layout>
-      <Helmet>
-        <title>{policy.title} | e-regulariza</title>
-        <meta name="description" content={policy.description} />
-        <meta name="robots" content="index, follow" />
-        <meta property="og:title" content={`${policy.title} | e-regulariza`} />
-        <meta property="og:description" content={policy.description} />
-        <meta property="og:type" content="article" />
-        <meta name="author" content="e-regulariza" />
-        <meta name="revisit-after" content="7 days" />
-      </Helmet>
-      <div className="container mx-auto py-12 px-4">
-        <Card className="p-6 md:p-8">
-          <h1 className="text-3xl font-bold mb-6">{policy.title}</h1>
-          <div 
-            className="prose max-w-none"
-            dangerouslySetInnerHTML={{ __html: policy.content }}
-          />
-          <div className="mt-8 pt-4 border-t text-sm text-muted-foreground">
-            <p>Última atualização: {new Date(policy.lastUpdated).toLocaleDateString()}</p>
+    <div className="min-h-screen flex flex-col">
+      <Header />
+      <main className="flex-1">
+        <section className="py-16 md:py-24">
+          <div className="container mx-auto px-4 lg:px-8">
+            <div className="max-w-3xl mx-auto text-center mb-12">
+              <h1 className="text-4xl md:text-5xl font-bold mb-6" data-testid="text-policy-title">
+                Políticas e Termos
+              </h1>
+              <p className="text-lg text-muted-foreground" data-testid="text-policy-subtitle">
+                Transparência e segurança são prioridades para a e-regulariza. 
+                Confira nossas políticas e termos de uso.
+              </p>
+            </div>
+
+            <div className="max-w-3xl mx-auto space-y-6">
+              {policies.map((policy) => (
+                <PolicySection
+                  key={policy.id}
+                  {...policy}
+                  isOpen={openSections[policy.id]}
+                  onToggle={() => toggleSection(policy.id)}
+                />
+              ))}
+            </div>
           </div>
-        </Card>
-      </div>
-    </Layout>
+        </section>
+      </main>
+      <Footer />
+    </div>
   );
 }

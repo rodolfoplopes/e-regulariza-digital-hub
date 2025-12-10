@@ -53,9 +53,7 @@ const App = () => (
               <Route path="/novo-processo" element={<ProcessCreate />} />
               <Route path="/configuracoes" element={<UserSettings />} />
               <Route path="/configuracoes/logo" element={<LogoManagementPage />} />
-              <Route path="/politica-de-privacidade" element={<PolicyPage />} />
-              <Route path="/termos-de-uso" element={<PolicyPage />} />
-              <Route path="/politica-de-cookies" element={<PolicyPage />} />
+              <Route path="/politicas" element={<PolicyPage />} />
               <Route path="/notificacoes" element={<Notifications />} />
               <Route path="/mensagens" element={<Messages />} />
               <Route path="/perfil" element={<UserProfile />} />
