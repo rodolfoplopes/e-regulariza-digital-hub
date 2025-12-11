@@ -19,20 +19,8 @@ const faqs = [
     answer: "A regularização assegura que o imóvel esteja conforme as normas legais e urbanísticas, permitindo transações legais como venda, financiamento ou herança. Também protege o proprietário contra reivindicações futuras e litígios sobre a propriedade.",
   },
   {
-    question: "O que acontece se não regularizar o imóvel?",
-    answer: "Não regularizar um imóvel pode resultar em uma série de complicações legais, como impedimentos em vendas ou financiamentos, multas, e até ações judiciais. Além disso, o proprietário pode enfrentar dificuldades em realizar melhorias ou construções no imóvel.",
-  },
-  {
-    question: "Qualquer imóvel pode ser desmembrado?",
-    answer: "Não todos; o desmembramento de um imóvel depende de normas urbanísticas locais, que podem incluir limitações sobre o tamanho mínimo dos lotes e a necessidade de infraestrutura adequada. Imóveis em áreas protegidas ou de preservação também podem ter restrições adicionais.",
-  },
-  {
     question: "Quais imóveis não são passíveis de usucapião?",
     answer: "Imóveis públicos, como aqueles pertencentes ao governo municipal, estadual ou federal, não são passíveis de usucapião. Além disso, propriedades utilizadas por empresas públicas para a prestação de serviços públicos também são excluídas.",
-  },
-  {
-    question: "O que significa RGI?",
-    answer: "RGI significa Registro Geral de Imóveis. É o documento oficial emitido pelo cartório de registro de imóveis que contém todas as informações pertinentes sobre um imóvel, incluindo a identificação do proprietário, a localização, descrição detalhada, e o histórico de todas as transações e alterações jurídicas associadas ao imóvel.",
   },
   {
     question: "Quais são os tipos de usucapião existentes?",
@@ -47,10 +35,6 @@ const faqs = [
     answer: "A usucapião baseia-se na posse prolongada do imóvel sob certas condições, enquanto a adjudicação compulsória é baseada em um contrato de compra e venda. A adjudicação é geralmente mais direta quando há documentos claros e um acordo prévio, enquanto a usucapião pode ser mais complexa e demorada.",
   },
   {
-    question: "Por que fazer uma instituição de condomínio?",
-    answer: "A instituição de condomínio é importante para propriedades divididas em unidades autônomas. Os principais motivos incluem: Legalidade e Organização, Gestão dos Espaços Comuns, Regularidade Financeira, Resolução de Conflitos, Valorização do Imóvel e Segurança Jurídica.",
-  },
-  {
     question: "Quem pode requerer a usucapião e para que serve?",
     answer: "O indivíduo que exerça posse mansa, pacífica e ininterrupta de um imóvel pode requerer a usucapião. Este instituto jurídico serve para regularizar a situação registral de um imóvel quando o possuidor, não sendo o titular de domínio registrado, busca reconhecer e formalizar sua propriedade.",
   },
@@ -61,14 +45,6 @@ const faqs = [
   {
     question: "Posso usucapir apenas uma parte do terreno?",
     answer: "Sim, é possível usucapir apenas uma fração do terreno, desde que você detenha a posse exclusiva e incontestada dessa parte específica. A usucapião de parte de um imóvel é comum em situações onde múltiplos indivíduos possuem diferentes partes de um mesmo terreno.",
-  },
-  {
-    question: "Comprar um imóvel que foi usucapido não me trará problemas com o antigo proprietário?",
-    answer: "Em geral, a compra de um imóvel usucapido é segura após a finalização do processo de usucapião, que inclui a notificação dos proprietários anteriores e confrontantes. Contudo, é fundamental verificar se o processo foi concluído corretamente e se o título de propriedade foi devidamente registrado no cartório de registro de imóveis.",
-  },
-  {
-    question: "Comprei um terreno há pouco mais de 1 ano, mas a pessoa que me vendeu está no imóvel há muito tempo. Posso requerer a usucapião?",
-    answer: "Sim, é possível requerer a usucapião por meio da soma das posses (sua e do vendedor anterior), se o total atingir o período prescricional necessário (geralmente 10 ou 15 anos) e se a posse foi contínua, pacífica e sem oposição. Isso é conhecido como \"posse derivada\".",
   },
   {
     question: "O proprietário do imóvel que comprei faleceu, posso usucapir?",
