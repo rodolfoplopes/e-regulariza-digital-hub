@@ -10,12 +10,6 @@ import familiaUsucapiaoImg from "@/assets/familia-usucapiao.jpg";
 
 const services = [
   {
-    id: "usucapiao",
-    category: "Extrajudicial",
-    title: "Usucapião Extrajudicial",
-    description: "A usucapião extrajudicial permite a aquisição da propriedade de um imóvel por meio de procedimento administrativo em cartório, sem necessidade de ação judicial, desde que cumpridos os requisitos legais de posse prolongada e pacífica.",
-  },
-  {
     id: "incorporacao",
     category: "Incorporação",
     title: "Incorporação Imobiliária",
@@ -139,27 +133,28 @@ export default function ServicesPage() {
 
             {/* Banner Destaque - Usucapião Extrajudicial */}
             <div 
-              className="relative rounded-lg overflow-hidden mb-8"
+              className="relative rounded-lg overflow-hidden mb-6"
               data-testid="banner-usucapiao"
             >
               <div className="flex flex-col lg:flex-row">
                 {/* Conteúdo */}
-                <div className="flex-1 bg-gradient-to-br from-[#4318FF] to-[#6B4EFF] p-8 lg:p-10 flex flex-col justify-center">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="w-10 h-10 rounded-lg bg-white/20 flex items-center justify-center">
-                      <FileCheck className="w-5 h-5 text-white" />
+                <div className="flex-1 bg-gradient-to-br from-[#4318FF] to-[#6B4EFF] p-6 flex flex-col justify-center">
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center">
+                      <FileCheck className="w-4 h-4 text-white" />
                     </div>
-                    <span className="text-white/80 text-sm font-medium uppercase tracking-wider">Serviço em Destaque</span>
+                    <span className="text-white/80 text-xs font-medium uppercase tracking-wider">Serviço em Destaque</span>
                   </div>
-                  <h3 className="text-2xl lg:text-3xl font-bold text-white mb-4" data-testid="text-banner-title">
+                  <h3 className="font-bold text-lg text-white mb-2" data-testid="text-banner-title">
                     Usucapião Extrajudicial
                   </h3>
-                  <p className="text-white/90 mb-6 leading-relaxed" data-testid="text-banner-description">
+                  <p className="text-sm text-white/90 mb-4 leading-relaxed" data-testid="text-banner-description">
                     A usucapião extrajudicial permite a aquisição da propriedade de um imóvel por meio de procedimento administrativo em cartório, sem necessidade de ação judicial, desde que cumpridos os requisitos legais de posse prolongada e pacífica.
                   </p>
-                  <div className="flex flex-wrap gap-3">
+                  <div>
                     <Button 
                       asChild 
+                      size="sm"
                       className="bg-[#06D7A5] hover:bg-[#05c496] text-white border-0"
                     >
                       <a href={whatsappLink} target="_blank" rel="noopener noreferrer" data-testid="link-banner-whatsapp">
@@ -170,7 +165,7 @@ export default function ServicesPage() {
                   </div>
                 </div>
                 {/* Imagem */}
-                <div className="lg:w-2/5 h-64 lg:h-auto relative">
+                <div className="lg:w-1/3 h-48 lg:h-auto relative">
                   <img 
                     src={familiaUsucapiaoImg} 
                     alt="Família em seu lar" 
