@@ -4,6 +4,9 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { FileCheck, MessageCircle, ArrowRight } from "lucide-react";
+import familiaUsucapiaoImg from "@/assets/familia-usucapiao.jpg";
 
 const services = [
   {
@@ -106,6 +109,7 @@ const services = [
 
 export default function ServicesPage() {
   const { hash } = useLocation();
+  const whatsappLink = "https://wa.me/5521999011999?text=Olá! Gostaria de saber mais sobre Usucapião Extrajudicial.";
 
   useEffect(() => {
     if (hash) {
@@ -131,6 +135,59 @@ export default function ServicesPage() {
               <p className="text-lg text-muted-foreground" data-testid="text-services-subtitle">
                 Oferecemos uma ampla gama de serviços de regularização imobiliária para atender todas as suas necessidades jurídicas e documentais.
               </p>
+            </div>
+
+            {/* Banner Destaque - Usucapião Extrajudicial */}
+            <div 
+              className="relative rounded-lg overflow-hidden mb-8"
+              data-testid="banner-usucapiao"
+            >
+              <div className="flex flex-col lg:flex-row">
+                {/* Conteúdo */}
+                <div className="flex-1 bg-gradient-to-br from-[#4318FF] to-[#6B4EFF] p-8 lg:p-10 flex flex-col justify-center">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-10 h-10 rounded-lg bg-white/20 flex items-center justify-center">
+                      <FileCheck className="w-5 h-5 text-white" />
+                    </div>
+                    <span className="text-white/80 text-sm font-medium uppercase tracking-wider">Serviço em Destaque</span>
+                  </div>
+                  <h3 className="text-2xl lg:text-3xl font-bold text-white mb-4" data-testid="text-banner-title">
+                    Usucapião Extrajudicial
+                  </h3>
+                  <p className="text-white/90 mb-6 leading-relaxed" data-testid="text-banner-description">
+                    A usucapião extrajudicial permite a aquisição da propriedade de um imóvel por meio de procedimento administrativo em cartório, sem necessidade de ação judicial, desde que cumpridos os requisitos legais de posse prolongada e pacífica.
+                  </p>
+                  <div className="flex flex-wrap gap-3">
+                    <Button 
+                      asChild 
+                      className="bg-[#06D7A5] hover:bg-[#05c496] text-white border-0"
+                    >
+                      <a href={whatsappLink} target="_blank" rel="noopener noreferrer" data-testid="link-banner-whatsapp">
+                        <MessageCircle className="w-4 h-4 mr-2" />
+                        Fale com um especialista
+                      </a>
+                    </Button>
+                    <Button 
+                      asChild 
+                      className="bg-white text-[#4318FF] hover:bg-white/90 border-0"
+                    >
+                      <a href="#usucapiao" data-testid="link-banner-saiba-mais">
+                        Saiba mais
+                        <ArrowRight className="w-4 h-4 ml-2" />
+                      </a>
+                    </Button>
+                  </div>
+                </div>
+                {/* Imagem */}
+                <div className="lg:w-2/5 h-64 lg:h-auto relative">
+                  <img 
+                    src={familiaUsucapiaoImg} 
+                    alt="Família em seu lar" 
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-r from-[#4318FF]/30 to-transparent lg:from-[#6B4EFF]/50"></div>
+                </div>
+              </div>
             </div>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
