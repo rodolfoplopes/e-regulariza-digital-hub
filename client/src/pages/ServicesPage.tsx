@@ -5,7 +5,7 @@ import Footer from "@/components/layout/Footer";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { FileCheck, MessageCircle, ArrowRight } from "lucide-react";
+import { FileCheck, MessageCircle } from "lucide-react";
 import familiaUsucapiaoImg from "@/assets/familia-usucapiao.jpg";
 
 const services = [
@@ -165,15 +165,6 @@ export default function ServicesPage() {
                       <a href={whatsappLink} target="_blank" rel="noopener noreferrer" data-testid="link-banner-whatsapp">
                         <MessageCircle className="w-4 h-4 mr-2" />
                         Fale com um especialista
-                      </a>
-                    </Button>
-                    <Button 
-                      asChild 
-                      className="bg-white text-[#4318FF] hover:bg-white/90 border-0"
-                    >
-                      <a href="#usucapiao" data-testid="link-banner-saiba-mais">
-                        Saiba mais
-                        <ArrowRight className="w-4 h-4 ml-2" />
                       </a>
                     </Button>
                   </div>
