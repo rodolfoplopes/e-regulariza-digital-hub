@@ -1,9 +1,22 @@
-import { pgTable, uuid, text, timestamp, integer, boolean, json } from "drizzle-orm/pg-core";
+import { pgTable, uuid, text, timestamp, integer, boolean, json, unique } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import { createInsertSchema } from "drizzle-zod";
 
+// Escritório/tenant. Um SaaS fechado multi-escritório: cada advogado opera
+// isolado dos demais via organization_id + RLS (ver docs/plano-desenvolvimento.md).
+export const organizations = pgTable("organizations", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  name: text("name").notNull(),
+  slug: text("slug").notNull().unique(),
+  logoUrl: text("logo_url"),
+  primaryColor: text("primary_color"),
+  status: text("status").notNull().default("active"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
 export const profiles = pgTable("profiles", {
   id: uuid("id").primaryKey(),
+  organizationId: uuid("organization_id").notNull().references(() => organizations.id),
   email: text("email").notNull(),
   name: text("name").notNull(),
   phone: text("phone"),
@@ -15,6 +28,7 @@ export const profiles = pgTable("profiles", {
 
 export const processTypes = pgTable("process_types", {
   id: uuid("id").primaryKey().defaultRandom(),
+  organizationId: uuid("organization_id").notNull().references(() => organizations.id),
   name: text("name").notNull(),
   description: text("description"),
   estimatedDurationDays: integer("estimated_duration_days"),
@@ -23,7 +37,8 @@ export const processTypes = pgTable("process_types", {
 
 export const processes = pgTable("processes", {
   id: uuid("id").primaryKey().defaultRandom(),
-  processNumber: text("process_number").notNull().unique(),
+  organizationId: uuid("organization_id").notNull().references(() => organizations.id),
+  processNumber: text("process_number").notNull(),
   title: text("title").notNull(),
   description: text("description"),
   status: text("status").notNull().default("pendente"),
@@ -33,10 +48,13 @@ export const processes = pgTable("processes", {
   deadline: timestamp("deadline"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
-});
+}, (table) => [
+  unique("processes_org_process_number").on(table.organizationId, table.processNumber),
+]);
 
 export const processSteps = pgTable("process_steps", {
   id: uuid("id").primaryKey().defaultRandom(),
+  organizationId: uuid("organization_id").notNull().references(() => organizations.id),
   processId: uuid("process_id").notNull().references(() => processes.id, { onDelete: "cascade" }),
   title: text("title").notNull(),
   description: text("description"),
@@ -50,6 +68,7 @@ export const processSteps = pgTable("process_steps", {
 
 export const processDocuments = pgTable("process_documents", {
   id: uuid("id").primaryKey().defaultRandom(),
+  organizationId: uuid("organization_id").notNull().references(() => organizations.id),
   processId: uuid("process_id").notNull().references(() => processes.id, { onDelete: "cascade" }),
   name: text("name").notNull(),
   fileUrl: text("file_url").notNull(),
@@ -65,6 +84,7 @@ export const processDocuments = pgTable("process_documents", {
 
 export const processMessages = pgTable("process_messages", {
   id: uuid("id").primaryKey().defaultRandom(),
+  organizationId: uuid("organization_id").notNull().references(() => organizations.id),
   processId: uuid("process_id").notNull().references(() => processes.id, { onDelete: "cascade" }),
   senderId: uuid("sender_id").notNull().references(() => profiles.id),
   message: text("message").notNull(),
@@ -76,6 +96,7 @@ export const processMessages = pgTable("process_messages", {
 
 export const notifications = pgTable("notifications", {
   id: uuid("id").primaryKey().defaultRandom(),
+  organizationId: uuid("organization_id").notNull().references(() => organizations.id),
   userId: uuid("user_id").notNull().references(() => profiles.id),
   processId: uuid("process_id").references(() => processes.id),
   title: text("title").notNull(),
@@ -89,6 +110,7 @@ export const notifications = pgTable("notifications", {
 
 export const auditLogs = pgTable("audit_logs", {
   id: uuid("id").primaryKey().defaultRandom(),
+  organizationId: uuid("organization_id").notNull().references(() => organizations.id),
   adminId: uuid("admin_id").notNull().references(() => profiles.id),
   action: text("action").notNull(),
   targetType: text("target_type").notNull(),
@@ -102,6 +124,7 @@ export const auditLogs = pgTable("audit_logs", {
 
 export const documentAuditLogs = pgTable("document_audit_logs", {
   id: uuid("id").primaryKey().defaultRandom(),
+  organizationId: uuid("organization_id").notNull().references(() => organizations.id),
   documentId: uuid("document_id").notNull().references(() => processDocuments.id, { onDelete: "cascade" }),
   userId: uuid("user_id").notNull().references(() => profiles.id),
   action: text("action").notNull(),
@@ -113,6 +136,7 @@ export const documentAuditLogs = pgTable("document_audit_logs", {
 
 export const processFeedback = pgTable("process_feedback", {
   id: uuid("id").primaryKey().defaultRandom(),
+  organizationId: uuid("organization_id").notNull().references(() => organizations.id),
   processId: uuid("process_id").notNull().references(() => processes.id),
   userId: uuid("user_id").notNull().references(() => profiles.id),
   rating: integer("rating").notNull(),
@@ -122,14 +146,18 @@ export const processFeedback = pgTable("process_feedback", {
 
 export const processCounter = pgTable("process_counter", {
   id: uuid("id").primaryKey().defaultRandom(),
-  yearMonth: text("year_month").notNull().unique(),
+  organizationId: uuid("organization_id").notNull().references(() => organizations.id),
+  yearMonth: text("year_month").notNull(),
   counter: integer("counter").default(0),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
-});
+}, (table) => [
+  unique("process_counter_org_year_month").on(table.organizationId, table.yearMonth),
+]);
 
 export const cmsContents = pgTable("cms_contents", {
   id: uuid("id").primaryKey().defaultRandom(),
+  organizationId: uuid("organization_id").notNull().references(() => organizations.id),
   tipo: text("tipo").notNull(),
   titulo: text("titulo").notNull(),
   conteudo: text("conteudo").notNull(),
@@ -148,7 +176,17 @@ export const systemSettings = pgTable("system_settings", {
 });
 
 // Relations
-export const profilesRelations = relations(profiles, ({ many }) => ({
+export const organizationsRelations = relations(organizations, ({ many }) => ({
+  profiles: many(profiles),
+  processTypes: many(processTypes),
+  processes: many(processes),
+}));
+
+export const profilesRelations = relations(profiles, ({ one, many }) => ({
+  organization: one(organizations, {
+    fields: [profiles.organizationId],
+    references: [organizations.id],
+  }),
   processesAsClient: many(processes),
   uploadedDocuments: many(processDocuments),
   reviewedDocuments: many(processDocuments),
@@ -164,6 +202,10 @@ export const processTypesRelations = relations(processTypes, ({ many }) => ({
 }));
 
 export const processesRelations = relations(processes, ({ one, many }) => ({
+  organization: one(organizations, {
+    fields: [processes.organizationId],
+    references: [organizations.id],
+  }),
   client: one(profiles, {
     fields: [processes.clientId],
     references: [profiles.id],
@@ -254,6 +296,7 @@ export const processFeedbackRelations = relations(processFeedback, ({ one }) => 
 }));
 
 // Insert schemas
+export const insertOrganizationSchema = createInsertSchema(organizations).omit({ id: true, createdAt: true });
 export const insertProfileSchema = createInsertSchema(profiles).omit({ createdAt: true, updatedAt: true });
 export const insertProcessTypeSchema = createInsertSchema(processTypes).omit({ id: true, createdAt: true });
 export const insertProcessSchema = createInsertSchema(processes).omit({ id: true, createdAt: true, updatedAt: true });
@@ -269,6 +312,9 @@ export const insertCmsContentSchema = createInsertSchema(cmsContents).omit({ id:
 export const insertSystemSettingSchema = createInsertSchema(systemSettings).omit({ id: true, createdAt: true, updatedAt: true });
 
 // Types - using Drizzle's $inferSelect and $inferInsert for better compatibility
+export type Organization = typeof organizations.$inferSelect;
+export type InsertOrganization = typeof organizations.$inferInsert;
+
 export type Profile = typeof profiles.$inferSelect;
 export type InsertProfile = typeof profiles.$inferInsert;
 
