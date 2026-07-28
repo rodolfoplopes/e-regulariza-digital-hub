@@ -14,9 +14,10 @@ import {
 } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
 import Layout from "@/components/layout/Layout";
-import { createCPFHash, validateCPF, formatCPF } from "@/utils/userUtils";
+import { validateCPF, formatCPF } from "@/utils/userUtils";
 import { AlertCircle, Check, Eye, EyeOff } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 
 export default function Register() {
   const [name, setName] = useState("");
@@ -30,9 +31,11 @@ export default function Register() {
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState<number>(0);
-  
+  const [needsEmailConfirmation, setNeedsEmailConfirmation] = useState(false);
+
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { register } = useSupabaseAuth();
 
   const validateEmail = (email: string): boolean => {
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -130,39 +133,29 @@ export default function Register() {
 
     setIsLoading(true);
 
-    // Mock registration function - would be replaced with actual auth
     try {
-      // In a real Supabase implementation, we'd check if CPF already exists in the database
-      // For this mock version, we'll simulate a check
-      const cpfHash = await createCPFHash(cpf);
-      const emailExists = Math.random() > 0.9; // 10% chance of email already existing
-      
-      if (emailExists) {
+      const { success, error, needsEmailConfirmation: needsConfirmation } = await register(email, password, {
+        name,
+        cpf: cpf.replace(/\D/g, ""),
+        phone: phone.replace(/\D/g, ""),
+      });
+
+      if (!success) {
         toast({
           variant: "destructive",
           title: "Erro no cadastro",
-          description: "E-mail já cadastrado no sistema.",
+          description: error || "Não foi possível concluir o cadastro. Tente novamente.",
         });
         setIsLoading(false);
         return;
       }
-      
-      // Simulate CPF check
-      const cpfExists = Math.random() > 0.9; // 10% chance of CPF already existing
-      
-      if (cpfExists) {
-        toast({
-          variant: "destructive",
-          title: "Erro no cadastro",
-          description: "CPF já cadastrado no sistema.",
-        });
+
+      if (needsConfirmation) {
+        setNeedsEmailConfirmation(true);
         setIsLoading(false);
         return;
       }
-      
-      // Simulate API call with delay
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      
+
       toast({
         title: "Cadastro realizado com sucesso",
         description: "Redirecionando para o dashboard...",
@@ -195,6 +188,37 @@ export default function Register() {
   };
 
   const strength = getPasswordStrengthText();
+
+  if (needsEmailConfirmation) {
+    return (
+      <Layout hideFooter>
+        <div className="flex items-center justify-center min-h-[calc(100vh-64px)] bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+          <div className="w-full max-w-md">
+            <Card className="shadow-lg border-0">
+              <CardHeader className="space-y-1 text-center">
+                <div className="w-16 h-16 rounded-full eregulariza-gradient flex items-center justify-center mx-auto mb-4">
+                  <span className="font-bold text-white text-2xl">e</span>
+                </div>
+                <CardTitle className="text-2xl font-bold">Confirme seu e-mail</CardTitle>
+                <CardDescription>
+                  Enviamos um link de confirmação para <strong>{email}</strong>. Clique nele
+                  para ativar sua conta e poder fazer login.
+                </CardDescription>
+              </CardHeader>
+              <CardFooter className="flex flex-col">
+                <p className="text-center text-sm mt-2">
+                  Já confirmou?{" "}
+                  <Link to="/login" className="text-eregulariza-primary hover:underline">
+                    Fazer login
+                  </Link>
+                </p>
+              </CardFooter>
+            </Card>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
 
   return (
     <Layout hideFooter>

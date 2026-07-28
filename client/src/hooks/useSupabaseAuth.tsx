@@ -24,7 +24,7 @@ interface AuthContextType {
   role: string | null;
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => Promise<void>;
-  register: (email: string, password: string, userData?: any) => Promise<{ success: boolean; error?: string }>;
+  register: (email: string, password: string, userData?: any) => Promise<{ success: boolean; error?: string; needsEmailConfirmation?: boolean }>;
   checkPermission: (requiredRole: "admin" | "cliente" | "any") => boolean;
   refreshProfile: () => Promise<void>;
 }
@@ -297,7 +297,7 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
     }
   };
 
-  const register = async (email: string, password: string, userData?: any): Promise<{ success: boolean; error?: string }> => {
+  const register = async (email: string, password: string, userData?: any): Promise<{ success: boolean; error?: string; needsEmailConfirmation?: boolean }> => {
     try {
       const { data, error } = await supabase.auth.signUp({
         email,
@@ -312,7 +312,9 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
         return { success: false, error: error.message };
       }
 
-      return { success: true };
+      // When email confirmation is required, signUp creates the user but
+      // returns no session until the confirmation link is clicked.
+      return { success: true, needsEmailConfirmation: !data.session };
     } catch (error) {
       return { success: false, error: 'Erro inesperado durante o cadastro' };
     }
