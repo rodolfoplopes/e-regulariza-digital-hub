@@ -1,13 +1,15 @@
-import { useState } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { DocumentType } from "@/components/process/DocumentUploader";
 import { auditService } from "@/services/auditService";
 import { useNotifications } from "@/hooks/useNotifications";
 import { sendNotification, notificationTemplates } from "@/services/notificationHelperService";
 import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
+import { documentService } from "@/services/documentService";
 
 interface UseDocumentManagerProps {
   processId: string;
+  clientId?: string;
 }
 
 interface UseDocumentManagerReturn {
@@ -15,6 +17,7 @@ interface UseDocumentManagerReturn {
   setActiveTab: (tab: string) => void;
   clientDocuments: DocumentType[];
   adminDocuments: DocumentType[];
+  isLoading: boolean;
   handleClientUpload: (documentId: string, file: File) => Promise<void>;
   handleAdminUpload: (documentId: string, file: File) => Promise<void>;
   handleRemoveDocument: (documentId: string) => Promise<void>;
@@ -22,301 +25,172 @@ interface UseDocumentManagerReturn {
   handleAddDocument: () => Promise<void>;
 }
 
-export function useDocumentManager({ processId }: UseDocumentManagerProps): UseDocumentManagerReturn {
+export function useDocumentManager({ processId, clientId }: UseDocumentManagerProps): UseDocumentManagerReturn {
   const { toast } = useToast();
   const { profile } = useSupabaseAuth();
   const { refreshNotifications } = useNotifications();
   const [activeTab, setActiveTab] = useState<string>("client");
+  const [isLoading, setIsLoading] = useState(true);
+  const [clientDocuments, setClientDocuments] = useState<DocumentType[]>([]);
+  const [adminDocuments, setAdminDocuments] = useState<DocumentType[]>([]);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  const [clientDocuments, setClientDocuments] = useState<DocumentType[]>([
-    {
-      id: "doc-1",
-      name: "RG do Proprietário",
-      description: "Documento de identidade do proprietário do imóvel",
-      required: true,
-      status: "pending",
-    },
-    {
-      id: "doc-2",
-      name: "Comprovante de Residência",
-      description: "Documento que comprove residência no imóvel (conta de luz, água, etc.)",
-      required: true,
-      status: "uploaded",
-      fileUrl: "/documentos/comprovante-123.pdf",
-      uploadDate: "01/05/2023",
-    },
-    {
-      id: "doc-3",
-      name: "Certidão de Casamento",
-      description: "Caso seja casado, a certidão atualizada",
-      required: false,
-      status: "rejected",
-      fileUrl: "/documentos/certidao.pdf",
-      uploadDate: "15/04/2023",
-      feedback: "Documento ilegível. Por favor, envie uma cópia mais clara.",
-    },
-    {
-      id: "doc-4",
-      name: "Declaração de Testemunha",
-      description: "Declaração de vizinhos confirmando o tempo de posse",
-      required: true,
-      status: "approved",
-      fileUrl: "/documentos/declaracao.pdf",
-      uploadDate: "20/04/2023",
-    },
-  ]);
-
-  const [adminDocuments, setAdminDocuments] = useState<DocumentType[]>([
-    {
-      id: "adm-doc-1",
-      name: "Memorial Descritivo",
-      description: "Memorial descritivo elaborado pelo topógrafo",
-      required: false,
-      status: "uploaded",
-      fileUrl: "/documentos/memorial.pdf",
-      uploadDate: "05/05/2023",
-    },
-    {
-      id: "adm-doc-2",
-      name: "Parecer Jurídico",
-      description: "Parecer jurídico sobre o caso",
-      required: false,
-      status: "uploaded",
-      fileUrl: "/documentos/parecer.pdf",
-      uploadDate: "10/05/2023",
-    },
-  ]);
-
-  // Handle document upload by client
-  const handleClientUpload = async (documentId: string, file: File) => {
+  const loadDocuments = useCallback(async () => {
     try {
-      console.log(`Upload client document ${documentId}:`, file);
-      
-      // Update document status
-      setClientDocuments(prevDocs => 
-        prevDocs.map(doc => 
-          doc.id === documentId 
-            ? { 
-                ...doc, 
-                status: "uploaded", 
-                fileUrl: URL.createObjectURL(file),
-                uploadDate: new Date().toLocaleDateString('pt-BR')
-              }
-            : doc
-        )
-      );
-
-      // Find document for audit logging
-      const document = clientDocuments.find(doc => doc.id === documentId);
-      if (document) {
-        // Log audit event
-        await auditService.logDocumentUpload(documentId, document.name, processId);
-        
-        toast({
-          title: "Documento enviado",
-          description: `${document.name} foi enviado com sucesso`,
-        });
-      }
+      setIsLoading(true);
+      const { clientDocuments: cDocs, adminDocuments: aDocs } = await documentService.getDocuments(processId);
+      setClientDocuments(cDocs);
+      setAdminDocuments(aDocs);
     } catch (error) {
-      console.error('Error uploading document:', error);
+      console.error("Error loading documents:", error);
       toast({
+        variant: "destructive",
+        title: "Erro ao carregar documentos",
+        description: "Não foi possível carregar os documentos deste processo.",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  }, [processId]);
+
+  useEffect(() => {
+    loadDocuments();
+  }, [loadDocuments]);
+
+  const findDocumentAllLists = (documentId: string) =>
+    clientDocuments.find((d) => d.id === documentId) || adminDocuments.find((d) => d.id === documentId);
+
+  const handleReplaceUpload = async (documentId: string, file: File) => {
+    try {
+      await documentService.replaceDocumentFile({ documentId, processId, file });
+      const document = findDocumentAllLists(documentId);
+      if (document) {
+        await auditService.logDocumentUpload(documentId, document.name, processId);
+        toast({ title: "Documento enviado", description: `${document.name} foi enviado com sucesso` });
+      }
+      await loadDocuments();
+    } catch (error) {
+      console.error("Error uploading document:", error);
+      toast({
+        variant: "destructive",
         title: "Erro ao enviar documento",
         description: "Ocorreu um erro ao enviar o documento",
-        variant: "destructive"
       });
     }
   };
 
-  // Handle document upload by admin
-  const handleAdminUpload = async (documentId: string, file: File) => {
-    try {
-      console.log(`Upload admin document ${documentId}:`, file);
-      
-      // Update document status
-      setAdminDocuments(prevDocs => 
-        prevDocs.map(doc => 
-          doc.id === documentId 
-            ? { 
-                ...doc, 
-                status: "uploaded", 
-                fileUrl: URL.createObjectURL(file),
-                uploadDate: new Date().toLocaleDateString('pt-BR')
-              }
-            : doc
-        )
-      );
+  // Upload/re-upload: same underlying operation regardless of which tab
+  // triggered it, since the "client vs interno" split comes from who
+  // uploaded, not from separate storage.
+  const handleClientUpload = (documentId: string, file: File) => handleReplaceUpload(documentId, file);
+  const handleAdminUpload = (documentId: string, file: File) => handleReplaceUpload(documentId, file);
 
-      // Find document for audit logging
-      const document = adminDocuments.find(doc => doc.id === documentId);
-      if (document) {
-        // Log audit event
-        await auditService.logDocumentUpload(documentId, document.name, processId);
-        
-        toast({
-          title: "Documento interno enviado",
-          description: `${document.name} foi enviado com sucesso`,
-        });
-      }
-    } catch (error) {
-      console.error('Error uploading admin document:', error);
-      toast({
-        title: "Erro ao enviar documento",
-        description: "Ocorreu um erro ao enviar o documento interno",
-        variant: "destructive"
-      });
-    }
-  };
-
-  // Handle document removal
   const handleRemoveDocument = async (documentId: string) => {
     try {
-      console.log(`Remove document ${documentId}`);
-      
-      // Find document for audit logging
-      const clientDoc = clientDocuments.find(doc => doc.id === documentId);
-      const adminDoc = adminDocuments.find(doc => doc.id === documentId);
-      const document = clientDoc || adminDoc;
-      
-      // Update client documents
-      setClientDocuments(prevDocs => 
-        prevDocs.map(doc => 
-          doc.id === documentId 
-            ? { ...doc, status: "pending", fileUrl: undefined, uploadDate: undefined }
-            : doc
-        )
-      );
-      
-      // Update admin documents
-      setAdminDocuments(prevDocs => 
-        prevDocs.map(doc => 
-          doc.id === documentId 
-            ? { ...doc, status: "pending", fileUrl: undefined, uploadDate: undefined }
-            : doc
-        )
-      );
+      const document = findDocumentAllLists(documentId);
+      if (!document?.fileUrl) return;
 
-      if (document) {
-        // Log audit event
-        await auditService.logDocumentDeletion(documentId, document.name, processId);
-        
-        toast({
-          title: "Documento removido",
-          description: `${document.name} foi removido com sucesso`,
-        });
-      }
+      await documentService.deleteDocument(documentId, document.fileUrl);
+      await auditService.logDocumentDeletion(documentId, document.name, processId);
+      toast({ title: "Documento removido", description: `${document.name} foi removido com sucesso` });
+      await loadDocuments();
     } catch (error) {
-      console.error('Error removing document:', error);
+      console.error("Error removing document:", error);
       toast({
+        variant: "destructive",
         title: "Erro ao remover documento",
         description: "Ocorreu um erro ao remover o documento",
-        variant: "destructive"
       });
     }
   };
 
-  // Handle document status change (approve/reject)
   const handleDocumentStatusChange = async (documentId: string, status: "approved" | "rejected", feedback?: string) => {
     try {
-      // Find document for audit logging and notifications
-      const document = clientDocuments.find(doc => doc.id === documentId);
-      if (!document) return;
+      const document = findDocumentAllLists(documentId);
+      if (!document || !profile?.id) return;
 
-      // Update document status
-      setClientDocuments(prevDocs => 
-        prevDocs.map(doc => 
-          doc.id === documentId 
-            ? { ...doc, status, feedback }
-            : doc
-        )
-      );
+      const dbStatus = status === "approved" ? "aprovado" : "rejeitado";
+      await documentService.updateStatus(documentId, dbStatus, profile.id, feedback);
 
-      // Log audit event
       if (status === "approved") {
         await auditService.logDocumentApproval(documentId, document.name, processId);
       } else {
         await auditService.logDocumentRejection(documentId, document.name, processId, feedback);
       }
 
-      // Send notification to client
-      if (profile?.id) {
-        const template = status === "approved" 
+      if (clientId) {
+        const template = status === "approved"
           ? notificationTemplates.documentApproved(`ER-${processId}`, document.name)
           : {
-              title: 'Documento rejeitado',
-              message: `O documento "${document.name}" foi rejeitado${feedback ? `: ${feedback}` : ''}`,
-              type: 'document' as const,
-              priority: 'high' as const
+              title: "Documento rejeitado",
+              message: `O documento "${document.name}" foi rejeitado${feedback ? `: ${feedback}` : ""}`,
+              type: "document" as const,
+              priority: "high" as const,
             };
 
-        // In a real app, this would send to the client who owns the process
-        // For demo, we'll show the notification concept
-        await sendNotification(
-          profile.id, // This would be the client_id from the process
-          template,
-          processId,
-          `/processo/${processId}`
-        );
+        await sendNotification(clientId, template, processId, `/processo/${processId}`);
       }
 
-      // Refresh notifications
       refreshNotifications();
-      
       toast({
         title: `Documento ${status === "approved" ? "aprovado" : "rejeitado"}`,
         description: `O documento ${status === "approved" ? "foi aprovado" : "foi rejeitado"}${feedback ? " com comentários" : ""}.`,
       });
+      await loadDocuments();
     } catch (error) {
-      console.error('Error changing document status:', error);
+      console.error("Error changing document status:", error);
       toast({
+        variant: "destructive",
         title: "Erro ao processar documento",
         description: "Ocorreu um erro ao alterar o status do documento",
-        variant: "destructive"
       });
     }
   };
 
-  // Handle addition of new document requirement
+  // "Adicionar documento" precisa de um arquivo real pra existir (o
+  // schema não modela um "requisito" vazio à espera de upload), então
+  // isso abre o seletor de arquivo e faz upload+registro assim que algo
+  // for escolhido.
   const handleAddDocument = async () => {
-    try {
-      const newDocument: DocumentType = {
-        id: `doc-${Date.now()}`,
-        name: "Novo Documento",
-        description: "Descrição do novo documento",
-        required: false,
-        status: "pending",
-      };
-      
-      if (activeTab === "client") {
-        setClientDocuments(prev => [...prev, newDocument]);
-      } else {
-        setAdminDocuments(prev => [...prev, newDocument]);
-      }
-
-      // Log audit event
-      await auditService.createAuditLog({
-        action: 'ADD_DOCUMENT_REQUIREMENT',
-        target_type: 'document',
-        target_id: newDocument.id,
-        target_name: newDocument.name,
-        details: {
-          processId,
-          documentType: activeTab,
-          action: 'requirement_added'
-        }
-      });
-      
+    if (!profile?.organization_id || !profile?.id) {
       toast({
-        title: "Documento adicionado com sucesso!",
-        description: "O requisito de documento foi adicionado ao processo",
-      });
-    } catch (error) {
-      console.error('Error adding document:', error);
-      toast({
+        variant: "destructive",
         title: "Erro ao adicionar documento",
-        description: "Ocorreu um erro ao adicionar o requisito de documento",
-        variant: "destructive"
+        description: "Não foi possível identificar seu escritório. Tente recarregar a página.",
       });
+      return;
     }
+
+    if (!fileInputRef.current) {
+      const input = document.createElement("input");
+      input.type = "file";
+      fileInputRef.current = input;
+    }
+
+    const organizationId = profile.organization_id;
+    const uploadedBy = profile.id;
+
+    fileInputRef.current.onchange = async () => {
+      const file = fileInputRef.current?.files?.[0];
+      if (!file) return;
+
+      try {
+        await documentService.uploadNewDocument({ processId, organizationId, uploadedBy, file });
+        toast({ title: "Documento adicionado com sucesso!", description: `${file.name} foi enviado.` });
+        await loadDocuments();
+      } catch (error) {
+        console.error("Error adding document:", error);
+        toast({
+          variant: "destructive",
+          title: "Erro ao adicionar documento",
+          description: "Ocorreu um erro ao enviar o documento",
+        });
+      } finally {
+        if (fileInputRef.current) fileInputRef.current.value = "";
+      }
+    };
+
+    fileInputRef.current.click();
   };
 
   return {
@@ -324,6 +198,7 @@ export function useDocumentManager({ processId }: UseDocumentManagerProps): UseD
     setActiveTab,
     clientDocuments,
     adminDocuments,
+    isLoading,
     handleClientUpload,
     handleAdminUpload,
     handleRemoveDocument,

@@ -9,6 +9,7 @@ interface DocumentManagerProps {
   etapaId: string;
   etapaNome: string;
   isAdmin: boolean;
+  clientId?: string;
 }
 
 export default function DocumentManager({
@@ -16,6 +17,7 @@ export default function DocumentManager({
   etapaId,
   etapaNome,
   isAdmin = false,
+  clientId,
 }: DocumentManagerProps) {
   const {
     activeTab,
@@ -27,7 +29,7 @@ export default function DocumentManager({
     handleRemoveDocument,
     handleDocumentStatusChange,
     handleAddDocument,
-  } = useDocumentManager({ processId });
+  } = useDocumentManager({ processId, clientId });
 
   return (
     <Card>

@@ -106,11 +106,12 @@ export default function ProcessDetailContent({
         
         <TabsContent value="documents" className="mt-6">
           <div className="bg-white rounded-lg border p-6">
-            <DocumentManager 
+            <DocumentManager
               processId={process.id}
               etapaId="current"
               etapaNome="Documentos do Processo"
               isAdmin={isAdmin}
+              clientId={process.client_id}
             />
           </div>
         </TabsContent>
