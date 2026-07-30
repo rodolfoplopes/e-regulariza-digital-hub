@@ -13,6 +13,7 @@ import LoadingSpinner from "@/components/feedback/LoadingSpinner";
 import { supabase } from "@/integrations/supabase/client";
 import { auditService } from "@/services/auditService";
 import { sendNotification, notificationTemplates } from "@/services/notificationHelperService";
+import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 
 interface ProcessStep {
   id: string;
@@ -39,6 +40,7 @@ export default function ManualStepEditor({
   onStepsChange 
 }: ManualStepEditorProps) {
   const { toast } = useToast();
+  const { profile } = useSupabaseAuth();
   const [steps, setSteps] = useState<ProcessStep[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [editingStep, setEditingStep] = useState<string | null>(null);
@@ -98,9 +100,19 @@ export default function ManualStepEditor({
     try {
       const nextOrderNumber = Math.max(...steps.map(s => s.order_number), 0) + 1;
       
+      if (!profile?.organization_id) {
+        toast({
+          variant: "destructive",
+          title: "Erro ao adicionar etapa",
+          description: "Não foi possível identificar seu escritório. Tente recarregar a página.",
+        });
+        return;
+      }
+
       const { data, error } = await supabase
         .from('process_steps')
         .insert({
+          organization_id: profile.organization_id,
           process_id: processId,
           title: newStep.title,
           description: newStep.description || null,

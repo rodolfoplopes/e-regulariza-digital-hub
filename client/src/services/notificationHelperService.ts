@@ -75,7 +75,22 @@ export const sendNotification = async (
   actionUrl?: string
 ) => {
   try {
+    // organization_id is required on notifications (multi-tenant) but this
+    // helper is called from many places with just a userId — resolve it
+    // from the recipient's own profile instead of threading it through
+    // every call site.
+    const { data: recipient, error: recipientError } = await supabase
+      .from('profiles')
+      .select('organization_id')
+      .eq('id', userId)
+      .single();
+
+    if (recipientError || !recipient) {
+      throw recipientError || new Error(`Profile not found for user ${userId}`);
+    }
+
     const notificationData: CreateNotificationData = {
+      organization_id: recipient.organization_id,
       user_id: userId,
       process_id: processId || null,
       title: template.title,

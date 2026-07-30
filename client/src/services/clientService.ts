@@ -101,10 +101,31 @@ class ClientService extends BaseService {
         throw new Error('Email já cadastrado no sistema');
       }
 
+      // NOTE: this insert still fails with a foreign key violation —
+      // profiles.id references auth.users.id, and nothing here creates a
+      // matching auth user. Creating a client needs to go through
+      // Supabase's Admin API (service_role, server-side only) or a proper
+      // invite flow, not a direct profiles insert. organization_id is
+      // filled in for correctness once that's fixed, but doesn't fix the
+      // FK issue on its own.
+      const { data: { user: currentUser } } = await supabase.auth.getUser();
+      if (!currentUser) {
+        throw new Error('Sessão inválida');
+      }
+      const { data: actor, error: actorError } = await supabase
+        .from('profiles')
+        .select('organization_id')
+        .eq('id', currentUser.id)
+        .single();
+      if (actorError || !actor) {
+        throw actorError || new Error('Não foi possível identificar seu escritório');
+      }
+
       const { data, error } = await supabase
         .from('profiles')
         .insert({
           id: crypto.randomUUID(),
+          organization_id: actor.organization_id,
           name: clientData.name,
           email: clientData.email,
           cpf: clientData.cpf,

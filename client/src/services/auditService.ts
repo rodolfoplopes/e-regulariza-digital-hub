@@ -29,12 +29,24 @@ export const auditService = {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return false;
 
+      const { data: actor, error: actorError } = await supabase
+        .from('profiles')
+        .select('organization_id')
+        .eq('id', user.id)
+        .single();
+
+      if (actorError || !actor) {
+        console.error('Error resolving actor organization for audit log:', actorError);
+        return false;
+      }
+
       // Get user agent and IP (in a real app, IP would come from server)
       const userAgent = navigator.userAgent;
 
       const { error } = await supabase
         .from('audit_logs')
         .insert({
+          organization_id: actor.organization_id,
           admin_id: user.id,
           action: data.action,
           target_type: data.target_type,
