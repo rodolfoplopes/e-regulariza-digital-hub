@@ -53,7 +53,7 @@ export default function AdminDashboard() {
             <p className="text-eregulariza-description mt-1">Gerencie processos, clientes e configurações do sistema</p>
           </div>
           <Button 
-            onClick={() => navigate('/admin/novo-processo')}
+            onClick={() => navigate('/novo-processo')}
             className="bg-eregulariza-primary hover:bg-eregulariza-primary/90 text-white"
           >
             <Plus className="h-4 w-4 mr-2" />

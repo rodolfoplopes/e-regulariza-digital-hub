@@ -51,6 +51,7 @@ export type CreateProcessData = {
   description?: string;
   client_id: string;
   process_type_id: string;
+  organization_id: string;
   deadline?: string;
 };
 

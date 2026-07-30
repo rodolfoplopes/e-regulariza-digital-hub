@@ -7,6 +7,7 @@ import { useToast } from '@/hooks/use-toast';
 
 interface Profile {
   id: string;
+  organization_id: string;
   name: string;
   email: string;
   role: 'admin' | 'cliente' | 'admin_master' | 'admin_editor' | 'admin_viewer';
@@ -241,22 +242,40 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
         }
 
         setUser(session?.user ?? null);
-        
+
         if (session?.user) {
-          try {
-            const userProfile = await profileService.getCurrentProfile();
-            if (userProfile) {
-              console.log('User profile loaded:', userProfile);
-              setProfile({
-                ...userProfile,
-                role: userProfile.role as Profile['role']
-              });
+          // Deferred via setTimeout, and querying profiles directly with
+          // session.user.id instead of calling supabase.auth.getUser():
+          // this callback runs while signIn/signUp/refresh is still
+          // holding the internal session lock, so any other
+          // supabase.auth.* call made synchronously here (including
+          // getUser()) deadlocks against it. This is Supabase's own
+          // documented workaround for that.
+          const userId = session.user.id;
+          setTimeout(async () => {
+            try {
+              const { data: userProfile, error } = await supabase
+                .from('profiles')
+                .select('*')
+                .eq('id', userId)
+                .single();
+              if (error) throw error;
+              if (userProfile) {
+                console.log('User profile loaded:', userProfile);
+                setProfile({
+                  ...userProfile,
+                  role: userProfile.role as Profile['role']
+                });
+              }
+            } catch (error) {
+              console.error('Error loading profile:', error);
+            } finally {
+              setIsLoading(false);
             }
-          } catch (error) {
-            console.error('Error loading profile:', error);
-          }
+          }, 0);
+        } else {
+          setIsLoading(false);
         }
-        setIsLoading(false);
       }
     );
 
@@ -277,17 +296,12 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
       }
 
       if (data.user) {
-        console.log('Login successful, fetching profile...');
+        // Don't fetch the profile here: onAuthStateChange already reacts to
+        // the SIGNED_IN event this signIn call triggers and loads it there.
+        // Doing both concurrently raced against each other and could hang
+        // (both calls await supabase.auth.getUser(), which is guarded by
+        // the same internal session lock).
         resetActivityTimer(); // Reset activity timer on successful login
-        
-        const userProfile = await profileService.getCurrentProfile();
-        if (userProfile) {
-          console.log('Profile fetched:', userProfile);
-          setProfile({
-            ...userProfile,
-            role: userProfile.role as Profile['role']
-          });
-        }
       }
 
       return { success: true };

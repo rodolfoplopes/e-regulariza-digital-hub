@@ -21,6 +21,7 @@ import { processService } from "@/services/processService";
 import { ProcessType } from "@/services/core/types";
 import { auditService } from "@/services/auditService";
 import { supabase } from "@/integrations/supabase/client";
+import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 
 interface Client {
   id: string;
@@ -33,7 +34,8 @@ interface Client {
 export default function EnhancedProcessCreate() {
   const navigate = useNavigate();
   const { toast } = useToast();
-  
+  const { profile } = useSupabaseAuth();
+
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
   const [clients, setClients] = useState<Client[]>([]);
@@ -167,6 +169,15 @@ export default function EnhancedProcessCreate() {
       return;
     }
 
+    if (!profile?.organization_id) {
+      toast({
+        variant: "destructive",
+        title: "Erro ao criar processo",
+        description: "Não foi possível identificar seu escritório. Tente recarregar a página."
+      });
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       // Criar processo
@@ -174,7 +185,8 @@ export default function EnhancedProcessCreate() {
         title: formData.title,
         description: formData.description,
         client_id: selectedClient.id,
-        process_type_id: selectedProcessType.id
+        process_type_id: selectedProcessType.id,
+        organization_id: profile.organization_id
       });
 
       if (process) {

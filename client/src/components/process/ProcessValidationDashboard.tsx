@@ -90,7 +90,7 @@ export default function ProcessValidationDashboard() {
         
         {canCreateProcess() && (
           <Button
-            onClick={() => navigate('/admin/novo-processo')}
+            onClick={() => navigate('/novo-processo')}
             className="eregulariza-gradient btn-eregulariza-hover text-white"
           >
             Criar Novo Processo
