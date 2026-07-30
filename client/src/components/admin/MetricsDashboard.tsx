@@ -111,7 +111,7 @@ export default function MetricsDashboard() {
   if (isLoading) {
     return (
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <h2 className="text-2xl font-bold">Métricas e Relatórios</h2>
           <Button disabled>
             <RefreshCw className="h-4 w-4 animate-spin mr-2" />
@@ -152,12 +152,12 @@ export default function MetricsDashboard() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <h2 className="text-2xl font-bold flex items-center gap-2">
           <TrendingUp className="h-6 w-6 text-[#06D7A5]" />
           Métricas e Relatórios
         </h2>
-        <div className="flex gap-2">
+        <div className="flex shrink-0 gap-2">
           <Button variant="outline" onClick={loadMetrics}>
             <RefreshCw className="h-4 w-4 mr-2" />
             Atualizar

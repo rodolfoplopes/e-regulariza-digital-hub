@@ -197,9 +197,9 @@ export default function DocumentValidationPanel() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <h1 className="text-2xl font-bold">Validação de Documentos</h1>
-        <Button onClick={loadDocuments} variant="outline">
+        <Button onClick={loadDocuments} variant="outline" className="shrink-0">
           Atualizar
         </Button>
       </div>

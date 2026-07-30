@@ -47,14 +47,14 @@ export default function AdminDashboard() {
         serviceTypes={[]} 
       />
       <main className="container mx-auto px-4 py-8">
-        <div className="flex justify-between items-center mb-6">
-          <div>
+        <div className="flex flex-col gap-4 mb-6 sm:flex-row sm:items-center sm:justify-between">
+          <div className="min-w-0">
             <h1 className="text-3xl font-bold text-eregulariza-gray">Dashboard Administrativo</h1>
             <p className="text-eregulariza-description mt-1">Gerencie processos, clientes e configurações do sistema</p>
           </div>
-          <Button 
+          <Button
             onClick={() => navigate('/novo-processo')}
-            className="bg-eregulariza-primary hover:bg-eregulariza-primary/90 text-white"
+            className="shrink-0 bg-eregulariza-primary hover:bg-eregulariza-primary/90 text-white"
           >
             <Plus className="h-4 w-4 mr-2" />
             Criar Processo

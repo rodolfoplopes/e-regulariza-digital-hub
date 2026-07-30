@@ -302,15 +302,15 @@ export default function SystemValidation() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="min-w-0">
           <h2 className="text-2xl font-bold">Validação Completa do Sistema</h2>
           <p className="text-gray-600">Revisão de todos os módulos e funcionalidades implementadas</p>
         </div>
-        <Button 
-          onClick={runValidation} 
+        <Button
+          onClick={runValidation}
           disabled={isRunning}
-          className="bg-eregulariza-primary hover:bg-eregulariza-primary/90"
+          className="shrink-0 bg-eregulariza-primary hover:bg-eregulariza-primary/90"
         >
           {isRunning ? 'Executando...' : 'Executar Validação'}
         </Button>

@@ -19,13 +19,13 @@ export default function DocumentManagerHeader({
 }: DocumentManagerHeaderProps) {
   return (
     <CardHeader>
-      <div className="flex justify-between items-center">
-        <div>
-          <CardTitle>Documentos da Etapa: {etapaNome}</CardTitle>
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div className="min-w-0">
+          <CardTitle className="text-xl sm:text-2xl">Documentos da Etapa: {etapaNome}</CardTitle>
           <CardDescription>Gerenciamento de documentos necessários para esta etapa</CardDescription>
         </div>
         {isAdmin && (
-          <div className="flex gap-2">
+          <div className="flex shrink-0 gap-2">
             <AuditHistoryPanel processId={processId} />
             <Button onClick={onAddDocument}>
               <Upload className="h-4 w-4 mr-2" />
