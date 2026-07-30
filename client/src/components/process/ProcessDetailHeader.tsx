@@ -1,7 +1,8 @@
 
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { CalendarDays, FileText, User, AlertCircle, CheckCircle, Clock } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
+import { AlertCircle, CheckCircle, Clock } from "lucide-react";
 import { ProcessWithDetails } from "@/services/core/types";
 
 interface ProcessDetailHeaderProps {
@@ -109,43 +110,41 @@ export default function ProcessDetailHeader({ process }: ProcessDetailHeaderProp
         </CardContent>
       </Card>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card>
-          <CardContent className="p-4 flex items-center gap-3">
-            <User className="h-5 w-5 text-eregulariza-primary" />
-            <div>
-              <p className="text-sm text-eregulariza-description">Cliente</p>
-              <p className="font-medium text-eregulariza-gray">
-                {process.client?.name || 'Não informado'}
-              </p>
-            </div>
-          </CardContent>
-        </Card>
+      {/* Resumo do processo — um único bloco, sem repetir a mesma
+          informação em cards separados. Segue o padrão Stripe de
+          "faixa de metadados": rótulo pequeno em cima, valor abaixo,
+          colunas separadas por espaço em branco em vez de cada dado
+          ganhar seu próprio card com borda. */}
+      <Card>
+        <CardContent className="grid grid-cols-2 gap-x-6 gap-y-5 p-6 sm:grid-cols-4">
+          <div className="min-w-0">
+            <p className="text-sm text-eregulariza-description">Cliente</p>
+            <p className="font-medium text-eregulariza-gray break-words">
+              {process.client?.name || 'Não informado'}
+            </p>
+          </div>
 
-        <Card>
-          <CardContent className="p-4 flex items-center gap-3">
-            <FileText className="h-5 w-5 text-eregulariza-primary" />
-            <div>
-              <p className="text-sm text-eregulariza-description">Tipo</p>
-              <p className="font-medium text-eregulariza-gray">
-                {process.process_type?.name || 'Não informado'}
-              </p>
-            </div>
-          </CardContent>
-        </Card>
+          <div className="min-w-0">
+            <p className="text-sm text-eregulariza-description">Tipo</p>
+            <p className="font-medium text-eregulariza-gray break-words">
+              {process.process_type?.name || 'Não informado'}
+            </p>
+          </div>
 
-        <Card>
-          <CardContent className="p-4 flex items-center gap-3">
-            <CalendarDays className="h-5 w-5 text-eregulariza-primary" />
-            <div>
-              <p className="text-sm text-eregulariza-description">Criado em</p>
-              <p className="font-medium text-eregulariza-gray">
-                {new Date(process.created_at).toLocaleDateString('pt-BR')}
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+          <div className="min-w-0">
+            <p className="text-sm text-eregulariza-description">Criado em</p>
+            <p className="font-medium text-eregulariza-gray">
+              {new Date(process.created_at).toLocaleDateString('pt-BR')}
+            </p>
+          </div>
+
+          <div className="min-w-0">
+            <p className="text-sm text-eregulariza-description">Progresso</p>
+            <p className="font-medium text-eregulariza-gray">{process.progress || 0}%</p>
+            <Progress value={process.progress || 0} className="mt-2 h-1.5" />
+          </div>
+        </CardContent>
+      </Card>
 
       {process.description && (
         <Card>

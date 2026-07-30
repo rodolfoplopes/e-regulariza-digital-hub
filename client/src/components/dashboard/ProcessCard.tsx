@@ -217,7 +217,7 @@ export default function ProcessCard({ process }: ProcessCardProps) {
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button variant="outline" size="sm" asChild>
-                  <Link to={`/admin/processo/${process.id}/editar`}>
+                  <Link to={`/processo/${process.id}/editar`}>
                     <Edit className="h-4 w-4" />
                   </Link>
                 </Button>

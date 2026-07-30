@@ -65,7 +65,7 @@ export default function EnhancedDashboardStats({ processes, isLoading }: Enhance
     <>
       {/* Status Counters */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <Card className="border-l-4 border-blue-500">
+        <Card>
           <CardContent className="p-4 flex items-center">
             <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center mr-3">
               <Hourglass className="h-5 w-5 text-blue-500" />
@@ -77,7 +77,7 @@ export default function EnhancedDashboardStats({ processes, isLoading }: Enhance
           </CardContent>
         </Card>
         
-        <Card className="border-l-4 border-yellow-500">
+        <Card>
           <CardContent className="p-4 flex items-center">
             <div className="h-10 w-10 rounded-full bg-yellow-100 flex items-center justify-center mr-3">
               <AlertTriangle className="h-5 w-5 text-yellow-500" />
@@ -89,7 +89,7 @@ export default function EnhancedDashboardStats({ processes, isLoading }: Enhance
           </CardContent>
         </Card>
         
-        <Card className="border-l-4 border-green-500">
+        <Card>
           <CardContent className="p-4 flex items-center">
             <div className="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center mr-3">
               <CheckCircle className="h-5 w-5 text-green-500" />
@@ -101,7 +101,7 @@ export default function EnhancedDashboardStats({ processes, isLoading }: Enhance
           </CardContent>
         </Card>
         
-        <Card className="border-l-4 border-orange-500">
+        <Card>
           <CardContent className="p-4 flex items-center">
             <div className="h-10 w-10 rounded-full bg-orange-100 flex items-center justify-center mr-3">
               <FileWarning className="h-5 w-5 text-orange-500" />

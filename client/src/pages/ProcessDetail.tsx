@@ -6,7 +6,6 @@ import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
 import MobileNav from "@/components/dashboard/MobileNav";
 import ProcessDetailHeader from "@/components/process/ProcessDetailHeader";
-import ProcessInfoCards from "@/components/process/ProcessInfoCards";
 import ProcessDetailContent from "@/components/process/ProcessDetailContent";
 import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 import { processService } from "@/services/processService";
@@ -98,8 +97,7 @@ export default function ProcessDetail() {
         
         <main className="flex-1 overflow-y-auto p-4 md:p-6">
           <ProcessDetailHeader process={process} />
-          <ProcessInfoCards process={process} />
-          <ProcessDetailContent 
+          <ProcessDetailContent
             process={process} 
             isAdmin={isAdmin}
             onProcessUpdate={handleProcessUpdate}
