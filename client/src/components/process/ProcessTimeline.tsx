@@ -119,7 +119,7 @@ export default function ProcessTimeline({
               isInProgress ? "border-blue-200 bg-blue-50/50" :
               isPending ? "border-gray-200 bg-white" : "border-gray-200",
               isActive ? "ring-2 ring-eregulariza-primary/20" : "",
-              onStageClick ? "cursor-pointer hover:scale-[1.01]" : ""
+              onStageClick ? "cursor-pointer" : ""
             )}
             onClick={() => onStageClick && onStageClick(stage.id)}
           >

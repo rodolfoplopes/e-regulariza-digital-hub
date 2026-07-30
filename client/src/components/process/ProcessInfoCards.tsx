@@ -1,6 +1,7 @@
 
 import { FileText, Clock, User } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
 import { ProcessWithDetails } from "@/services/core/types";
 
 interface ProcessInfoCardsProps {
@@ -26,10 +27,11 @@ export default function ProcessInfoCards({ process }: ProcessInfoCardsProps) {
           <Clock className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{process.progress || 0}%</div>
+          <div className="text-2xl font-bold mb-2">{process.progress || 0}%</div>
+          <Progress value={process.progress || 0} className="h-1.5" />
         </CardContent>
       </Card>
-      
+
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Cliente</CardTitle>

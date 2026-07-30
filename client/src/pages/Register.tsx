@@ -194,7 +194,7 @@ export default function Register() {
       <Layout hideFooter>
         <div className="flex items-center justify-center min-h-[calc(100vh-64px)] bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
           <div className="w-full max-w-md">
-            <Card className="shadow-lg border-0">
+            <Card className="shadow-sm border">
               <CardHeader className="space-y-1 text-center">
                 <div className="w-16 h-16 rounded-full eregulariza-gradient flex items-center justify-center mx-auto mb-4">
                   <span className="font-bold text-white text-2xl">e</span>
@@ -224,7 +224,7 @@ export default function Register() {
     <Layout hideFooter>
       <div className="flex items-center justify-center min-h-[calc(100vh-64px)] bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
         <div className="w-full max-w-md">
-          <Card className="shadow-lg border-0">
+          <Card className="shadow-sm border">
             <CardHeader className="space-y-1 text-center">
               <div className="w-16 h-16 rounded-full eregulariza-gradient flex items-center justify-center mx-auto mb-4">
                 <span className="font-bold text-white text-2xl">e</span>

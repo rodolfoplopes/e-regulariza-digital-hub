@@ -192,7 +192,7 @@ export default function Login() {
     <Layout hideFooter>
       <div className="flex items-center justify-center min-h-[calc(100vh-64px)] bg-white py-12 px-4 sm:px-6 lg:px-8">
         <div className="w-full max-w-md">
-          <Card className="shadow-lg border-0">
+          <Card className="shadow-sm border">
             <CardHeader className="space-y-1 text-center">
               <div className="flex justify-center mb-4">
                 <Logo variant="circular" size="md" />
