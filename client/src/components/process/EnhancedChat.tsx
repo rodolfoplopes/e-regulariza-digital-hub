@@ -265,7 +265,7 @@ export default function EnhancedChat({
               <div className="flex max-w-[80%]">
                 {message.sender.type === "admin" && (
                   <Avatar className="h-8 w-8 mr-2 mt-1">
-                    <AvatarFallback className="bg-[#3C00F8] text-white text-xs">
+                    <AvatarFallback className="bg-[#10223D] text-white text-xs">
                       {message.sender.initials}
                     </AvatarFallback>
                   </Avatar>
@@ -277,7 +277,7 @@ export default function EnhancedChat({
                       "rounded-lg p-3 shadow-sm",
                       message.sender.type === "admin" 
                         ? "bg-gray-100 text-gray-900" 
-                        : "bg-[#3C00F8] text-white"
+                        : "bg-[#10223D] text-white"
                     )}
                   >
                     {message.tags && message.tags.length > 0 && (
@@ -330,7 +330,7 @@ export default function EnhancedChat({
                 
                 {message.sender.type === "client" && (
                   <Avatar className="h-8 w-8 ml-2 mt-1">
-                    <AvatarFallback className="bg-[#3C00F8] text-white text-xs">
+                    <AvatarFallback className="bg-[#10223D] text-white text-xs">
                       {message.sender.initials}
                     </AvatarFallback>
                   </Avatar>
@@ -440,7 +440,7 @@ export default function EnhancedChat({
               value={newMessage}
               onChange={(e) => setNewMessage(e.target.value)}
               placeholder="Digite sua mensagem..."
-              className="border-gray-200 focus:border-[#3C00F8]"
+              className="border-gray-200 focus:border-[#10223D]"
               maxLength={1000}
             />
           </div>
@@ -448,7 +448,7 @@ export default function EnhancedChat({
           <Button
             type="submit"
             disabled={isSending || (!newMessage.trim() && !attachments.length)}
-            className="h-10 bg-[#3C00F8] hover:bg-[#3C00F8]/90 text-white"
+            className="h-10 bg-[#10223D] hover:bg-[#10223D]/90 text-white"
           >
             {isSending ? (
               "Enviando..."

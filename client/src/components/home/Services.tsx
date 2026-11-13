@@ -72,8 +72,8 @@ export function Services() {
             >
               <CardContent className="p-6">
                 <div className="flex items-center gap-4 mb-4">
-                  <div className="w-12 h-12 rounded-lg bg-[#4318FF]/10 flex items-center justify-center flex-shrink-0">
-                    <service.icon className="w-6 h-6 text-[#4318FF]" />
+                  <div className="w-12 h-12 rounded-lg bg-[#10223D]/10 flex items-center justify-center flex-shrink-0">
+                    <service.icon className="w-6 h-6 text-[#10223D]" />
                   </div>
                   <h3 className="font-semibold text-lg" data-testid={`text-service-title-${service.id}`}>
                     {service.title}
@@ -83,7 +83,7 @@ export function Services() {
                   variant="ghost" 
                   size="sm" 
                   asChild 
-                  className="text-[#4318FF] hover:text-[#4318FF]/80 p-0 h-auto"
+                  className="text-[#10223D] hover:text-[#10223D]/80 p-0 h-auto"
                 >
                   <Link to={service.url} data-testid={`link-service-${service.id}`}>
                     Saiba mais

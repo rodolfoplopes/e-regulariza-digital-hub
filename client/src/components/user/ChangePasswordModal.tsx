@@ -206,7 +206,7 @@ export default function ChangePasswordModal({ isOpen, onClose }: ChangePasswordM
             </Button>
             <Button 
               type="submit" 
-              className="bg-[#3C00F8] hover:bg-[#3C00F8]/90 text-white"
+              className="bg-[#10223D] hover:bg-[#10223D]/90 text-white"
               disabled={isLoading || !newPassword || !confirmPassword}
             >
               {isLoading ? "Alterando..." : "Alterar senha"}

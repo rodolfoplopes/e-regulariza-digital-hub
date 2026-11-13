@@ -24,7 +24,7 @@ const faqs = [
   },
   {
     question: "O que é due diligence imobiliária e quando fazer?",
-    answer: "É a análise minuciosa da documentação de um imóvel — registros, certidões, contratos — para identificar riscos e confirmar a regularidade jurídica antes de uma compra, venda ou incorporação. Recomendamos sempre antes de fechar negócio.",
+    answer: "É a análise minuciosa da documentação de um imóvel (registros, certidões, contratos) para identificar riscos e confirmar a regularidade jurídica antes de uma compra, venda ou incorporação. Recomendamos sempre antes de fechar negócio.",
   },
   {
     question: "O que é o ITCMD (ITD no Rio de Janeiro)?",

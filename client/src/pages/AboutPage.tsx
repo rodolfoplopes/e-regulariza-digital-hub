@@ -41,7 +41,7 @@ export default function AboutPage() {
           <div className="container mx-auto px-4 lg:px-8">
             <div className="max-w-3xl mx-auto text-center mb-12">
               <h1 className="text-4xl md:text-5xl font-bold mb-6">
-                Sobre a <span className="text-[#4318FF]">e-regulariza</span>
+                Sobre a <span className="text-[#10223D]">e-regulariza</span>
               </h1>
               <p className="text-lg text-muted-foreground">
                 Somos uma empresa especializada em regularização imobiliária, 
@@ -54,8 +54,8 @@ export default function AboutPage() {
               {stats.map((stat, index) => (
                 <Card key={index} className="border-0 shadow-sm text-center" data-testid={`card-stat-${index}`}>
                   <CardContent className="p-6">
-                    <div className="w-12 h-12 rounded-lg bg-[#4318FF]/10 flex items-center justify-center mx-auto mb-4">
-                      <stat.icon className="w-6 h-6 text-[#4318FF]" />
+                    <div className="w-12 h-12 rounded-lg bg-[#10223D]/10 flex items-center justify-center mx-auto mb-4">
+                      <stat.icon className="w-6 h-6 text-[#10223D]" />
                     </div>
                     <p className="text-3xl font-bold mb-1">{stat.value}</p>
                     <p className="text-sm text-muted-foreground">{stat.label}</p>

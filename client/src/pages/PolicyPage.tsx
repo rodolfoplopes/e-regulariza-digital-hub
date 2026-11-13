@@ -21,8 +21,8 @@ function PolicySection({ id, title, icon: Icon, summary, content, isOpen, onTogg
     <Card id={id} className="border-0 shadow-sm scroll-mt-24" data-testid={`card-${id}`}>
       <CardHeader className="pb-4">
         <div className="flex items-start gap-4">
-          <div className="w-12 h-12 rounded-lg bg-[#4318FF]/10 flex items-center justify-center flex-shrink-0">
-            <Icon className="w-6 h-6 text-[#4318FF]" />
+          <div className="w-12 h-12 rounded-lg bg-[#10223D]/10 flex items-center justify-center flex-shrink-0">
+            <Icon className="w-6 h-6 text-[#10223D]" />
           </div>
           <div className="flex-1">
             <CardTitle className="text-xl mb-2">{title}</CardTitle>
@@ -34,7 +34,7 @@ function PolicySection({ id, title, icon: Icon, summary, content, isOpen, onTogg
         <Button
           variant="outline"
           onClick={onToggle}
-          className="mb-4 border-[#4318FF] text-[#4318FF] hover:bg-[#4318FF] hover:text-white"
+          className="mb-4 border-[#10223D] text-[#10223D] hover:bg-[#10223D] hover:text-white"
           data-testid={`button-toggle-${id}`}
         >
           {isOpen ? (

@@ -10,7 +10,7 @@ export function Hero() {
           <div className="space-y-6">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight" data-testid="text-hero-title">
               Regularização imobiliária{" "}
-              <span className="text-[#4318FF]">simplificada e transparente</span>
+              <span className="text-[#10223D]">simplificada e transparente</span>
             </h1>
             <p className="text-lg md:text-xl text-muted-foreground max-w-lg" data-testid="text-hero-description">
               Chega de complicações. A e-regulariza simplifica todo o processo para você, desde a análise até a entrega da sua documentação. É mais rápido do que você imagina!

@@ -21,7 +21,7 @@ const testimonials = [
 
 export function Testimonials() {
   return (
-    <section className="py-16 md:py-24 bg-gradient-to-b from-[#4318FF]/5 to-transparent" data-testid="section-testimonials">
+    <section className="py-16 md:py-24 bg-gradient-to-b from-[#10223D]/5 to-transparent" data-testid="section-testimonials">
       <div className="container mx-auto px-4 lg:px-8">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold mb-4" data-testid="text-testimonials-title">
@@ -35,7 +35,7 @@ export function Testimonials() {
           {testimonials.map((testimonial, index) => (
             <Card key={index} className="border shadow-sm" data-testid={`card-testimonial-${index}`}>
               <CardContent className="p-6">
-                <Quote className="w-10 h-10 text-[#4318FF] mb-4" />
+                <Quote className="w-10 h-10 text-[#10223D] mb-4" />
                 <p className="text-muted-foreground mb-6" data-testid={`text-testimonial-quote-${index}`}>
                   "{testimonial.quote}"
                 </p>

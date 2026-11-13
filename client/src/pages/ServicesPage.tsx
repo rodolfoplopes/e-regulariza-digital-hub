@@ -9,7 +9,7 @@ import { FileCheck, MessageCircle } from "lucide-react";
 import familiaUsucapiaoImg from "@/assets/familia-usucapiao.jpg";
 
 const services = [
-  // Principais — Reurb nas três modalidades.
+  // Principais: Reurb nas três modalidades.
   {
     id: "reurb-e",
     category: "Reurb",
@@ -28,7 +28,7 @@ const services = [
     id: "reurb-nominal",
     category: "Reurb",
     title: "Reurb Nominal",
-    description: "Modalidade de Regularização Fundiária Urbana em que a titulação é outorgada diretamente e de forma individualizada a cada ocupante, em vez de soluções coletivas ou condominiais — indicada quando é possível identificar e separar a posse de cada beneficiário.",
+    description: "Modalidade de Regularização Fundiária Urbana em que a titulação é outorgada diretamente e de forma individualizada a cada ocupante, em vez de soluções coletivas ou condominiais. Indicada quando é possível identificar e separar a posse de cada beneficiário.",
     featured: true,
     needsLegalReview: true,
   },
@@ -142,7 +142,7 @@ export default function ServicesPage() {
     <div className="min-h-screen flex flex-col">
       <Header />
       <main className="flex-1">
-        <section className="py-16 md:py-24 bg-gradient-to-b from-[#4318FF]/5 to-transparent">
+        <section className="py-16 md:py-24 bg-gradient-to-b from-[#10223D]/5 to-transparent">
           <div className="container mx-auto px-4 lg:px-8">
             <div className="max-w-3xl mx-auto text-center mb-12">
               <h1 className="text-4xl md:text-5xl font-bold mb-6" data-testid="text-services-title">
@@ -160,7 +160,7 @@ export default function ServicesPage() {
             >
               <div className="flex flex-col lg:flex-row">
                 {/* Conteúdo */}
-                <div className="flex-1 bg-gradient-to-br from-[#4318FF] to-[#6B4EFF] p-6 flex flex-col justify-center">
+                <div className="flex-1 bg-gradient-to-br from-[#10223D] to-[#1E3A61] p-6 flex flex-col justify-center">
                   <div className="flex items-center gap-2 mb-3">
                     <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center">
                       <FileCheck className="w-4 h-4 text-white" />
@@ -168,10 +168,10 @@ export default function ServicesPage() {
                     <span className="text-white/80 text-xs font-medium uppercase tracking-wider">Serviço em Destaque</span>
                   </div>
                   <h3 className="font-bold text-lg text-white mb-2" data-testid="text-banner-title">
-                    Reurb — Regularização Fundiária Urbana
+                    Reurb: Regularização Fundiária Urbana
                   </h3>
                   <p className="text-sm text-white/90 mb-4 leading-relaxed" data-testid="text-banner-description">
-                    Conduzimos a Reurb nas suas três modalidades — Reurb-E, Reurb-S e Reurb Nominal — levando titulação e acesso à infraestrutura urbana para quem ocupa um imóvel de forma irregular, com o procedimento certo pra cada caso.
+                    Conduzimos a Reurb nas suas três modalidades (Reurb-E, Reurb-S e Reurb Nominal), levando titulação e acesso à infraestrutura urbana para quem ocupa um imóvel de forma irregular, com o procedimento certo para cada caso.
                   </p>
                   <div>
                     <Button
@@ -193,7 +193,7 @@ export default function ServicesPage() {
                     alt="Família em seu lar"
                     className="w-full h-full object-cover"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-r from-[#4318FF]/30 to-transparent lg:from-[#6B4EFF]/50"></div>
+                  <div className="absolute inset-0 bg-gradient-to-r from-[#10223D]/30 to-transparent lg:from-[#1E3A61]/50"></div>
                 </div>
               </div>
             </div>
@@ -203,16 +203,16 @@ export default function ServicesPage() {
                 <Card
                   key={index}
                   id={service.id}
-                  className={`border shadow-sm hover:shadow-md transition-shadow scroll-mt-24 ${service.featured ? "border-[#4318FF]/30 ring-1 ring-[#4318FF]/10" : ""}`}
+                  className={`border shadow-sm hover:shadow-md transition-shadow scroll-mt-24 ${service.featured ? "border-[#10223D]/30 ring-1 ring-[#10223D]/10" : ""}`}
                   data-testid={`card-service-${index}`}
                 >
                   <CardHeader className="pb-2">
                     <div className="flex items-center justify-between gap-2">
-                      <Badge variant="outline" className="w-fit text-[#4318FF] border-[#4318FF]">
+                      <Badge variant="outline" className="w-fit text-[#10223D] border-[#10223D]">
                         {service.category}
                       </Badge>
                       {service.featured && (
-                        <Badge className="w-fit bg-[#4318FF] text-white hover:bg-[#4318FF]">
+                        <Badge className="w-fit bg-[#10223D] text-white hover:bg-[#10223D]">
                           Principal
                         </Badge>
                       )}
@@ -223,7 +223,7 @@ export default function ServicesPage() {
                     <p className="text-sm text-muted-foreground">{service.description}</p>
                     {service.needsLegalReview && (
                       <p className="text-xs text-amber-600 bg-amber-50 border border-amber-200 rounded px-2 py-1">
-                        Descrição preliminar — aguardando revisão jurídica.
+                        Descrição preliminar, aguardando revisão jurídica.
                       </p>
                     )}
                   </CardContent>

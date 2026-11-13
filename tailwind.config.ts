@@ -20,8 +20,9 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ['Montserrat', 'ui-sans-serif', 'system-ui'],
-        montserrat: ['Montserrat', 'sans-serif'],
+        sans: ['Inter', 'ui-sans-serif', 'system-ui'],
+        montserrat: ['Inter', 'sans-serif'],
+        mono: ['"IBM Plex Mono"', 'ui-monospace', 'monospace'],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -68,8 +69,9 @@ export default {
         "admin-editor": "hsl(var(--admin-editor))",
         "admin-viewer": "hsl(var(--admin-viewer))",
         // Cores atualizadas da identidade visual e-regulariza
-        "eregulariza-primary": "#3C00F8",
-        "eregulariza-secondary": "#06D7A5", 
+        "eregulariza-primary": "#10223D",
+        "eregulariza-primary-light": "#1E3A61",
+        "eregulariza-secondary": "#06D7A5",
         "eregulariza-gray": "#373535",
         "eregulariza-surface": "#F5F5F5",
         "eregulariza-accent": "hsl(var(--eregulariza-accent))",

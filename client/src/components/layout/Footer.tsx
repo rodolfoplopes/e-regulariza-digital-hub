@@ -32,7 +32,7 @@ export default function Footer() {
   const whatsappLink = "https://wa.me/5521999011999";
 
   return (
-    <footer className="bg-gradient-to-r from-[#4318FF] to-[#00D9A5]">
+    <footer className="bg-gradient-to-r from-[#10223D] to-[#00D9A5]">
       <div className="container mx-auto px-4 py-12 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="space-y-4">

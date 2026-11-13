@@ -43,7 +43,7 @@ export function HowItWorks() {
           {steps.map((step, index) => (
             <Card key={index} className="border shadow-sm" data-testid={`step-${index}`}>
               <CardContent className="p-6">
-                <h3 className="font-semibold text-lg mb-2 text-[#4318FF]" data-testid={`step-title-${index}`}>
+                <h3 className="font-semibold text-lg mb-2 text-[#10223D]" data-testid={`step-title-${index}`}>
                   {step.title}
                 </h3>
                 <p className="text-sm text-muted-foreground" data-testid={`step-desc-${index}`}>
