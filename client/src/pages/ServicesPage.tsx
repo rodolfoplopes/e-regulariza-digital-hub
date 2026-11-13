@@ -9,30 +9,58 @@ import { FileCheck, MessageCircle } from "lucide-react";
 import familiaUsucapiaoImg from "@/assets/familia-usucapiao.jpg";
 
 const services = [
+  // Principais — Reurb nas três modalidades.
   {
-    id: "incorporacao",
-    category: "Incorporação",
-    title: "Incorporação Imobiliária",
-    description: "A incorporação imobiliária viabiliza a construção e comercialização de unidades autônomas (apartamentos ou casas) em edifícios ou conjuntos habitacionais antes da conclusão das obras, envolvendo a elaboração de memoriais, registros e cumprimento de normas legais.",
+    id: "reurb-e",
+    category: "Reurb",
+    title: "Reurb-E (Interesse Específico)",
+    description: "Modalidade de Regularização Fundiária Urbana voltada a ocupações de interesse específico, em geral imóveis de maior valor ou ocupantes com capacidade de arcar com os custos do processo. Formaliza a titulação e o acesso a infraestrutura urbana.",
+    featured: true,
+  },
+  {
+    id: "reurb-s",
+    category: "Reurb",
+    title: "Reurb-S (Interesse Social)",
+    description: "Modalidade de Regularização Fundiária Urbana destinada a núcleos urbanos informais ocupados predominantemente por população de baixa renda, com isenção de custas e emolumentos cartorários conforme a legislação.",
+    featured: true,
+  },
+  {
+    id: "reurb-nominal",
+    category: "Reurb",
+    title: "Reurb Nominal",
+    description: "Modalidade de Regularização Fundiária Urbana em que a titulação é outorgada diretamente e de forma individualizada a cada ocupante, em vez de soluções coletivas ou condominiais — indicada quando é possível identificar e separar a posse de cada beneficiário.",
+    featured: true,
+    needsLegalReview: true,
   },
   {
     id: "duediligence",
     category: "Consultoria",
     title: "Due Diligence",
     description: "A due diligence imobiliária consiste na análise minuciosa de documentos e informações de um imóvel, como registros, certidões e contratos, para verificar sua regularidade jurídica e identificar possíveis riscos antes de transações como compra, venda ou incorporação.",
+    featured: true,
   },
   {
-    id: "reurb",
-    category: "Regularização",
-    title: "Reurb (Reurb-E e Reurb-S)",
-    description: "A Regularização Fundiária Urbana (Reurb) promove a legalização de ocupações irregulares, dividida em Reurb-E (interesse específico, para imóveis de maior valor) e Reurb-S (interesse social, para populações de baixa renda), garantindo titulação e acesso a serviços urbanos.",
+    id: "incorporacao",
+    category: "Incorporação",
+    title: "Incorporação Imobiliária",
+    description: "A incorporação imobiliária viabiliza a construção e comercialização de unidades autônomas (apartamentos ou casas) em edifícios ou conjuntos habitacionais antes da conclusão das obras, envolvendo a elaboração de memoriais, registros e cumprimento de normas legais.",
+    featured: true,
   },
   {
-    id: "adjudicacao",
-    category: "Judicial",
-    title: "Adjudicação Compulsória",
-    description: "A adjudicação compulsória é um procedimento judicial que garante ao comprador de um imóvel a transferência formal da propriedade quando o vendedor se recusa ou está impossibilitado de lavrar a escritura definitiva, mesmo após o pagamento total do valor acordado.",
+    id: "instituicao",
+    category: "Condomínio",
+    title: "Instituição e Especificação de Condomínio",
+    description: "Este serviço formaliza juridicamente a criação de um condomínio, dividindo um prédio ou conjunto de prédios em unidades autônomas com áreas comuns e exclusivas definidas. Inclui a elaboração de documentos e registros necessários em cartório.",
+    featured: true,
   },
+  {
+    id: "itcmd",
+    category: "Tributário",
+    title: "ITCMD / ITD",
+    description: "Gestão e emissão de guias do Imposto sobre Transmissão Causa Mortis e Doação (ITCMD, chamado de ITD no Rio de Janeiro), devido em heranças e doações de imóveis, garantindo conformidade fiscal para a regularização do bem.",
+    featured: true,
+  },
+  // Demais serviços.
   {
     id: "contrato",
     category: "Contratos",
@@ -58,22 +86,16 @@ const services = [
     description: "Inclui a obtenção de certidões imobiliárias e pessoais, como certidão de ônus reais, negativa de débitos ou de propriedade, essenciais para comprovar a regularidade de imóveis e garantir segurança em negociações ou processos legais.",
   },
   {
-    id: "tributos",
+    id: "itbi",
     category: "Tributário",
-    title: "Emissão de ITBI e ITCMD",
-    description: "Envolve a gestão e emissão de guias para pagamento do Imposto sobre Transmissão de Bens Imóveis (ITBI), aplicável em transações de compra e venda, e do Imposto sobre Transmissão Causa Mortis e Doação (ITCMD), para heranças e doações, garantindo conformidade fiscal.",
+    title: "Emissão de ITBI",
+    description: "Gestão e emissão de guias para pagamento do Imposto sobre Transmissão de Bens Imóveis (ITBI), devido em transações de compra e venda de imóveis, garantindo conformidade fiscal para o registro da transação.",
   },
   {
     id: "georreferenciamento",
     category: "Topografia",
     title: "Georreferenciamento",
     description: "O georreferenciamento é o processo técnico de mapeamento e delimitação de imóveis, especialmente rurais, utilizando coordenadas geográficas. Este serviço atende às exigências do INCRA e dos cartórios para regularização e atualização de registros.",
-  },
-  {
-    id: "instituicao",
-    category: "Condomínio",
-    title: "Instituição e Especificação de Condomínio",
-    description: "Este serviço formaliza juridicamente a criação de um condomínio, dividindo um prédio ou conjunto de prédios em unidades autônomas com áreas comuns e exclusivas definidas. Inclui a elaboração de documentos e registros necessários em cartório.",
   },
   {
     id: "loteamentos",
@@ -103,7 +125,7 @@ const services = [
 
 export default function ServicesPage() {
   const { hash } = useLocation();
-  const whatsappLink = "https://wa.me/5521999011999?text=Olá! Gostaria de saber mais sobre Usucapião Extrajudicial.";
+  const whatsappLink = "https://wa.me/5521999011999?text=Olá! Gostaria de saber mais sobre Reurb.";
 
   useEffect(() => {
     if (hash) {
@@ -131,10 +153,10 @@ export default function ServicesPage() {
               </p>
             </div>
 
-            {/* Banner Destaque - Usucapião Extrajudicial */}
-            <div 
+            {/* Banner Destaque - Reurb */}
+            <div
               className="relative rounded-lg overflow-hidden mb-6"
-              data-testid="banner-usucapiao"
+              data-testid="banner-reurb"
             >
               <div className="flex flex-col lg:flex-row">
                 {/* Conteúdo */}
@@ -146,14 +168,14 @@ export default function ServicesPage() {
                     <span className="text-white/80 text-xs font-medium uppercase tracking-wider">Serviço em Destaque</span>
                   </div>
                   <h3 className="font-bold text-lg text-white mb-2" data-testid="text-banner-title">
-                    Usucapião Extrajudicial
+                    Reurb — Regularização Fundiária Urbana
                   </h3>
                   <p className="text-sm text-white/90 mb-4 leading-relaxed" data-testid="text-banner-description">
-                    A usucapião extrajudicial permite a aquisição da propriedade de um imóvel por meio de procedimento administrativo em cartório, sem necessidade de ação judicial, desde que cumpridos os requisitos legais de posse prolongada e pacífica.
+                    Conduzimos a Reurb nas suas três modalidades — Reurb-E, Reurb-S e Reurb Nominal — levando titulação e acesso à infraestrutura urbana para quem ocupa um imóvel de forma irregular, com o procedimento certo pra cada caso.
                   </p>
                   <div>
-                    <Button 
-                      asChild 
+                    <Button
+                      asChild
                       size="sm"
                       className="bg-[#06D7A5] hover:bg-[#05c496] text-white border-0"
                     >
@@ -166,9 +188,9 @@ export default function ServicesPage() {
                 </div>
                 {/* Imagem */}
                 <div className="lg:w-1/3 h-48 lg:h-auto relative">
-                  <img 
-                    src={familiaUsucapiaoImg} 
-                    alt="Família em seu lar" 
+                  <img
+                    src={familiaUsucapiaoImg}
+                    alt="Família em seu lar"
                     className="w-full h-full object-cover"
                   />
                   <div className="absolute inset-0 bg-gradient-to-r from-[#4318FF]/30 to-transparent lg:from-[#6B4EFF]/50"></div>
@@ -178,20 +200,32 @@ export default function ServicesPage() {
 
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {services.map((service, index) => (
-                <Card 
-                  key={index} 
+                <Card
+                  key={index}
                   id={service.id}
-                  className="border shadow-sm hover:shadow-md transition-shadow scroll-mt-24" 
+                  className={`border shadow-sm hover:shadow-md transition-shadow scroll-mt-24 ${service.featured ? "border-[#4318FF]/30 ring-1 ring-[#4318FF]/10" : ""}`}
                   data-testid={`card-service-${index}`}
                 >
                   <CardHeader className="pb-2">
-                    <Badge variant="outline" className="w-fit text-[#4318FF] border-[#4318FF]">
-                      {service.category}
-                    </Badge>
+                    <div className="flex items-center justify-between gap-2">
+                      <Badge variant="outline" className="w-fit text-[#4318FF] border-[#4318FF]">
+                        {service.category}
+                      </Badge>
+                      {service.featured && (
+                        <Badge className="w-fit bg-[#4318FF] text-white hover:bg-[#4318FF]">
+                          Principal
+                        </Badge>
+                      )}
+                    </div>
                   </CardHeader>
                   <CardContent className="space-y-3">
                     <h3 className="font-bold text-lg">{service.title}</h3>
                     <p className="text-sm text-muted-foreground">{service.description}</p>
+                    {service.needsLegalReview && (
+                      <p className="text-xs text-amber-600 bg-amber-50 border border-amber-200 rounded px-2 py-1">
+                        Descrição preliminar — aguardando revisão jurídica.
+                      </p>
+                    )}
                   </CardContent>
                 </Card>
               ))}

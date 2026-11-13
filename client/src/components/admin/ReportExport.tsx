@@ -72,9 +72,9 @@ export default function ReportExport({ clients = [], serviceTypes = [] }: Report
   ];
   
   const mockServices: ServiceType[] = serviceTypes.length > 0 ? serviceTypes : [
-    { id: "service-1", name: "Usucapião" },
+    { id: "service-1", name: "Reurb-E" },
     { id: "service-2", name: "Retificação de Área" },
-    { id: "service-3", name: "Inventário Extrajudicial" },
+    { id: "service-3", name: "Due Diligence" },
     { id: "service-4", name: "Regularização Fundiária" }
   ];
   

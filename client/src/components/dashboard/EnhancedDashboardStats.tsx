@@ -28,8 +28,8 @@ export default function EnhancedDashboardStats({ processes, isLoading }: Enhance
   // Calculate process types
   const processTypes: ProcessType[] = [
     {
-      type: "Usucapião",
-      count: processes.filter(p => p.type.includes("Usucapião")).length,
+      type: "Reurb",
+      count: processes.filter(p => p.type.includes("Reurb")).length,
       icon: Home,
       color: "text-green-600",
       bgColor: "bg-green-100"
@@ -42,18 +42,18 @@ export default function EnhancedDashboardStats({ processes, isLoading }: Enhance
       bgColor: "bg-blue-100"
     },
     {
-      type: "Inventário",
-      count: processes.filter(p => p.type.includes("Inventário")).length,
+      type: "Due Diligence",
+      count: processes.filter(p => p.type.includes("Due Diligence")).length,
       icon: Users,
       color: "text-purple-600",
       bgColor: "bg-purple-100"
     },
     {
       type: "Outros",
-      count: processes.filter(p => 
-        !p.type.includes("Usucapião") && 
-        !p.type.includes("Retificação") && 
-        !p.type.includes("Inventário")
+      count: processes.filter(p =>
+        !p.type.includes("Reurb") &&
+        !p.type.includes("Retificação") &&
+        !p.type.includes("Due Diligence")
       ).length,
       icon: FileWarning,
       color: "text-orange-600",

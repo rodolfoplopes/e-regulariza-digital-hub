@@ -7,48 +7,32 @@ import {
 
 const faqs = [
   {
-    question: "O que é usucapião?",
-    answer: "Usucapião é um instituto jurídico que permite a aquisição da propriedade de um bem imóvel mediante a posse prolongada e contínua, sob certas condições. A posse deve ser pacífica, pública e ininterrupta, com um período variando conforme o tipo de usucapião, e deve estar acompanhada da intenção de ser dono do bem.",
-  },
-  {
-    question: "Por que fazer uma usucapião?",
-    answer: "Realizar uma usucapião é uma forma de legalizar a propriedade de um imóvel que já é possuído de fato por um indivíduo, mas não de direito, por falta de documentação formal ou adequada. É especialmente útil em casos onde o possuidor não possui título formal de propriedade ou o título existente possui problemas.",
-  },
-  {
     question: "Por que é necessário regularizar um imóvel?",
     answer: "A regularização assegura que o imóvel esteja conforme as normas legais e urbanísticas, permitindo transações legais como venda, financiamento ou herança. Também protege o proprietário contra reivindicações futuras e litígios sobre a propriedade.",
   },
   {
-    question: "Quais imóveis não são passíveis de usucapião?",
-    answer: "Imóveis públicos, como aqueles pertencentes ao governo municipal, estadual ou federal, não são passíveis de usucapião. Além disso, propriedades utilizadas por empresas públicas para a prestação de serviços públicos também são excluídas.",
+    question: "O que é a Reurb (Regularização Fundiária Urbana)?",
+    answer: "A Reurb é o conjunto de medidas jurídicas, urbanísticas e ambientais que regulariza núcleos urbanos informais, levando titulação e acesso à infraestrutura urbana a quem já ocupa um imóvel de fato, mas não tem a documentação em dia.",
   },
   {
-    question: "Quais são os tipos de usucapião existentes?",
-    answer: "Existem vários tipos de usucapião no Brasil, cada um com requisitos específicos: Usucapião Extraordinária, Usucapião Ordinária, Usucapião Especial Urbana, Usucapião Especial Rural, Usucapião de Bem Móvel, Usucapião Familiar e Usucapião Administrativa. Cada tipo atende a diferentes situações legais e sociais.",
+    question: "Qual a diferença entre Reurb-E e Reurb-S?",
+    answer: "A Reurb-E (interesse específico) se aplica a ocupações em que os moradores têm condição de arcar com os custos do processo. A Reurb-S (interesse social) é voltada a núcleos ocupados predominantemente por população de baixa renda, com isenção de custas e emolumentos cartorários.",
   },
   {
-    question: "O que é adjudicação compulsória?",
-    answer: "É uma ação que permite a alguém obter formalmente a propriedade de um imóvel quando o vendedor se recusa a realizar a escritura pública definitiva de compra e venda, apesar de existir um contrato que estipula a transferência. É um recurso jurídico usado para forçar a transferência da propriedade ao comprador.",
+    question: "O que é a Reurb Nominal?",
+    answer: "É a modalidade em que a titulação é outorgada diretamente a cada ocupante, de forma individualizada, em vez de uma solução coletiva ou condominial. Indicamos essa modalidade quando é possível identificar e separar claramente a posse de cada beneficiário.",
   },
   {
-    question: "Qual a diferença entre adjudicação compulsória e usucapião?",
-    answer: "A usucapião baseia-se na posse prolongada do imóvel sob certas condições, enquanto a adjudicação compulsória é baseada em um contrato de compra e venda. A adjudicação é geralmente mais direta quando há documentos claros e um acordo prévio, enquanto a usucapião pode ser mais complexa e demorada.",
+    question: "O que é due diligence imobiliária e quando fazer?",
+    answer: "É a análise minuciosa da documentação de um imóvel — registros, certidões, contratos — para identificar riscos e confirmar a regularidade jurídica antes de uma compra, venda ou incorporação. Recomendamos sempre antes de fechar negócio.",
   },
   {
-    question: "Quem pode requerer a usucapião e para que serve?",
-    answer: "O indivíduo que exerça posse mansa, pacífica e ininterrupta de um imóvel pode requerer a usucapião. Este instituto jurídico serve para regularizar a situação registral de um imóvel quando o possuidor, não sendo o titular de domínio registrado, busca reconhecer e formalizar sua propriedade.",
+    question: "O que é o ITCMD (ITD no Rio de Janeiro)?",
+    answer: "É o imposto estadual devido na transmissão de bens por herança ou doação. No Rio de Janeiro é chamado de ITD. O pagamento é condição para o registro do imóvel em nome do herdeiro ou donatário.",
   },
   {
-    question: "Possuo um imóvel que foi objeto de usucapião, posso usucapir outro?",
-    answer: "Sim, a lei não impede que uma pessoa que já tenha adquirido um imóvel por usucapião adquira outro da mesma forma, desde que cumpra os requisitos legais, como o prazo prescricional de posse que varia de 5 a 15 anos, dependendo do caso específico, e a função social do imóvel.",
-  },
-  {
-    question: "Posso usucapir apenas uma parte do terreno?",
-    answer: "Sim, é possível usucapir apenas uma fração do terreno, desde que você detenha a posse exclusiva e incontestada dessa parte específica. A usucapião de parte de um imóvel é comum em situações onde múltiplos indivíduos possuem diferentes partes de um mesmo terreno.",
-  },
-  {
-    question: "O proprietário do imóvel que comprei faleceu, posso usucapir?",
-    answer: "Neste caso, a usucapião não é o procedimento apropriado. Em vez disso, deve-se iniciar um processo de inventário para tratar da sucessão dos bens do falecido. A abertura de inventário é essencial para resolver as questões de propriedade e garantir o recolhimento de impostos devidos.",
+    question: "O que é instituição de condomínio?",
+    answer: "É o ato jurídico que formaliza a divisão de um prédio ou conjunto de prédios em unidades autônomas, com áreas comuns e exclusivas definidas, viabilizando o registro individual de cada unidade.",
   },
 ];
 

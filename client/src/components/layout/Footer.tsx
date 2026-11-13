@@ -8,10 +8,11 @@ const footerContent = {
     { label: "Sobre nós", url: "/sobre" }
   ],
   serviceLinks: [
-    { label: "Usucapião Extrajudicial", url: "/servicos#usucapiao" },
+    { label: "Reurb-E", url: "/servicos#reurb-e" },
+    { label: "Reurb-S", url: "/servicos#reurb-s" },
+    { label: "Reurb Nominal", url: "/servicos#reurb-nominal" },
     { label: "Incorporação Imobiliária", url: "/servicos#incorporacao" },
-    { label: "Due Diligence", url: "/servicos#duediligence" },
-    { label: "Reurb", url: "/servicos#reurb" }
+    { label: "Due Diligence", url: "/servicos#duediligence" }
   ],
   contactInfo: {
     email: "sac@e-regulariza.com",

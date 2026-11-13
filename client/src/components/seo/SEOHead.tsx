@@ -14,7 +14,7 @@ export default function SEOHead({
   title = "e-regulariza - Regularização Imobiliária Digital",
   description = "Simplifique sua regularização imobiliária com nossa plataforma digital. Acompanhe processos em tempo real com total transparência.",
   canonical,
-  keywords = "regularização imobiliária, usucapião, inventário extrajudicial, retificação de área, digital, transparente",
+  keywords = "regularização imobiliária, reurb, reurb-e, reurb-s, reurb nominal, retificação de área, due diligence imobiliária, digital, transparente",
   ogImage = "https://images.unsplash.com/photo-1527576539890-dfa815648363",
   noIndex = false
 }: SEOHeadProps) {

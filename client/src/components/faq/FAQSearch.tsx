@@ -25,12 +25,12 @@ interface FAQSearchProps {
 
 const categories = [
   'Todos',
-  'Usucapião',
+  'Reurb',
   'Regularização',
   'Documentação',
   'Condomínio',
-  'Inventário',
-  'Adjudicação',
+  'Tributário',
+  'Consultoria',
   'Desmembramento',
   'Compra e Venda',
   'Comparação'

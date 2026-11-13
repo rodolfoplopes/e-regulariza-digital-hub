@@ -73,9 +73,9 @@ export default function EnhancedReportExport({ clients = [], serviceTypes = [] }
   ];
 
   const mockServices: ServiceType[] = serviceTypes.length > 0 ? serviceTypes : [
-    { id: "service-1", name: "Usucapião" },
+    { id: "service-1", name: "Reurb-E" },
     { id: "service-2", name: "Retificação de Área" },
-    { id: "service-3", name: "Inventário Extrajudicial" },
+    { id: "service-3", name: "Due Diligence" },
     { id: "service-4", name: "Regularização Fundiária" }
   ];
 
@@ -119,7 +119,7 @@ export default function EnhancedReportExport({ clients = [], serviceTypes = [] }
     // Simulate CSV generation
     const csvContent = [
       "Processo,Cliente,Tipo,Status,Progresso,Data Criação,Prazo",
-      "ER-240101-00001,João da Silva,Usucapião,Em Andamento,75%,01/01/2024,01/06/2024",
+      "ER-240101-00001,João da Silva,Reurb-E,Em Andamento,75%,01/01/2024,01/06/2024",
       "ER-240102-00002,Maria Souza,Retificação,Pendente,25%,02/01/2024,02/06/2024",
     ].join('\n');
 

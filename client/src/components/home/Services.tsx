@@ -1,20 +1,26 @@
 import { Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, FileCheck, Building2, Search, MapPin, Scale, FileText } from "lucide-react";
+import { ArrowRight, Building2, Search, MapPin, FileText, Building, Receipt } from "lucide-react";
 
 const services = [
   {
-    id: "usucapiao",
-    icon: FileCheck,
-    title: "Usucapião Extrajudicial",
-    url: "/servicos#usucapiao",
+    id: "reurb-e",
+    icon: MapPin,
+    title: "Reurb-E",
+    url: "/servicos#reurb-e",
   },
   {
-    id: "incorporacao",
-    icon: Building2,
-    title: "Incorporação Imobiliária",
-    url: "/servicos#incorporacao",
+    id: "reurb-s",
+    icon: MapPin,
+    title: "Reurb-S",
+    url: "/servicos#reurb-s",
+  },
+  {
+    id: "reurb-nominal",
+    icon: MapPin,
+    title: "Reurb Nominal",
+    url: "/servicos#reurb-nominal",
   },
   {
     id: "duediligence",
@@ -23,16 +29,22 @@ const services = [
     url: "/servicos#duediligence",
   },
   {
-    id: "reurb",
-    icon: MapPin,
-    title: "Reurb",
-    url: "/servicos#reurb",
+    id: "incorporacao",
+    icon: Building2,
+    title: "Incorporação Imobiliária",
+    url: "/servicos#incorporacao",
   },
   {
-    id: "adjudicacao",
-    icon: Scale,
-    title: "Adjudicação Compulsória",
-    url: "/servicos#adjudicacao",
+    id: "instituicao",
+    icon: Building,
+    title: "Instituição de Condomínio",
+    url: "/servicos#instituicao",
+  },
+  {
+    id: "itcmd",
+    icon: Receipt,
+    title: "ITCMD / ITD",
+    url: "/servicos#itcmd",
   },
   {
     id: "retificacao",

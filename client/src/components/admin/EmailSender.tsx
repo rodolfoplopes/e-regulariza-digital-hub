@@ -60,9 +60,9 @@ export default function EmailSender({ clients = [], processes = [] }: EmailSende
   ];
   
   const mockProcesses: Process[] = processes.length > 0 ? processes : [
-    { id: "proc-1", title: "Usucapião - Lote 123", clientId: "client-1" },
+    { id: "proc-1", title: "Reurb-E - Lote 123", clientId: "client-1" },
     { id: "proc-2", title: "Retificação de Área", clientId: "client-2" },
-    { id: "proc-3", title: "Inventário Extrajudicial", clientId: "client-3" }
+    { id: "proc-3", title: "Due Diligence", clientId: "client-3" }
   ];
   
   const emailTemplates = [

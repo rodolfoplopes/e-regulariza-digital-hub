@@ -12,10 +12,10 @@ const initialFooterData: FooterData = {
     { label: "Carreiras", url: "/carreiras" }
   ],
   serviceLinks: [
-    { label: "Usucapião", url: "/servicos/usucapiao" },
-    { label: "Inventário Extrajudicial", url: "/servicos/inventario" },
-    { label: "Retificação de Área", url: "/servicos/retificacao" },
-    { label: "Demarcação de Imóvel", url: "/servicos/demarcacao" }
+    { label: "Reurb-E", url: "/servicos#reurb-e" },
+    { label: "Reurb-S", url: "/servicos#reurb-s" },
+    { label: "Reurb Nominal", url: "/servicos#reurb-nominal" },
+    { label: "Retificação de Área", url: "/servicos/retificacao" }
   ],
   contactInfo: {
     email: "contato@eregulariza.com.br",

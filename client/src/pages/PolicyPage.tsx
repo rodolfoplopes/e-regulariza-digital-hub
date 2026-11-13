@@ -88,7 +88,7 @@ const privacyContent = (
       <h4 className="font-semibold text-foreground mb-2">2. Para que usamos seus dados?</h4>
       <p className="mb-2">Utilizamos seus dados para:</p>
       <ul className="list-disc pl-5 space-y-1">
-        <li>Analisar e processar serviços solicitados (ex: usucapião, Reurb, retificações);</li>
+        <li>Analisar e processar serviços solicitados (ex: Reurb, due diligence, retificações);</li>
         <li>Elaborar documentos jurídicos;</li>
         <li>Cumprir obrigações legais e regulatórias;</li>
         <li>Aperfeiçoar nossa plataforma e atendimento.</li>
@@ -140,7 +140,7 @@ const termsContent = (
       <h4 className="font-semibold text-foreground mb-2">1. Sobre a e-regulariza</h4>
       <p>
         Somos uma plataforma jurídica especializada em regularização de imóveis, com foco em 
-        soluções extrajudiciais, como usucapião, Reurb, retificações e registros.
+        soluções extrajudiciais, como Reurb, retificações e registros.
       </p>
     </div>
 

@@ -104,7 +104,7 @@ export default function ProcessNotifications({
     {
       id: "5",
       title: "Novo processo iniciado",
-      message: "Um novo processo de usucapião foi iniciado para você.",
+      message: "Um novo processo de Reurb foi iniciado para você.",
       timestamp: "28/04/2023 11:30",
       isRead: true,
       type: "system",
