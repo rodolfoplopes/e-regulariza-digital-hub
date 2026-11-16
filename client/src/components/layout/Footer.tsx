@@ -8,15 +8,12 @@ const footerContent = {
     { label: "Sobre nós", url: "/sobre" }
   ],
   serviceLinks: [
-    { label: "Reurb-E", url: "/servicos#reurb-e" },
-    { label: "Reurb-S", url: "/servicos#reurb-s" },
-    { label: "Reurb Nominal", url: "/servicos#reurb-nominal" },
-    { label: "Incorporação Imobiliária", url: "/servicos#incorporacao" },
-    { label: "Due Diligence", url: "/servicos#duediligence" }
+    { label: "Imóveis e Empreendimentos", url: "/#imoveis-empreendimentos" },
+    { label: "Territórios e REURB", url: "/#territorios-reurb" },
+    { label: "Rural, Ambiental e Crédito", url: "/#rural-ambiental-credito" },
   ],
   contactInfo: {
-    email: "sac@e-regulariza.com",
-    phone: "+55 (21) 99901-1999",
+    email: "falecom@e-regulariza.com",
     location: "Itaguaí, RJ"
   },
   legalLinks: [
@@ -80,7 +77,7 @@ export default function Footer() {
               </li>
               <li>
                 <a href={whatsappLink} target="_blank" rel="noopener noreferrer" className="text-white/70 hover:text-white text-sm transition-colors">
-                  {footerContent.contactInfo.phone}
+                  Fale no WhatsApp
                 </a>
               </li>
               <li className="text-white/70 text-sm">

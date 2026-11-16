@@ -1,95 +1,63 @@
-import { Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { ArrowRight, Building2, Search, MapPin, FileText, Building, Receipt } from "lucide-react";
+import { ArrowRight, Building2, MapPinned, Sprout } from "lucide-react";
 
-const services = [
+const pillars = [
   {
-    id: "reurb-e",
-    icon: MapPin,
-    title: "Reurb-E",
-    url: "/servicos#reurb-e",
-  },
-  {
-    id: "reurb-s",
-    icon: MapPin,
-    title: "Reurb-S",
-    url: "/servicos#reurb-s",
-  },
-  {
-    id: "reurb-nominal",
-    icon: MapPin,
-    title: "Reurb Nominal",
-    url: "/servicos#reurb-nominal",
-  },
-  {
-    id: "duediligence",
-    icon: Search,
-    title: "Due Diligence",
-    url: "/servicos#duediligence",
-  },
-  {
-    id: "incorporacao",
+    id: "imoveis-empreendimentos",
     icon: Building2,
-    title: "Incorporação Imobiliária",
-    url: "/servicos#incorporacao",
+    title: "Imóveis e Empreendimentos",
+    description: "Diagnosticamos, regularizamos e acompanhamos construções, condomínios e incorporações, com gestão de carteiras inteiras de imóveis em um único fluxo.",
   },
   {
-    id: "instituicao",
-    icon: Building,
-    title: "Instituição de Condomínio",
-    url: "/servicos#instituicao",
+    id: "territorios-reurb",
+    icon: MapPinned,
+    title: "Territórios e REURB",
+    description: "Conduzimos REURB-S e REURB-E, regularizamos parcelamentos antigos e apoiamos operacionalmente governos na organização documental de territórios inteiros.",
   },
   {
-    id: "itcmd",
-    icon: Receipt,
-    title: "ITCMD / ITD",
-    url: "/servicos#itcmd",
-  },
-  {
-    id: "retificacao",
-    icon: FileText,
-    title: "Retificação de Registros",
-    url: "/servicos#retificacao",
+    id: "rural-ambiental-credito",
+    icon: Sprout,
+    title: "Rural, Ambiental e Crédito",
+    description: "Organizamos o CAR, atualizamos cadastros e ITR rural e preparamos dossiês técnicos para viabilizar linhas de crédito verde.",
   },
 ];
 
 export function Services() {
   return (
-    <section className="py-16 md:py-24 bg-muted/30" data-testid="section-services-home">
+    <section className="py-16 md:py-24" data-testid="section-pillars">
       <div className="container mx-auto px-4 lg:px-8">
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4" data-testid="text-services-title">
-            Serviços que resolvem sua vida imobiliária
+          <h2 className="text-3xl md:text-4xl font-bold mb-4" data-testid="text-pillars-title">
+            Nossos três pilares de atuação
           </h2>
         </div>
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
-          {services.map((service) => (
-            <Card 
-              key={service.id} 
-              className="border-0 shadow-sm hover-elevate transition-all" 
-              data-testid={`card-service-${service.id}`}
+          {pillars.map((pillar) => (
+            <Card
+              key={pillar.id}
+              className="border-0 shadow-sm hover-elevate transition-all"
+              data-testid={`card-pillar-${pillar.id}`}
             >
               <CardContent className="p-6">
                 <div className="flex items-center gap-4 mb-4">
                   <div className="w-12 h-12 rounded-lg bg-[#10223D]/10 flex items-center justify-center flex-shrink-0">
-                    <service.icon className="w-6 h-6 text-[#10223D]" />
+                    <pillar.icon className="w-6 h-6 text-[#10223D]" />
                   </div>
-                  <h3 className="font-semibold text-lg" data-testid={`text-service-title-${service.id}`}>
-                    {service.title}
+                  <h3 className="font-semibold text-lg" data-testid={`text-pillar-title-${pillar.id}`}>
+                    {pillar.title}
                   </h3>
                 </div>
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  asChild 
-                  className="text-[#10223D] hover:text-[#10223D]/80 p-0 h-auto"
+                <p className="text-sm text-muted-foreground mb-4" data-testid={`text-pillar-desc-${pillar.id}`}>
+                  {pillar.description}
+                </p>
+                <a
+                  href={`#${pillar.id}`}
+                  className="inline-flex items-center text-sm font-medium text-[#10223D] hover:text-[#17335c]"
+                  data-testid={`link-pillar-${pillar.id}`}
                 >
-                  <Link to={service.url} data-testid={`link-service-${service.id}`}>
-                    Saiba mais
-                    <ArrowRight className="w-4 h-4 ml-1" />
-                  </Link>
-                </Button>
+                  Saiba mais
+                  <ArrowRight className="w-4 h-4 ml-1" />
+                </a>
               </CardContent>
             </Card>
           ))}

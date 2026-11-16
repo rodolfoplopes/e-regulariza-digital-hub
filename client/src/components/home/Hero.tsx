@@ -49,13 +49,13 @@ export function Hero() {
           >
             <span className="block">Inteligência e gestão</span>
             <span className="block">
-              para <span className="text-[#00B388]">regularizar</span>
+              para <span className="text-[#00B388]">regularização</span>
             </span>
-            <span className="block">imóveis.</span>
+            <span className="block">imobiliária e fundiária.</span>
           </h1>
 
           <p className="text-lg md:text-xl text-muted-foreground max-w-xl mb-10" data-testid="text-hero-description">
-            Organizamos documentos, identificamos pendências cadastrais e coordenamos as etapas da regularização para empresas, condomínios e proprietários.
+            Avaliamos a viabilidade, apresentamos os caminhos legais e conduzimos a regularização até a conclusão.
           </p>
 
           <div className="relative inline-flex mb-14">

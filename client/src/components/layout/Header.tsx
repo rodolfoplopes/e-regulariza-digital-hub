@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X, User, Bell, Settings } from "lucide-react";
+import { Menu, X, User, Bell, Settings, Mail, MessageCircle, Instagram, Linkedin, Facebook } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Logo } from "@/components/brand/Logo";
 import {
@@ -24,6 +24,32 @@ export default function Header() {
 
   return (
     <header className="bg-white shadow-sm border-b sticky top-0 z-50">
+      <div className="hidden md:flex items-center justify-end gap-4 border-b bg-eregulariza-surface px-4 py-1.5 text-xs text-eregulariza-gray sm:px-6 lg:px-8">
+        <a href="mailto:falecom@e-regulariza.com" className="flex items-center gap-1.5 hover:text-eregulariza-primary">
+          <Mail className="h-3.5 w-3.5" />
+          falecom@e-regulariza.com
+        </a>
+        <a
+          href="https://wa.me/5521999011999"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-1.5 hover:text-eregulariza-primary"
+        >
+          <MessageCircle className="h-3.5 w-3.5" />
+          Fale no WhatsApp
+        </a>
+        <div className="flex items-center gap-3 border-l pl-4">
+          <a href="https://www.facebook.com/eregulariza" target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="hover:text-eregulariza-primary">
+            <Facebook className="h-3.5 w-3.5" />
+          </a>
+          <a href="https://www.instagram.com/e_regulariza" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="hover:text-eregulariza-primary">
+            <Instagram className="h-3.5 w-3.5" />
+          </a>
+          <a href="https://www.linkedin.com/company/e-regulariza/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="hover:text-eregulariza-primary">
+            <Linkedin className="h-3.5 w-3.5" />
+          </a>
+        </div>
+      </div>
       <div className="container mx-auto flex justify-between items-center h-20 px-4 sm:px-6 lg:px-8">
         <div className="flex items-center">
           <Link to="/" className="flex items-center">
